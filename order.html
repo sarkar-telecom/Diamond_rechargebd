@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Place New Order - Sarkar Telecom</title>
+  <title>New Order - Sarkar Telecom</title>
   <style>
     body {
       margin: 0;
@@ -12,12 +12,11 @@
       color: #fff;
       text-align: center;
     }
-
     header {
       background: #111;
       color: cyan;
       padding: 12px;
-      font-size: 20px;
+      font-size: 22px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -26,177 +25,188 @@
     header .logo {
       font-weight: bold;
     }
-    header .user {
-      font-size: 14px;
+    header button {
+      background: crimson;
+      border: none;
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    header button:hover {
+      background: red;
     }
 
-    h2 {
-      color: cyan;
-      margin-top: 20px;
-      text-shadow: 0 0 10px cyan;
-    }
-
-    .order-box {
+    .card {
+      margin: 30px auto;
       background: #111;
       padding: 20px;
-      margin: 20px;
-      border-radius: 15px;
-      box-shadow: 0 0 20px #0ff;
+      width: 350px;
+      border-radius: 16px;
+      box-shadow: 0 0 20px cyan;
     }
-
+    .card h2 {
+      color: cyan;
+      margin-bottom: 20px;
+    }
     input {
       width: 90%;
       padding: 12px;
       margin: 10px 0;
+      border-radius: 10px;
       border: none;
-      border-radius: 8px;
       font-size: 16px;
       text-align: center;
     }
-
-    .amounts {
+    .grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin: 20px 0;
+      gap: 10px;
+      margin: 15px 0;
     }
-    .amounts button {
-      padding: 15px;
+    .grid button {
+      padding: 14px;
       border: none;
       border-radius: 10px;
-      background: #111;
-      color: cyan;
-      font-size: 16px;
+      background: cyan;
+      color: #000;
+      font-weight: bold;
       cursor: pointer;
-      box-shadow: 0 0 10px cyan;
       transition: 0.2s;
     }
-    .amounts button:hover {
-      background: cyan;
-      color: #000;
+    .grid button:hover {
+      background: #0ff;
+      box-shadow: 0 0 10px cyan;
     }
-    .amounts button.active {
-      background: cyan;
+    .submit-btn {
+      margin-top: 15px;
+      padding: 14px;
+      width: 100%;
+      background: lime;
       color: #000;
-      font-weight: bold;
-    }
-
-    .confirm-btn {
-      background: cyan;
-      color: #000;
-      font-size: 18px;
-      padding: 15px;
-      width: 90%;
       border: none;
       border-radius: 12px;
-      cursor: pointer;
+      font-size: 18px;
       font-weight: bold;
-      margin-top: 20px;
-    }
-
-    nav {
-      background: #111;
-      display: flex;
-      justify-content: space-around;
-      padding: 12px;
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-    }
-    nav button {
-      background: #222;
-      color: #fff;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 8px;
       cursor: pointer;
     }
-    nav button:hover {
-      background: cyan;
-      color: #000;
+    .submit-btn:hover {
+      background: #0f0;
+      box-shadow: 0 0 15px lime;
     }
   </style>
 </head>
 <body>
 
   <header>
-    <div class="logo">⚡ Sarkar Telecom</div>
-    <div class="user">👤 saMrat IT</div>
+    <div class="logo">📱 New Order</div>
+    <button onclick="logout()">Logout</button>
   </header>
 
-  <h2>📝 Place New Order</h2>
-
-  <div class="order-box">
-    <input type="text" id="profileId" placeholder="Profile ID / Number (with country code)" />
-    <small>উদাহরণ: +8801XXXXXXXXX অথবা গেম প্রোফাইল আইডি</small>
-
-    <div class="amounts">
-      <button onclick="selectAmount(10)">10</button>
-      <button onclick="selectAmount(50)">50</button>
-      <button onclick="selectAmount(100)">100</button>
-      <button onclick="selectAmount(200)">200</button>
-      <button onclick="selectAmount(500)">500</button>
-      <button onclick="selectAmount(1000)">1000</button>
-      <button onclick="selectAmount(2000)">2000</button>
-      <button onclick="selectAmount(5000)">5000</button>
-      <button onclick="selectAmount(10000)">10000</button>
+  <div class="card">
+    <h2>Enter Details</h2>
+    <input type="text" id="profileId" placeholder="Profile ID / Number (with country code)">
+    
+    <div class="grid">
+      <button onclick="setAmount(50)">50</button>
+      <button onclick="setAmount(100)">100</button>
+      <button onclick="setAmount(200)">200</button>
+      <button onclick="setAmount(300)">300</button>
+      <button onclick="setAmount(500)">500</button>
+      <button onclick="setAmount(1000)">1000</button>
     </div>
 
-    <p id="selected">Selected: None</p>
-
-    <button class="confirm-btn" onclick="confirmOrder()">✅ Confirm Order</button>
+    <input type="number" id="amount" placeholder="Or Enter Amount">
+    <button class="submit-btn" onclick="placeOrder()">Confirm Order</button>
   </div>
 
-  <nav>
-    <button onclick="location.href='dashboard.html'">🏠 Home</button>
-    <button onclick="location.href='order.html'">📱 Order</button>
-    <button onclick="location.href='order-history.html'">📜 Orders</button>
-    <button onclick="location.href='profile.html'">👤 Profile</button>
-  </nav>
+  <script type="module">
+    // Firebase Import
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  <script>
-    let selectedAmount = null;
+    // Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyAyhjOsIXNAkBglpRllt0OZIOJYpdB_9-8",
+      authDomain: "diamond-recharge-f7f59.firebaseapp.com",
+      projectId: "diamond-recharge-f7f59",
+      storageBucket: "diamond-recharge-f7f59.appspot.com",
+      messagingSenderId: "657717928489",
+      appId: "1:657717928489:web:70431ebc9afb7002d4b238",
+      measurementId: "G-TDK78BQ8SQ"
+    };
 
-    function selectAmount(amount) {
-      selectedAmount = amount;
-      document.getElementById("selected").innerText = "Selected: " + amount;
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-      let buttons = document.querySelectorAll(".amounts button");
-      buttons.forEach(btn => btn.classList.remove("active"));
+    let currentUser = null;
 
-      event.target.classList.add("active");
+    // Auth Check
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        currentUser = user;
+      } else {
+        window.location.href = "login.html";
+      }
+    });
+
+    // Logout
+    window.logout = function() {
+      signOut(auth).then(() => {
+        localStorage.removeItem("userBalance");
+        window.location.href = "login.html";
+      });
     }
 
-    function confirmOrder() {
-      let profileId = document.getElementById("profileId").value;
+    // Set Amount from Button
+    window.setAmount = function(value) {
+      document.getElementById("amount").value = value;
+    }
 
-      if (!profileId || !selectedAmount) {
-        alert("⚠️ Please enter Profile ID and select an amount!");
+    // Place Order
+    window.placeOrder = async function() {
+      const profileId = document.getElementById("profileId").value.trim();
+      const amount = parseInt(document.getElementById("amount").value);
+
+      if (!profileId || !amount) {
+        alert("⚠ Please enter Profile ID and Amount");
         return;
       }
 
-      // Order Data Save LocalStorage
-      let orders = JSON.parse(localStorage.getItem("orders")) || [];
-      orders.push({
-        id: Date.now(),
-        profileId: profileId,
-        amount: selectedAmount,
-        date: new Date().toLocaleString(),
-        status: "Success"
-      });
-      localStorage.setItem("orders", JSON.stringify(orders));
+      if (!currentUser) {
+        alert("⚠ You must be logged in");
+        return;
+      }
 
-      // Balance Update
-      let balance = localStorage.getItem("balance") || 15000;
-      balance = parseInt(balance) - selectedAmount;
-      localStorage.setItem("balance", balance);
+      const userRef = doc(db, "users", currentUser.uid);
+      const snap = await getDoc(userRef);
+
+      let balance = 0;
+      if (snap.exists()) {
+        balance = snap.data().balance || 0;
+      }
+
+      // Local override
+      let localBalance = localStorage.getItem("userBalance");
+      if (localBalance) {
+        balance = parseInt(localBalance);
+      }
+
+      if (balance < amount) {
+        alert("❌ Not enough balance");
+        return;
+      }
+
+      // Deduct balance
+      let newBalance = balance - amount;
+      await updateDoc(userRef, { balance: newBalance });
+      localStorage.setItem("userBalance", newBalance);
 
       alert("✅ Order placed successfully!");
-
-      // Redirect to Order History
       window.location.href = "order-history.html";
     }
   </script>
-
 </body>
 </html>
