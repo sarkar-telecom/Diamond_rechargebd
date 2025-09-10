@@ -28,10 +28,7 @@
       from { opacity: 0; transform: scale(0.9); }
       to { opacity: 1; transform: scale(1); }
     }
-    h2 {
-      margin-bottom: 20px;
-      color: #00ffe0;
-    }
+    h2 { margin-bottom: 20px; color: #00ffe0; }
     input {
       width: 90%;
       padding: 10px;
@@ -53,34 +50,18 @@
       color: #000;
       transition: 0.3s;
     }
-    button:hover {
-      background: #00cccc;
-    }
+    button:hover { background: #00cccc; }
     #googleLoginBtn {
       margin-top: 15px;
       width: 90%;
       background: #db4437;
       color: #fff;
     }
-    #googleLoginBtn:hover {
-      background: #c1351d;
-    }
-    .welcome-box {
-      text-align: center;
-    }
-    .logout-btn {
-      margin-top: 20px;
-      background: #ff0040;
-      color: #fff;
-    }
-    .logout-btn:hover {
-      background: #cc0033;
-    }
+    #googleLoginBtn:hover { background: #c1351d; }
   </style>
 </head>
 <body>
 
-  <!-- 🔹 Login Box -->
   <div class="login-box">
     <h2>Login</h2>
     <input type="email" id="email" placeholder="Email">
@@ -94,22 +75,12 @@
     <button id="googleLoginBtn">Login with Google</button>
   </div>
 
-  <div class="welcome-box" style="display:none;">
-    <h2 id="welcomeMsg"></h2>
-    <button class="logout-btn" onclick="logout()">Logout</button>
-  </div>
-
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { 
-      getAuth, 
-      GoogleAuthProvider, 
-      signInWithPopup, 
-      signInWithEmailAndPassword,
-      createUserWithEmailAndPassword,
-      sendPasswordResetEmail,
-      onAuthStateChanged,
-      signOut
+      getAuth, GoogleAuthProvider, signInWithPopup,
+      signInWithEmailAndPassword, createUserWithEmailAndPassword,
+      sendPasswordResetEmail, onAuthStateChanged
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
     const firebaseConfig = {
@@ -126,59 +97,45 @@
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
 
-    const loginBox = document.querySelector(".login-box");
-    const welcomeBox = document.querySelector(".welcome-box");
-    const welcomeMsg = document.getElementById("welcomeMsg");
-
-    // 🔹 Track Login State
+    // Already logged in → go dashboard
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        loginBox.style.display = "none";
-        welcomeBox.style.display = "block";
-        welcomeMsg.innerText = `Welcome, ${user.displayName || user.email}`;
-      } else {
-        loginBox.style.display = "block";
-        welcomeBox.style.display = "none";
+        window.location.href = "dashboard.html";
       }
     });
 
-    // 🔹 Google Login
-    document.getElementById("googleLoginBtn").addEventListener("click", () => {
-      signInWithPopup(auth, provider).catch((error) => {
-        alert("Error: " + error.message);
-      });
-    });
-
-    // 🔹 Email Login
+    // Login
     document.getElementById("loginBtn").addEventListener("click", () => {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
-      signInWithEmailAndPassword(auth, email, password).catch(error => {
-        alert("Error: " + error.message);
-      });
+      signInWithEmailAndPassword(auth, email, password)
+        .then(() => window.location.href = "dashboard.html")
+        .catch(err => alert("Error: " + err.message));
     });
 
-    // 🔹 Register
+    // Register
     document.getElementById("registerBtn").addEventListener("click", () => {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
-      createUserWithEmailAndPassword(auth, email, password).catch(error => {
-        alert("Error: " + error.message);
-      });
+      createUserWithEmailAndPassword(auth, email, password)
+        .then(() => window.location.href = "dashboard.html")
+        .catch(err => alert("Error: " + err.message));
     });
 
-    // 🔹 Forgot Password
+    // Reset Password
     document.getElementById("resetBtn").addEventListener("click", () => {
       const email = document.getElementById("email").value;
       sendPasswordResetEmail(auth, email)
         .then(() => alert("Password reset email sent!"))
-        .catch(error => alert("Error: " + error.message));
+        .catch(err => alert("Error: " + err.message));
     });
 
-    // 🔹 Logout
-    window.logout = function () {
-      signOut(auth);
-    }
+    // Google Login
+    document.getElementById("googleLoginBtn").addEventListener("click", () => {
+      signInWithPopup(auth, provider)
+        .then(() => window.location.href = "dashboard.html")
+        .catch(err => alert("Error: " + err.message));
+    });
   </script>
 </body>
 </html>
