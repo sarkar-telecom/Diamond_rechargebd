@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Sarkar Telecom</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<header class="header" role="banner" aria-label="Site header">
+  <div class="brand">
+    <img src="logo.png" class="logo" alt="logo">
+    <div>
+      <div class="site-name">Sarkar Telecom</div>
+      <div class="muted small">Recharge & Topup</div>
+    </div>
+  </div>
+  <div class="actions">
+    <button class="sidebar-toggle" id="sidebarToggle" aria-label="Open menu" title="Menu">
+      <svg width="18" height="14" viewBox="0 0 24 24" fill="none" aria-hidden><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
+    <div id="userInfo" class="kv"><span class="muted">Not signed in</span></div>
+  </div>
+</header>
+
+<aside class="sidebar" id="rightSidebar" aria-hidden="true">
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div style="font-weight:700">Navigation</div>
+      <button class="btn btn-close">✕</button>
+    </div>
+    <nav class="nav">
+      <a href="index.html" class="btn">🏠 Home</a>
+      <a href="dashboard.html" class="btn">📊 Dashboard</a>
+      <a href="order.html" class="btn">📱 New Order</a>
+      <a href="order-history.html" class="btn">📃 Orders</a>
+      <a href="profile.html" class="btn">👤 Profile</a>
+      <a href="balance.html" class="btn">💰 Balance</a>
+      <a href="admin.html" class="btn">⚙️ Admin</a>
+    </nav>
+  </div>
+</aside>
+
+<main class="main container">
+  <div class="card">
+
+
+<style>
+  .site-footer {
+    background:#171a21;
+    padding:20px 10px;
+    margin-top:30px;
+    color:#e7eaf0;
+    text-align:center;
+  }
+  .footer-container {
+    display:flex;
+    justify-content:space-between;
+    align-items:stretch;
+    flex-wrap:wrap;
+    gap:15px;
+  }
+  .footer-nav-grid {
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:10px;
+    flex:1;
+  }
+  .footer-nav-grid button {
+    background:#0f1115;
+    color:#e7eaf0;
+    border:1px solid #2b3347;
+    padding:14px;
+    border-radius:8px;
+    font-size:15px;
+    font-weight:bold;
+    cursor:pointer;
+    transition:0.2s;
+    height:60px;
+  }
+  .footer-nav-grid button:hover {
+    background:#06b6d4;
+    color:#001;
+  }
+
+  .user-card {
+  flex: 0 1 320px;   /* fixed width card */
+  background:#0f1115;
+  border:1px solid #2b3347;
+  border-radius:12px;
+  padding:8px;         /* height কমানোর জন্য কমানো হলো */
+  display:flex;
+  align-items:center;
+  gap:10px;            /* আগে 15px ছিল */
+  min-width:260px;
+  max-width:320px;     
+  margin:auto;       
+  box-shadow:0 4px 12px rgba(0,0,0,0.4);
+  box-sizing:border-box;
+}
+.user-card img {
+  width:70px;   /* আগে ছিল 90px */
+  height:70px;
+  border-radius:50%;
+  border:3px solid #06b6d4;
+  box-shadow:0 0 15px #06b6d4;
+  animation: glowPulse 2s infinite alternate;
+}
+.user-details h3 { margin:4px 0; font-size:16px; color:#06b6d4; }
+.user-details p { margin:3px 0; font-size:13px; font-weight:bold; }
+  .role-text { color:#f97316; font-size:13px; }
+  .balance-gradient {
+    background: linear-gradient(90deg, #06b6d4, #22c55e);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    font-weight:bold;
+  }
+  .phone-text { color:#facc15; }
+  .email-text { color:#3b82f6; }
+
+  .footer-copy {
+    margin-top:20px;
+    font-size:14px;
+    color:#9aa3b2;
+  }
+
+  @media(max-width:768px){
+    .footer-container { flex-direction:column; }
+    .footer-nav-grid { width:100%; grid-template-columns:repeat(3,1fr); }
+    .user-card { width:100%; max-width:100%; justify-content:center; }
+    .user-details { text-align:center; }
+  }
+</style>
+
+<!-- Firebase Auth Detect -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  const userBox = document.getElementById("userBox");
+
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      const name = user.displayName || "Guest User";
+      const email = user.email || "";
+      const photo = user.photoURL || "https://via.placeholder.com/80";
+
+      userBox.innerHTML = `
+        <img src="${photo}" alt="User">
+        <div class="user-details">
+          <h3>${name}</h3>
+          <p class="email-text">${email}</p>
+          <p class="role-text">Logged in</p>
+        </div>
+      `;
+    } else {
+      userBox.innerHTML = `
+        <div class="user-details">
+          <h3>Not Logged In</h3>
+          <p><a href="login.html">🔑 Login</a></p>
+        </div>
+      `;
+    }
+  });
+
+  document.querySelectorAll(".logout-btn").forEach(btn=>{
+    btn.addEventListener("click",(e)=>{
+      e.preventDefault();
+      signOut(auth);
+    });
+  });
+</script>
+  </div>
+</main>
+
+
+<footer class="site-footer" role="contentinfo">
+  <div class="footer-nav">
+    <a class="btn" href="index.html">🏠 Home</a>
+    <a class="btn" href="order.html">📱 Order</a>
+    <a class="btn" href="order-history.html">📃 Orders</a>
+    <a class="btn" href="profile.html">👤 Profile</a>
+  </div>
+</footer>
+
+
+
+<script src="header-loader.js" defer></script>
+<script src="header-script.js" defer></script>
+
+<script>
+(function(){
+  function setup(sidebarId, toggleId, closeSelector){
+    const sidebar = document.getElementById(sidebarId);
+    const toggle = document.getElementById(toggleId);
+    if(!sidebar || !toggle) return;
+    let closeBtn = sidebar.querySelector(closeSelector);
+    if(!closeBtn){
+      closeBtn = document.createElement('button');
+      closeBtn.className = 'btn btn-close';
+      closeBtn.innerText = '✕';
+      closeBtn.style.marginLeft = 'auto';
+      sidebar.insertBefore(closeBtn, sidebar.firstChild);
+    }
+    function setOpen(v){
+      if(v){ sidebar.classList.add('open'); document.body.style.overflow='hidden'; }
+      else { sidebar.classList.remove('open'); document.body.style.overflow=''; }
+    }
+    toggle.addEventListener('click', ()=> setOpen(true));
+    closeBtn.addEventListener('click', ()=> setOpen(false));
+    document.addEventListener('click', (e)=> { if(sidebar.classList.contains('open') && !sidebar.contains(e.target) && !toggle.contains(e.target)) setOpen(false)});
+    document.addEventListener('keydown', (e)=> { if(e.key==='Escape') setOpen(false) });
+  }
+  setup('rightSidebar','sidebarToggle','.btn-close');
+  setup('rightSidebar','sidebarToggleLogin','.btn-close');
+})();
+</script>
+
+</body>
+</html>

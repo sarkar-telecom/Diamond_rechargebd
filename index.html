@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Sarkar Telecom - Home</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<header class="header" role="banner" aria-label="Site header">
+  <div class="brand">
+    <img src="logo.png" class="logo" alt="logo">
+    <div>
+      <div class="site-name">Sarkar Telecom</div>
+      <div class="muted small">Recharge & Topup</div>
+    </div>
+  </div>
+  <div class="actions">
+    <button class="sidebar-toggle" id="sidebarToggle" aria-label="Open menu" title="Menu">
+      <svg width="18" height="14" viewBox="0 0 24 24" fill="none" aria-hidden><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
+    <div id="userInfo" class="kv"><span class="muted">Not signed in</span></div>
+  </div>
+</header>
+
+<aside class="sidebar" id="rightSidebar" aria-hidden="true">
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div style="font-weight:700">Navigation</div>
+      <button class="btn btn-close">✕</button>
+    </div>
+    <nav class="nav">
+      <a href="index.html" class="btn">🏠 Home</a>
+      <a href="dashboard.html" class="btn">📊 Dashboard</a>
+      <a href="order.html" class="btn">📱 New Order</a>
+      <a href="order-history.html" class="btn">📃 Orders</a>
+      <a href="profile.html" class="btn">👤 Profile</a>
+      <a href="balance.html" class="btn">💰 Balance</a>
+      <a href="admin.html" class="btn">⚙️ Admin</a>
+    </nav>
+  </div>
+</aside>
+
+<main class="main container">
+  <div class="card">
+
+
+  <!-- 🔄 টিকার -->
+  <div class="ticker-wrap">
+    <span id="ticker" class="ticker">⏳ সর্বশেষ তথ্য লোড হচ্ছে...</span>
+  </div>
+
+  <section class="hero">
+    <h2>👋 Welcome to Sarkar Telecom</h2>
+    <p>Fast & Secure Online Recharge Service</p>
+    <a href="order.html" class="btn">🚀 Order Now🛒</a>
+  </section>
+
+  <section class="features">
+    <div class="feature">
+      <h3>⚡ Fast Recharge</h3>
+      <p>Instant mobile top-up & gaming recharge.</p>
+    </div>
+    <div class="feature">
+      <h3>📋 Order Tracking</h3>
+      <p>Check & manage all your past orders easily.</p>
+    </div>
+    <div class="feature">
+      <h3>🔐 Secure Login</h3>
+      <p>Safe authentication system with Firebase.</p>
+    </div>
+    <div class="feature">
+      <h3>📱 24/7 Support</h3>
+      <p>Sarkar Telecom here to help you anytime.</p>
+    </div>
+  </section>
+
+  <!-- Footer load -->
+  <div id="footer"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBIIOv-2Laqugv5_HAIRNJllp8YUfYndF8",
+      authDomain: "diamond-recharge-f7f59.firebaseapp.com",
+      projectId: "diamond-recharge-f7f59",
+      storageBucket: "diamond-recharge-f7f59.appspot.com",
+      messagingSenderId: "657717928489",
+      appId: "1:657717928489:web:70431ebc9afb7002d4b238"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const loginBtn=document.getElementById("loginBtn");
+    const logoutBtn=document.getElementById("logoutBtn");
+
+    onAuthStateChanged(auth,(user)=>{
+      if(user){loginBtn.style.display="none";logoutBtn.style.display="inline";}
+      else{loginBtn.style.display="inline";logoutBtn.style.display="none";}
+    });
+    loginBtn.onclick=()=>window.location.href="login.html";
+    logoutBtn.onclick=()=>signOut(auth);
+
+    // Footer Load
+    fetch("footer.html")
+      .then(res=>res.text())
+      .then(html=>{
+        document.getElementById("footer").innerHTML=html;
+        attachUserInfo();
+      });
+
+    // Footer user info
+    function attachUserInfo(){
+      const userBox=document.getElementById("userBox");
+      if(!userBox) return;
+      onAuthStateChanged(auth, async (user)=>{
+        if(user){
+          const snap=await getDoc(doc(db,"users",user.uid));
+          const data=snap.exists()?snap.data():{};
+          const bal=data.balance ?? 0;
+          const role=data.role ?? "User";
+          const phone=data.phone ?? "N/A";
+          userBox.innerHTML=`
+            <img src="${data.avatar || user.photoURL || 'https://i.ibb.co/3pPYd14/user.png'}" width="80" style="border-radius:50%;border:2px solid #06b6d4;">
+            <div>
+              <h3>${data.name || user.displayName || "No Name"} <span style="color:orange">(${role})</span></h3>
+              <p>💎 <span style="color:lime">${bal}</span></p>
+              <p>📱 ${phone}</p>
+              <p>📧 ${user.email}</p>
+            </div>
+          `;
+        } else {
+          userBox.innerHTML="<p>❌ Not logged in</p>";
+        }
+      });
+    }
+
+    // 🔄 Ticker Logic
+    const ticker=document.getElementById("ticker");
+
+    fetch("https://docs.google.com/spreadsheets/d/e/2PACX-1vR4owbSc_h38ouaktOU30TYqH6wy93qYjmW0G5GWXhsBMzsrVSaWzPtVPA7YpyOUmlEpStByT8TxG0-/pub?gid=1098128992&single=true&output=csv")
+      .then(res=>res.text())
+      .then(csv=>{
+        const rows=csv.split("\n").slice(1).reverse();
+        const messages=rows.slice(0,5).map(r=>{
+          const cols=r.split(",");
+          const email=cols[3]||"অজানা ইউজার";
+          const amount=cols[2]||"0";
+          const status=cols[4]||"Waiting";
+          if(status.trim()==="COMPLETE"){
+            return `✅ ${email} সফলভাবে ${amount} 💎 অর্ডার করেছেন`;
+          } else if(status.trim()==="CANCEL"){
+            return `🔴 ${email} ${amount} 💎 ফেরত পেয়েছেন (অর্ডার ক্যান্সেল)`;
+          } else {
+            return `⏳ ${email} ${amount} 💎 অর্ডার দিয়েছেন, অপেক্ষমান...`;
+          }
+        });
+
+        let i=0;
+        function showMessage(){
+          ticker.textContent=messages[i];
+          ticker.classList.remove("ticker");
+          void ticker.offsetWidth; // reflow
+          ticker.classList.add("ticker");
+          i=(i+1)%messages.length;
+          setTimeout(showMessage,30000); 
+          // 20s scroll + 10s gap = 30s
+        }
+        if(messages.length>0) showMessage();
+        else ticker.textContent="কোনও অর্ডারের তথ্য পাওয়া যায়নি।";
+      });
+  </script>
+  </div>
+</main>
+
+
+<footer class="site-footer" role="contentinfo">
+  <div class="footer-nav">
+    <a class="btn" href="index.html">🏠 Home</a>
+    <a class="btn" href="order.html">📱 Order</a>
+    <a class="btn" href="order-history.html">📃 Orders</a>
+    <a class="btn" href="profile.html">👤 Profile</a>
+  </div>
+</footer>
+
+
+
+<script src="header-loader.js" defer></script>
+<script src="header-script.js" defer></script>
+
+<script>
+(function(){
+  function setup(sidebarId, toggleId, closeSelector){
+    const sidebar = document.getElementById(sidebarId);
+    const toggle = document.getElementById(toggleId);
+    if(!sidebar || !toggle) return;
+    let closeBtn = sidebar.querySelector(closeSelector);
+    if(!closeBtn){
+      closeBtn = document.createElement('button');
+      closeBtn.className = 'btn btn-close';
+      closeBtn.innerText = '✕';
+      closeBtn.style.marginLeft = 'auto';
+      sidebar.insertBefore(closeBtn, sidebar.firstChild);
+    }
+    function setOpen(v){
+      if(v){ sidebar.classList.add('open'); document.body.style.overflow='hidden'; }
+      else { sidebar.classList.remove('open'); document.body.style.overflow=''; }
+    }
+    toggle.addEventListener('click', ()=> setOpen(true));
+    closeBtn.addEventListener('click', ()=> setOpen(false));
+    document.addEventListener('click', (e)=> { if(sidebar.classList.contains('open') && !sidebar.contains(e.target) && !toggle.contains(e.target)) setOpen(false)});
+    document.addEventListener('keydown', (e)=> { if(e.key==='Escape') setOpen(false) });
+  }
+  setup('rightSidebar','sidebarToggle','.btn-close');
+  setup('rightSidebar','sidebarToggleLogin','.btn-close');
+})();
+</script>
+
+</body>
+</html>
