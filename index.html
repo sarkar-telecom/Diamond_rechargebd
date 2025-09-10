@@ -3,280 +3,147 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sarkar Telecom</title>
+  <title>Login</title>
   <style>
     body {
       margin: 0;
-      font-family: "Poppins", sans-serif;
-      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      font-family: 'Poppins', sans-serif;
+      background: #0d0d0d;
       color: #fff;
-    }
-
-    header {
-      position: sticky;
-      top: 0;
-      background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(10px);
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 20px;
-      z-index: 1000;
-    }
-
-    .logo {
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: #00fff0;
-      text-shadow: 0 0 10px #00fff0, 0 0 20px #00fff0;
-    }
-
-    .menu-toggle {
-      font-size: 1.8rem;
-      cursor: pointer;
-      color: #00fff0;
-    }
-
-    .sidebar {
-      position: fixed;
-      top: 0;
-      right: -260px;
-      width: 250px;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(15px);
-      box-shadow: -5px 0 15px rgba(0, 0, 0, 0.6);
-      transition: right 0.3s ease-in-out;
-      padding: 20px;
-      z-index: 999;
-    }
-
-    .sidebar.active {
-      right: 0;
-    }
-
-    .sidebar h3 {
-      margin-top: 0;
-      color: #00fff0;
-      text-align: center;
-    }
-
-    .sidebar button {
-      display: block;
-      width: 100%;
-      padding: 12px;
-      margin: 10px 0;
-      border: none;
-      border-radius: 8px;
-      background: rgba(0, 255, 240, 0.1);
-      color: #00fff0;
-      font-size: 1rem;
-      cursor: pointer;
-      text-align: left;
-      transition: 0.3s;
-      text-shadow: 0 0 5px #00fff0;
-    }
-
-    .sidebar button:hover {
-      background: rgba(0, 255, 240, 0.2);
-      box-shadow: 0 0 10px #00fff0;
-    }
-
-    main {
-      padding: 20px;
-    }
-
-    .card {
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 15px;
-      padding: 20px;
-      margin: 20px 0;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 0 10px rgba(0, 255, 240, 0.3);
-    }
-
-    footer {
-      text-align: center;
-      padding: 15px;
-      background: rgba(0, 0, 0, 0.7);
-      margin-top: 20px;
-    }
-
-    .glow-btn {
-      display: inline-block;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 25px;
-      background: rgba(0, 255, 240, 0.1);
-      color: #00fff0;
-      cursor: pointer;
-      text-shadow: 0 0 5px #00fff0;
-      box-shadow: 0 0 10px #00fff0;
-      transition: 0.3s;
-    }
-
-    .glow-btn:hover {
-      background: rgba(0, 255, 240, 0.3);
-      box-shadow: 0 0 20px #00fff0, 0 0 40px #00fff0;
-    }
-
-    /* Popup Modal */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.8);
-      backdrop-filter: blur(8px);
-      display: flex;
-      align-items: center;
       justify-content: center;
-      z-index: 2000;
+      align-items: center;
+      height: 100vh;
     }
-
-    .modal-content {
-      background: rgba(20, 20, 20, 0.95);
-      padding: 25px;
-      border-radius: 12px;
-      width: 90%;
-      max-width: 400px;
+    .login-box {
+      background: rgba(20, 20, 20, 0.8);
+      border-radius: 15px;
+      padding: 30px;
+      width: 320px;
       text-align: center;
-      box-shadow: 0 0 20px #00fff0;
+      box-shadow: 0 0 25px #00ffe0;
     }
-
-    .modal-content input {
-      width: 100%;
+    h2 {
+      margin-bottom: 20px;
+      color: #00ffe0;
+      text-shadow: 0 0 15px #00ffe0;
+    }
+    input {
+      width: 90%;
       padding: 10px;
       margin: 10px 0;
       border: none;
       border-radius: 8px;
-      background: rgba(255, 255, 255, 0.1);
-      color: white;
+      outline: none;
+    }
+    button {
+      margin: 8px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      background: #00ffe0;
+      color: #000;
+      font-weight: bold;
+      box-shadow: 0 0 15px #00ffe0;
+      transition: 0.3s;
+    }
+    button:hover {
+      box-shadow: 0 0 25px #00ffe0, 0 0 50px #00ffe0;
     }
   </style>
 </head>
 <body>
-  <header>
-    <div class="logo">SARKAR TELECOM</div>
-    <div class="menu-toggle" onclick="toggleSidebar()">☰</div>
-  </header>
-
-  <div class="sidebar" id="sidebar">
-    <h3>Menu</h3>
-    <button onclick="showLogin()">Login</button>
-    <button onclick="logoutUser()">Logout</button>
-    <button>Dashboard</button>
-    <button>Profile</button>
-    <button>Recharge</button>
-  </div>
-
-  <main>
-    <div class="card">
-      <h2>Welcome to Sarkar Telecom</h2>
-      <p>Your one-stop solution for mobile recharge.</p>
-      <button class="glow-btn" onclick="showLogin()">Get Started</button>
+  <div class="login-box">
+    <h2>Login</h2>
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
+    <div>
+      <button id="loginBtn">Login</button>
+      <button id="registerBtn">Register</button>
+      <button id="resetBtn">Forgot Password</button>
     </div>
-  </main>
-
-  <footer>
-    <p>© 2025 Sarkar Telecom. All rights reserved.</p>
-  </footer>
-
-  <!-- Login Modal -->
-  <div class="modal" id="loginModal">
-    <div class="modal-content">
-      <h2>Login</h2>
-      <input type="email" id="email" placeholder="Email">
-      <input type="password" id="password" placeholder="Password">
-      <button class="glow-btn" onclick="loginUser()">Login</button>
-      <button class="glow-btn" onclick="registerUser()">Register</button>
-      <button class="glow-btn" onclick="resetPassword()">Forgot Password</button>
-      <hr>
-      <button id="googleLoginBtn" class="glow-btn">Login with Google</button>
-    </div>
+    <hr style="margin:15px 0; border:0; border-top:1px solid #00ffe0;">
+    <button id="googleLoginBtn">Login with Google</button>
   </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult,
-             signInWithEmailAndPassword, createUserWithEmailAndPassword,
-             sendPasswordResetEmail, signOut } 
-    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { 
+      getAuth, 
+      GoogleAuthProvider, 
+      signInWithPopup, 
+      signInWithEmailAndPassword,
+      createUserWithEmailAndPassword,
+      sendPasswordResetEmail 
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-    // Firebase Config (আপনার আসল কনফিগ)
+    // ✅ আপনার config
     const firebaseConfig = {
-      apiKey: "AlzaSyBlIOv-2Laqugv5_HAIRNJIIp8YUfyNdF8",
+      apiKey: "AIzaSyAyhjOsIXNAkBglpRllt0OZIOJYpdB_9-8",
       authDomain: "diamond-recharge-f7f59.firebaseapp.com",
       projectId: "diamond-recharge-f7f59",
-      storageBucket: "diamond-recharge-f7f59.appspot.com",
+      storageBucket: "diamond-recharge-f7f59.firebasestorage.app",
       messagingSenderId: "657717928489",
-      appId: "1:657717928489:web:70431ebc9afb7002d4b238"
+      appId: "1:657717928489:web:70431ebc9afb7002d4b238",
+      measurementId: "G-TDK78BQ8SQ"
     };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
 
-    // Sidebar Toggle
-    window.toggleSidebar = () => {
-      document.getElementById("sidebar").classList.toggle("active");
-    };
+    // 🔹 Google Login
+    document.getElementById("googleLoginBtn").addEventListener("click", () => {
+      signInWithPopup(auth, provider)
+        .then((result) => {
+          const user = result.user;
+          alert("Welcome " + user.displayName);
+          console.log("User Info:", user);
+        })
+        .catch((error) => {
+          alert("Error: " + error.message);
+          console.error(error);
+        });
+    });
 
-    // Modal Toggle
-    window.showLogin = () => {
-      document.getElementById("loginModal").style.display = "flex";
-    };
-
-    // Login
-    window.loginUser = () => {
+    // 🔹 Email Login
+    document.getElementById("loginBtn").addEventListener("click", () => {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
       signInWithEmailAndPassword(auth, email, password)
         .then(userCredential => {
-          alert("Logged in: " + userCredential.user.email);
-          document.getElementById("loginModal").style.display = "none";
+          alert("Logged in as " + userCredential.user.email);
         })
-        .catch(err => alert(err.message));
-    };
+        .catch(error => {
+          alert("Error: " + error.message);
+        });
+    });
 
-    // Register
-    window.registerUser = () => {
+    // 🔹 Register
+    document.getElementById("registerBtn").addEventListener("click", () => {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
       createUserWithEmailAndPassword(auth, email, password)
         .then(userCredential => {
           alert("Registered: " + userCredential.user.email);
         })
-        .catch(err => alert(err.message));
-    };
-
-    // Reset Password
-    window.resetPassword = () => {
-      const email = document.getElementById("email").value;
-      sendPasswordResetEmail(auth, email)
-        .then(() => alert("Password reset email sent!"))
-        .catch(err => alert(err.message));
-    };
-
-    // Logout
-    window.logoutUser = () => {
-      signOut(auth).then(() => alert("Logged out"));
-    };
-
-    // Google Login
-    document.getElementById("googleLoginBtn").addEventListener("click", () => {
-      signInWithRedirect(auth, provider);
+        .catch(error => {
+          alert("Error: " + error.message);
+        });
     });
 
-    getRedirectResult(auth)
-      .then(result => {
-        if (result && result.user) {
-          alert("Welcome " + result.user.displayName);
-          console.log(result.user);
-          document.getElementById("loginModal").style.display = "none";
-        }
-      })
-      .catch(err => console.error(err));
+    // 🔹 Forgot Password
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      const email = document.getElementById("email").value;
+      sendPasswordResetEmail(auth, email)
+        .then(() => {
+          alert("Password reset email sent!");
+        })
+        .catch(error => {
+          alert("Error: " + error.message);
+        });
+    });
   </script>
 </body>
 </html>
