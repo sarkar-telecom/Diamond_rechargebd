@@ -3,85 +3,50 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Diamond Recharge - Login</title>
+  <title>Login - Diamond Recharge</title>
   <style>
     body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #0d0d0d;
+      background: #000;
       color: #fff;
+      font-family: Arial, sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
     }
     .login-box {
-      background: rgba(20, 20, 20, 0.9);
+      background: #111;
       padding: 20px;
-      border-radius: 12px;
-      width: 300px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px cyan;
       text-align: center;
-      box-shadow: 0 0 25px #00ffe0;
-      animation: fadeIn 0.6s ease-in-out;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.9); }
-      to { opacity: 1; transform: scale(1); }
-    }
-    h2 { margin-bottom: 20px; color: #00ffe0; }
-    input {
-      width: 90%;
-      padding: 10px;
-      margin: 8px 0;
-      border: none;
-      border-radius: 6px;
-      outline: none;
-      background: #1a1a1a;
-      color: #fff;
+      width: 300px;
     }
     button {
-      background: #00ffe0;
+      margin-top: 15px;
+      padding: 10px;
+      width: 100%;
       border: none;
-      padding: 10px 15px;
-      margin: 8px 5px;
-      border-radius: 20px;
+      border-radius: 6px;
       cursor: pointer;
       font-weight: bold;
-      color: #000;
-      transition: 0.3s;
     }
-    button:hover { background: #00cccc; }
-    #googleLoginBtn {
-      margin-top: 15px;
-      width: 90%;
-      background: #db4437;
-      color: #fff;
+    .google-btn {
+      background: cyan;
+      color: black;
     }
-    #googleLoginBtn:hover { background: #c1351d; }
   </style>
 </head>
 <body>
-
   <div class="login-box">
     <h2>Login</h2>
-    <input type="email" id="email" placeholder="Email">
-    <input type="password" id="password" placeholder="Password">
-    <div>
-      <button id="loginBtn">Login</button>
-      <button id="registerBtn">Register</button>
-      <button id="resetBtn">Forgot Password</button>
-    </div>
-    <hr style="margin:15px 0; border:1px solid #333;">
-    <button id="googleLoginBtn">Login with Google</button>
+    <button id="googleLoginBtn" class="google-btn">Login with Google</button>
   </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { 
-      getAuth, GoogleAuthProvider, signInWithPopup,
-      signInWithEmailAndPassword, createUserWithEmailAndPassword,
-      sendPasswordResetEmail, onAuthStateChanged
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup } 
+      from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAyhjOsIXNAkBglpRllt0OZIOJYpdB_9-8",
@@ -97,44 +62,21 @@
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
 
-    // Already logged in → go dashboard
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        window.location.href = "dashboard.html";
-      }
-    });
-
-    // Login
-    document.getElementById("loginBtn").addEventListener("click", () => {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      signInWithEmailAndPassword(auth, email, password)
-        .then(() => window.location.href = "dashboard.html")
-        .catch(err => alert("Error: " + err.message));
-    });
-
-    // Register
-    document.getElementById("registerBtn").addEventListener("click", () => {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      createUserWithEmailAndPassword(auth, email, password)
-        .then(() => window.location.href = "dashboard.html")
-        .catch(err => alert("Error: " + err.message));
-    });
-
-    // Reset Password
-    document.getElementById("resetBtn").addEventListener("click", () => {
-      const email = document.getElementById("email").value;
-      sendPasswordResetEmail(auth, email)
-        .then(() => alert("Password reset email sent!"))
-        .catch(err => alert("Error: " + err.message));
-    });
-
-    // Google Login
     document.getElementById("googleLoginBtn").addEventListener("click", () => {
       signInWithPopup(auth, provider)
-        .then(() => window.location.href = "dashboard.html")
-        .catch(err => alert("Error: " + err.message));
+        .then((result) => {
+          const user = result.user;
+          alert("Welcome " + user.displayName);
+
+          // redirect param আছে কিনা চেক করা হবে
+          const params = new URLSearchParams(window.location.search);
+          const redirectPage = params.get("redirect") || "dashboard.html";
+          window.location.href = redirectPage;
+        })
+        .catch((error) => {
+          console.error("Error:", error.message);
+          alert("Login failed: " + error.message);
+        });
     });
   </script>
 </body>
