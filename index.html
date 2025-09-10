@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login</title>
+  <title>Diamond Recharge - Login</title>
   <style>
     body {
       margin: 0;
-      font-family: 'Poppins', sans-serif;
+      font-family: Arial, sans-serif;
       background: #0d0d0d;
       color: #fff;
       display: flex;
@@ -16,44 +16,71 @@
       height: 100vh;
     }
     .login-box {
-      background: rgba(20, 20, 20, 0.8);
-      border-radius: 15px;
-      padding: 30px;
-      width: 320px;
+      background: rgba(20, 20, 20, 0.9);
+      padding: 20px;
+      border-radius: 12px;
+      width: 300px;
       text-align: center;
       box-shadow: 0 0 25px #00ffe0;
+      animation: fadeIn 0.6s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
     }
     h2 {
       margin-bottom: 20px;
       color: #00ffe0;
-      text-shadow: 0 0 15px #00ffe0;
     }
     input {
       width: 90%;
       padding: 10px;
-      margin: 10px 0;
+      margin: 8px 0;
       border: none;
-      border-radius: 8px;
+      border-radius: 6px;
       outline: none;
+      background: #1a1a1a;
+      color: #fff;
     }
     button {
-      margin: 8px;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 25px;
-      cursor: pointer;
       background: #00ffe0;
-      color: #000;
+      border: none;
+      padding: 10px 15px;
+      margin: 8px 5px;
+      border-radius: 20px;
+      cursor: pointer;
       font-weight: bold;
-      box-shadow: 0 0 15px #00ffe0;
+      color: #000;
       transition: 0.3s;
     }
     button:hover {
-      box-shadow: 0 0 25px #00ffe0, 0 0 50px #00ffe0;
+      background: #00cccc;
+    }
+    #googleLoginBtn {
+      margin-top: 15px;
+      width: 90%;
+      background: #db4437;
+      color: #fff;
+    }
+    #googleLoginBtn:hover {
+      background: #c1351d;
+    }
+    .welcome-box {
+      text-align: center;
+    }
+    .logout-btn {
+      margin-top: 20px;
+      background: #ff0040;
+      color: #fff;
+    }
+    .logout-btn:hover {
+      background: #cc0033;
     }
   </style>
 </head>
 <body>
+
+  <!-- 🔹 Login Box -->
   <div class="login-box">
     <h2>Login</h2>
     <input type="email" id="email" placeholder="Email">
@@ -63,8 +90,13 @@
       <button id="registerBtn">Register</button>
       <button id="resetBtn">Forgot Password</button>
     </div>
-    <hr style="margin:15px 0; border:0; border-top:1px solid #00ffe0;">
+    <hr style="margin:15px 0; border:1px solid #333;">
     <button id="googleLoginBtn">Login with Google</button>
+  </div>
+
+  <div class="welcome-box" style="display:none;">
+    <h2 id="welcomeMsg"></h2>
+    <button class="logout-btn" onclick="logout()">Logout</button>
   </div>
 
   <script type="module">
@@ -75,10 +107,11 @@
       signInWithPopup, 
       signInWithEmailAndPassword,
       createUserWithEmailAndPassword,
-      sendPasswordResetEmail 
+      sendPasswordResetEmail,
+      onAuthStateChanged,
+      signOut
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-    // ✅ আপনার config
     const firebaseConfig = {
       apiKey: "AIzaSyAyhjOsIXNAkBglpRllt0OZIOJYpdB_9-8",
       authDomain: "diamond-recharge-f7f59.firebaseapp.com",
@@ -93,57 +126,59 @@
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
 
+    const loginBox = document.querySelector(".login-box");
+    const welcomeBox = document.querySelector(".welcome-box");
+    const welcomeMsg = document.getElementById("welcomeMsg");
+
+    // 🔹 Track Login State
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        loginBox.style.display = "none";
+        welcomeBox.style.display = "block";
+        welcomeMsg.innerText = `Welcome, ${user.displayName || user.email}`;
+      } else {
+        loginBox.style.display = "block";
+        welcomeBox.style.display = "none";
+      }
+    });
+
     // 🔹 Google Login
     document.getElementById("googleLoginBtn").addEventListener("click", () => {
-      signInWithPopup(auth, provider)
-        .then((result) => {
-          const user = result.user;
-          alert("Welcome " + user.displayName);
-          console.log("User Info:", user);
-        })
-        .catch((error) => {
-          alert("Error: " + error.message);
-          console.error(error);
-        });
+      signInWithPopup(auth, provider).catch((error) => {
+        alert("Error: " + error.message);
+      });
     });
 
     // 🔹 Email Login
     document.getElementById("loginBtn").addEventListener("click", () => {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
-      signInWithEmailAndPassword(auth, email, password)
-        .then(userCredential => {
-          alert("Logged in as " + userCredential.user.email);
-        })
-        .catch(error => {
-          alert("Error: " + error.message);
-        });
+      signInWithEmailAndPassword(auth, email, password).catch(error => {
+        alert("Error: " + error.message);
+      });
     });
 
     // 🔹 Register
     document.getElementById("registerBtn").addEventListener("click", () => {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
-      createUserWithEmailAndPassword(auth, email, password)
-        .then(userCredential => {
-          alert("Registered: " + userCredential.user.email);
-        })
-        .catch(error => {
-          alert("Error: " + error.message);
-        });
+      createUserWithEmailAndPassword(auth, email, password).catch(error => {
+        alert("Error: " + error.message);
+      });
     });
 
     // 🔹 Forgot Password
     document.getElementById("resetBtn").addEventListener("click", () => {
       const email = document.getElementById("email").value;
       sendPasswordResetEmail(auth, email)
-        .then(() => {
-          alert("Password reset email sent!");
-        })
-        .catch(error => {
-          alert("Error: " + error.message);
-        });
+        .then(() => alert("Password reset email sent!"))
+        .catch(error => alert("Error: " + error.message));
     });
+
+    // 🔹 Logout
+    window.logout = function () {
+      signOut(auth);
+    }
   </script>
 </body>
 </html>
