@@ -1,239 +1,282 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Sarkar Telecom - Home</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sarkar Telecom</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #fff;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      z-index: 1000;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #00fff0;
+      text-shadow: 0 0 10px #00fff0, 0 0 20px #00fff0;
+    }
+
+    .menu-toggle {
+      font-size: 1.8rem;
+      cursor: pointer;
+      color: #00fff0;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      right: -260px;
+      width: 250px;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(15px);
+      box-shadow: -5px 0 15px rgba(0, 0, 0, 0.6);
+      transition: right 0.3s ease-in-out;
+      padding: 20px;
+      z-index: 999;
+    }
+
+    .sidebar.active {
+      right: 0;
+    }
+
+    .sidebar h3 {
+      margin-top: 0;
+      color: #00fff0;
+      text-align: center;
+    }
+
+    .sidebar button {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 8px;
+      background: rgba(0, 255, 240, 0.1);
+      color: #00fff0;
+      font-size: 1rem;
+      cursor: pointer;
+      text-align: left;
+      transition: 0.3s;
+      text-shadow: 0 0 5px #00fff0;
+    }
+
+    .sidebar button:hover {
+      background: rgba(0, 255, 240, 0.2);
+      box-shadow: 0 0 10px #00fff0;
+    }
+
+    main {
+      padding: 20px;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 15px;
+      padding: 20px;
+      margin: 20px 0;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 10px rgba(0, 255, 240, 0.3);
+    }
+
+    footer {
+      text-align: center;
+      padding: 15px;
+      background: rgba(0, 0, 0, 0.7);
+      margin-top: 20px;
+    }
+
+    .glow-btn {
+      display: inline-block;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 25px;
+      background: rgba(0, 255, 240, 0.1);
+      color: #00fff0;
+      cursor: pointer;
+      text-shadow: 0 0 5px #00fff0;
+      box-shadow: 0 0 10px #00fff0;
+      transition: 0.3s;
+    }
+
+    .glow-btn:hover {
+      background: rgba(0, 255, 240, 0.3);
+      box-shadow: 0 0 20px #00fff0, 0 0 40px #00fff0;
+    }
+
+    /* Popup Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+    }
+
+    .modal-content {
+      background: rgba(20, 20, 20, 0.95);
+      padding: 25px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 0 20px #00fff0;
+    }
+
+    .modal-content input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+    }
+  </style>
 </head>
 <body>
+  <header>
+    <div class="logo">SARKAR TELECOM</div>
+    <div class="menu-toggle" onclick="toggleSidebar()">☰</div>
+  </header>
 
-<!-- 🔹 Header -->
-<header class="header" role="banner" aria-label="Site header">
-  <div class="brand">
-    <img src="logo.png" class="logo" alt="logo">
-    <div>
-      <div class="site-name">Sarkar Telecom</div>
-      <div class="muted small">Recharge & Topup</div>
+  <div class="sidebar" id="sidebar">
+    <h3>Menu</h3>
+    <button onclick="showLogin()">Login</button>
+    <button onclick="logoutUser()">Logout</button>
+    <button>Dashboard</button>
+    <button>Profile</button>
+    <button>Recharge</button>
+  </div>
+
+  <main>
+    <div class="card">
+      <h2>Welcome to Sarkar Telecom</h2>
+      <p>Your one-stop solution for mobile recharge.</p>
+      <button class="glow-btn" onclick="showLogin()">Get Started</button>
+    </div>
+  </main>
+
+  <footer>
+    <p>© 2025 Sarkar Telecom. All rights reserved.</p>
+  </footer>
+
+  <!-- Login Modal -->
+  <div class="modal" id="loginModal">
+    <div class="modal-content">
+      <h2>Login</h2>
+      <input type="email" id="email" placeholder="Email">
+      <input type="password" id="password" placeholder="Password">
+      <button class="glow-btn" onclick="loginUser()">Login</button>
+      <button class="glow-btn" onclick="registerUser()">Register</button>
+      <button class="glow-btn" onclick="resetPassword()">Forgot Password</button>
+      <hr>
+      <button id="googleLoginBtn" class="glow-btn">Login with Google</button>
     </div>
   </div>
-  <div class="actions">
-    <button class="sidebar-toggle" id="sidebarToggle" aria-label="Open menu" title="Menu">
-      <svg width="18" height="14" viewBox="0 0 24 24" fill="none"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-    </button>
-    
-    <!-- 🔹 Auth Controls -->
-    <div id="authControls">
-      <button id="loginBtn" class="btn">Login</button>
-      <button id="logoutBtn" class="btn" style="display:none">Logout</button>
-      <button id="googleLoginBtn" class="btn">Login with Google</button>
-      <span id="usernameDisplay" style="margin-left:10px;color:#0ff"></span>
-    </div>
-  </div>
-</header>
 
-<!-- 🔹 Sidebar -->
-<aside class="sidebar" id="rightSidebar" aria-hidden="true">
-  <div class="card">
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <div style="font-weight:700">Navigation</div>
-      <button class="btn btn-close">✕</button>
-    </div>
-    <nav class="nav">
-      <a href="index.html" class="btn">🏠 Home</a>
-      <a href="dashboard.html" class="btn">📊 Dashboard</a>
-      <a href="order.html" class="btn">📱 New Order</a>
-      <a href="order-history.html" class="btn">📃 Orders</a>
-      <a href="profile.html" class="btn">👤 Profile</a>
-      <a href="balance.html" class="btn">💰 Balance</a>
-      <a href="admin.html" class="btn">⚙️ Admin</a>
-    </nav>
-  </div>
-</aside>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult,
+             signInWithEmailAndPassword, createUserWithEmailAndPassword,
+             sendPasswordResetEmail, signOut } 
+    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-<!-- 🔹 Main -->
-<main class="main container">
-  <div class="card">
+    // Firebase Config (আপনার আসল কনফিগ)
+    const firebaseConfig = {
+      apiKey: "AlzaSyBlIOv-2Laqugv5_HAIRNJIIp8YUfyNdF8",
+      authDomain: "diamond-recharge-f7f59.firebaseapp.com",
+      projectId: "diamond-recharge-f7f59",
+      storageBucket: "diamond-recharge-f7f59.appspot.com",
+      messagingSenderId: "657717928489",
+      appId: "1:657717928489:web:70431ebc9afb7002d4b238"
+    };
 
-    <!-- টিকার -->
-    <div class="ticker-wrap">
-      <span id="ticker" class="ticker">⏳ সর্বশেষ তথ্য লোড হচ্ছে...</span>
-    </div>
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
 
-    <!-- Hero Section -->
-    <section class="hero">
-      <h2>👋 Welcome to Sarkar Telecom</h2>
-      <p>Fast & Secure Online Recharge Service</p>
-      <a href="order.html" class="btn">🚀 Order Now 🛒</a>
-    </section>
+    // Sidebar Toggle
+    window.toggleSidebar = () => {
+      document.getElementById("sidebar").classList.toggle("active");
+    };
 
-    <!-- Features -->
-    <section class="features">
-      <div class="feature">
-        <h3>⚡ Fast Recharge</h3>
-        <p>Instant mobile top-up & gaming recharge.</p>
-      </div>
-      <div class="feature">
-        <h3>📋 Order Tracking</h3>
-        <p>Check & manage all your past orders easily.</p>
-      </div>
-      <div class="feature">
-        <h3>🔐 Secure Login</h3>
-        <p>Safe authentication system with Firebase.</p>
-      </div>
-      <div class="feature">
-        <h3>📱 24/7 Support</h3>
-        <p>Sarkar Telecom here to help you anytime.</p>
-      </div>
-    </section>
+    // Modal Toggle
+    window.showLogin = () => {
+      document.getElementById("loginModal").style.display = "flex";
+    };
 
-    <!-- Footer Load -->
-    <div id="footer"></div>
-  </div>
-</main>
+    // Login
+    window.loginUser = () => {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      signInWithEmailAndPassword(auth, email, password)
+        .then(userCredential => {
+          alert("Logged in: " + userCredential.user.email);
+          document.getElementById("loginModal").style.display = "none";
+        })
+        .catch(err => alert(err.message));
+    };
 
-<!-- 🔹 Footer -->
-<footer class="site-footer" role="contentinfo">
-  <div class="footer-nav">
-    <a class="btn" href="index.html">🏠 Home</a>
-    <a class="btn" href="order.html">📱 Order</a>
-    <a class="btn" href="order-history.html">📃 Orders</a>
-    <a class="btn" href="profile.html">👤 Profile</a>
-  </div>
-</footer>
+    // Register
+    window.registerUser = () => {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      createUserWithEmailAndPassword(auth, email, password)
+        .then(userCredential => {
+          alert("Registered: " + userCredential.user.email);
+        })
+        .catch(err => alert(err.message));
+    };
 
-<!-- 🔹 Scripts -->
-<script src="header-loader.js" defer></script>
-<script src="header-script.js" defer></script>
+    // Reset Password
+    window.resetPassword = () => {
+      const email = document.getElementById("email").value;
+      sendPasswordResetEmail(auth, email)
+        .then(() => alert("Password reset email sent!"))
+        .catch(err => alert(err.message));
+    };
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-  import { getAuth, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup } 
-    from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+    // Logout
+    window.logoutUser = () => {
+      signOut(auth).then(() => alert("Logged out"));
+    };
 
-  // ✅ Firebase Config
-  const firebaseConfig = {
-    apiKey: "AIzaSyBIIOv-2Laqugv5_HAIRNJllp8YUfYndF8",
-    authDomain: "diamond-recharge-f7f59.firebaseapp.com",
-    projectId: "diamond-recharge-f7f59",
-    storageBucket: "diamond-recharge-f7f59.appspot.com",
-    messagingSenderId: "657717928489",
-    appId: "1:657717928489:web:70431ebc9afb7002d4b238"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
-  const provider = new GoogleAuthProvider();
-
-  // Buttons
-  const loginBtn=document.getElementById("loginBtn");
-  const logoutBtn=document.getElementById("logoutBtn");
-  const googleBtn=document.getElementById("googleLoginBtn");
-  const usernameDisplay=document.getElementById("usernameDisplay");
-
-  // Normal Login
-  loginBtn.onclick=()=>window.location.href="login.html";
-
-  // Logout
-  logoutBtn.onclick=()=>signOut(auth);
-
-  // Google Login
-  googleBtn.onclick=()=> {
-    signInWithPopup(auth, provider)
-      .then((result)=>{
-        const user=result.user;
-        alert("Welcome " + user.displayName);
-      })
-      .catch(err=>console.error("Error:", err.message));
-  };
-
-  // Auth state
-  onAuthStateChanged(auth,(user)=>{
-    if(user){
-      loginBtn.style.display="none";
-      googleBtn.style.display="none";
-      logoutBtn.style.display="inline";
-      usernameDisplay.textContent=user.displayName || user.email;
-    } else {
-      loginBtn.style.display="inline";
-      googleBtn.style.display="inline";
-      logoutBtn.style.display="none";
-      usernameDisplay.textContent="";
-    }
-  });
-
-  // Footer Load
-  fetch("footer.html")
-    .then(res=>res.text())
-    .then(html=>{
-      document.getElementById("footer").innerHTML=html;
+    // Google Login
+    document.getElementById("googleLoginBtn").addEventListener("click", () => {
+      signInWithRedirect(auth, provider);
     });
 
-  // 🔄 Ticker Logic
-  const ticker=document.getElementById("ticker");
-  fetch("https://docs.google.com/spreadsheets/d/e/2PACX-1vR4owbSc_h38ouaktOU30TYqH6wy93qYjmW0G5GWXhsBMzsrVSaWzPtVPA7YpyOUmlEpStByT8TxG0-/pub?gid=1098128992&single=true&output=csv")
-    .then(res=>res.text())
-    .then(csv=>{
-      const rows=csv.split("\n").slice(1).reverse();
-      const messages=rows.slice(0,5).map(r=>{
-        const cols=r.split(",");
-        const email=cols[3]||"অজানা ইউজার";
-        const amount=cols[2]||"0";
-        const status=cols[4]||"Waiting";
-        if(status.trim()==="COMPLETE"){
-          return `✅ ${email} সফলভাবে ${amount} 💎 অর্ডার করেছেন`;
-        } else if(status.trim()==="CANCEL"){
-          return `🔴 ${email} ${amount} 💎 ফেরত পেয়েছেন (অর্ডার ক্যান্সেল)`;
-        } else {
-          return `⏳ ${email} ${amount} 💎 অর্ডার দিয়েছেন, অপেক্ষমান...`;
+    getRedirectResult(auth)
+      .then(result => {
+        if (result && result.user) {
+          alert("Welcome " + result.user.displayName);
+          console.log(result.user);
+          document.getElementById("loginModal").style.display = "none";
         }
-      });
-
-      let i=0;
-      function showMessage(){
-        ticker.textContent=messages[i];
-        ticker.classList.remove("ticker");
-        void ticker.offsetWidth;
-        ticker.classList.add("ticker");
-        i=(i+1)%messages.length;
-        setTimeout(showMessage,30000); 
-      }
-      if(messages.length>0) showMessage();
-      else ticker.textContent="কোনও অর্ডারের তথ্য পাওয়া যায়নি।";
-    });
-</script>
-
-<!-- Sidebar Toggle -->
-<script>
-(function(){
-  function setup(sidebarId, toggleId, closeSelector){
-    const sidebar=document.getElementById(sidebarId);
-    const toggle=document.getElementById(toggleId);
-    if(!sidebar || !toggle) return;
-    let closeBtn=sidebar.querySelector(closeSelector);
-    if(!closeBtn){
-      closeBtn=document.createElement('button');
-      closeBtn.className='btn btn-close';
-      closeBtn.innerText='✕';
-      closeBtn.style.marginLeft='auto';
-      sidebar.insertBefore(closeBtn, sidebar.firstChild);
-    }
-    function setOpen(v){
-      if(v){ sidebar.classList.add('open'); document.body.style.overflow='hidden'; }
-      else { sidebar.classList.remove('open'); document.body.style.overflow=''; }
-    }
-    toggle.addEventListener('click', ()=>setOpen(true));
-    closeBtn.addEventListener('click', ()=>setOpen(false));
-    document.addEventListener('click',(e)=>{ 
-      if(sidebar.classList.contains('open') && !sidebar.contains(e.target) && !toggle.contains(e.target)) setOpen(false)
-    });
-    document.addEventListener('keydown',(e)=>{ if(e.key==='Escape') setOpen(false) });
-  }
-  setup('rightSidebar','sidebarToggle','.btn-close');
-})();
-</script>
+      })
+      .catch(err => console.error(err));
+  </script>
 </body>
 </html>
