@@ -10,13 +10,21 @@
       font-family: Arial, sans-serif;
       background: #0d0d0d;
       color: #fff;
-      text-align: center;
-      padding: 50px;
+      padding: 20px;
     }
-    h1 { color: #00ffe0; }
+    header {
+      position: sticky;
+      top: 0;
+      background: rgba(20, 20, 20, 0.9);
+      padding: 15px;
+      border-bottom: 2px solid #00ffe0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 { color: #00ffe0; margin: 0; }
     .logout-btn {
-      margin-top: 20px;
-      padding: 10px 20px;
+      padding: 8px 16px;
       border: none;
       border-radius: 20px;
       background: #ff0040;
@@ -26,15 +34,70 @@
       transition: 0.3s;
     }
     .logout-btn:hover { background: #cc0033; }
+    .profile-card {
+      margin: 30px auto;
+      background: rgba(30, 30, 30, 0.8);
+      padding: 20px;
+      border-radius: 12px;
+      width: 320px;
+      text-align: center;
+      box-shadow: 0 0 25px #00ffe0;
+    }
+    .profile-card img {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      border: 2px solid #00ffe0;
+      margin-bottom: 10px;
+    }
+    .profile-card h2 {
+      margin: 8px 0;
+      color: #00ffe0;
+    }
+    .profile-card p { margin: 5px 0; }
+    .menu {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .menu a {
+      text-decoration: none;
+      background: #00ffe0;
+      color: #000;
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+    .menu a:hover { background: #00cccc; }
   </style>
 </head>
 <body>
-  <h1 id="welcomeText">Welcome</h1>
-  <button class="logout-btn" onclick="logout()">Logout</button>
+
+  <header>
+    <h1>📊 Dashboard</h1>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </header>
+
+  <div class="profile-card">
+    <img id="userPhoto" src="https://i.ibb.co/3pPYd14/user.png" alt="User">
+    <h2 id="userName">Loading...</h2>
+    <p id="userEmail">---</p>
+    <p>💎 Balance: <span id="userBalance">0</span></p>
+
+    <div class="menu">
+      <a href="order.html">📱 New Order</a>
+      <a href="order-history.html">📃 Order History</a>
+      <a href="profile.html">👤 Profile</a>
+      <a href="balance.html">💰 Balance</a>
+    </div>
+  </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAyhjOsIXNAkBglpRllt0OZIOJYpdB_9-8",
@@ -48,17 +111,33 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const db = getFirestore(app);
 
-    // If not logged in → back to login
-    onAuthStateChanged(auth, (user) => {
+    // Check login status
+    onAuthStateChanged(auth, async (user) => {
       if (user) {
-        document.getElementById("welcomeText").innerText = `Welcome, ${user.displayName || user.email}`;
+        document.getElementById("userName").innerText = user.displayName || "No Name";
+        document.getElementById("userEmail").innerText = user.email;
+        document.getElementById("userPhoto").src = user.photoURL || "https://i.ibb.co/3pPYd14/user.png";
+
+        // Fetch Firestore user balance
+        try {
+          const snap = await getDoc(doc(db, "users", user.uid));
+          if (snap.exists()) {
+            const data = snap.data();
+            document.getElementById("userBalance").innerText = data.balance ?? 0;
+          }
+        } catch (err) {
+          console.error("Balance fetch error:", err);
+        }
+
       } else {
+        // Not logged in → back to login page
         window.location.href = "index.html";
       }
     });
 
-    // Logout
+    // Logout function
     window.logout = function() {
       signOut(auth).then(() => {
         window.location.href = "index.html";
