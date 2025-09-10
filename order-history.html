@@ -1,170 +1,227 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Order History - Sarkar Telecom</title>
   <style>
+    :root{
+      --bg:#0f1115; --card:#171a21; --text:#e7eaf0;
+      --accent:#06b6d4; --ok:#22c55e; --bad:#ef4444; --muted:#9aa3b2;
+    }
     body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #000;
-      color: #fff;
-      text-align: center;
+      margin:0; font-family:Arial, sans-serif; background:var(--bg); color:var(--text);
+      display:flex; flex-direction:column; min-height:100vh;
     }
-
     header {
-      background: #111;
-      color: cyan;
-      padding: 12px;
-      font-size: 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 2px solid #0ff;
+      background:#171a21; padding:12px 20px;
+      display:flex; justify-content:space-between; align-items:center;
+      box-shadow:0 2px 6px rgba(0,0,0,0.6);
     }
-    header .logo {
-      font-weight: bold;
+    header h1 { font-size:18px; color:var(--accent); margin:0; }
+    .auth-btn {
+      background:var(--accent); border:none; padding:6px 12px;
+      border-radius:6px; cursor:pointer; font-weight:bold;
+      color:#001;
     }
-    header .user {
-      font-size: 14px;
-    }
+    .auth-btn.logout { background:var(--bad); color:#fff; }
+    main { flex:1; padding:20px; max-width:1000px; margin:auto; }
+    h2 { text-align:center; color:var(--accent); }
 
-    h2 {
-      color: cyan;
-      margin-top: 20px;
-      text-shadow: 0 0 10px cyan;
+    .top-bar { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin:15px 0; }
+    .search-box input {
+      padding:8px 12px; border-radius:6px; border:1px solid #333;
+      background:#171a21; color:var(--text); width:230px;
     }
-
-    .history-box {
-      margin: 20px;
-      background: #111;
-      padding: 15px;
-      border-radius: 12px;
-      box-shadow: 0 0 15px #0ff;
-      overflow-x: auto;
-    }
+    .btn { padding:8px 14px; border:none; border-radius:6px; cursor:pointer; font-weight:bold; }
+    .btn-accent{ background:var(--accent); color:#001; }
+    .btn-go{ background:var(--ok); color:#001; }
+    .btn-danger{ background:var(--bad); color:#fff; }
 
     table {
-      width: 100%;
-      border-collapse: collapse;
-      color: #fff;
+      width:100%; border-collapse:collapse; background:#171a21;
+      border-radius:8px; overflow:hidden;
     }
-    th, td {
-      padding: 10px;
-      border-bottom: 1px solid #444;
-      text-align: center;
-    }
-    th {
-      color: cyan;
-    }
-    tr:hover {
-      background: rgba(0,255,255,0.1);
-    }
-    .status {
-      font-weight: bold;
-      color: lime;
-    }
+    th, td { border:1px solid #333; padding:8px; text-align:center; font-size:14px; }
+    th { background:var(--accent); color:#001; }
+    .status-box { padding:4px 8px; border-radius:6px; font-size:13px; font-weight:bold; }
+    .waiting{ background:#eab308; color:#000; }
+    .completed{ background:#22c55e; color:#fff; }
+    .cancelled{ background:#ef4444; color:#fff; }
 
-    nav {
-      background: #111;
-      display: flex;
-      justify-content: space-around;
-      padding: 12px;
-      position: fixed;
-      bottom: 0;
-      width: 100%;
+    .pagination { text-align:center; margin:15px 0; }
+    .pagination button {
+      background:var(--accent); border:none; padding:6px 14px;
+      margin:3px; border-radius:6px; cursor:pointer; font-weight:bold;
     }
-    nav button {
-      background: #222;
-      color: #fff;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 8px;
-      cursor: pointer;
+    .pagination button:disabled{ background:#333; color:#777; cursor:not-allowed; }
+
+    /* Toast */
+    #toast {
+      visibility:hidden; min-width:220px; background:#333; color:#fff;
+      text-align:center; border-radius:6px; padding:12px;
+      position:fixed; z-index:1000; left:50%; bottom:30px;
+      transform:translateX(-50%);
     }
-    nav button:hover {
-      background: cyan;
-      color: #000;
-    }
+    #toast.show{ visibility:visible; animation:fadein 0.5s, fadeout 0.5s 2.5s; }
+    @keyframes fadein{ from{bottom:10px;opacity:0;} to{bottom:30px;opacity:1;} }
+    @keyframes fadeout{ from{bottom:30px;opacity:1;} to{bottom:10px;opacity:0;} }
   </style>
 </head>
 <body>
+<header>
+  <h1>💎 Order History</h1>
+  <button id="authBtn" class="auth-btn">Login</button>
+</header>
 
-  <header>
-    <div class="logo">⚡ Sarkar Telecom</div>
-    <div class="user">👤 saMrat IT</div>
-  </header>
-
-  <h2>📜 Order History</h2>
-
-  <div class="history-box">
-    <table id="orderTable">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Profile ID</th>
-          <th>Amount</th>
-          <th>Date</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Orders will load here -->
-      </tbody>
-    </table>
+<main>
+  <h2>📜 Your Orders</h2>
+  <div class="top-bar">
+    <div class="search-box"><input type="text" id="searchInput" placeholder="🔍 Search orders..."></div>
+    <button id="searchBtn" class="btn btn-accent">Search</button>
+    <button id="clearBtn" class="btn btn-danger">❌ Clear</button>
+    <button class="btn btn-go" onclick="window.location.href='order.html'">➕ New Order</button>
   </div>
 
-  <nav>
-    <button onclick="location.href='dashboard.html'">🏠 Home</button>
-    <button onclick="location.href='order.html'">📱 Order</button>
-    <button onclick="location.href='order-history.html'">📜 Orders</button>
-    <button onclick="location.href='profile.html'">👤 Profile</button>
-  </nav>
+  <table>
+    <thead><tr><th>SL</th><th>Number</th><th>Amount</th><th>Status</th><th>Time</th></tr></thead>
+    <tbody id="orderTable"></tbody>
+  </table>
+  <div class="pagination">
+    <button id="prevBtn">⬅ Prev</button>
+    <button id="nextBtn">Next ➡</button>
+  </div>
+</main>
 
-  <script>
-    function formatDate(dateString) {
-      let date = new Date(dateString);
+<div id="toast"></div>
 
-      let options = {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-        hour: "numeric",
-        minute: "numeric",
-        second: "numeric",
-        hour12: true
-      };
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+import { getFirestore, doc, getDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-      return date.toLocaleString("en-US", options);
-    }
+const firebaseConfig = {
+  apiKey: "AIzaSyBIIOv-2Laqugv5_HAIRNJllp8YUfYndF8",
+  authDomain: "diamond-recharge-f7f59.firebaseapp.com",
+  projectId: "diamond-recharge-f7f59",
+  storageBucket: "diamond-recharge-f7f59.appspot.com",
+  messagingSenderId: "657717928489",
+  appId: "1:657717928489:web:70431ebc9afb7002d4b238"
+};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-    function loadOrders() {
-      let orders = JSON.parse(localStorage.getItem("orders")) || [];
-      let tbody = document.querySelector("#orderTable tbody");
-      tbody.innerHTML = "";
+// DOM
+const orderTable=document.getElementById("orderTable");
+const prevBtn=document.getElementById("prevBtn");
+const nextBtn=document.getElementById("nextBtn");
+const searchInput=document.getElementById("searchInput");
+const searchBtn=document.getElementById("searchBtn");
+const clearBtn=document.getElementById("clearBtn");
+const authBtn=document.getElementById("authBtn");
+const toast=document.getElementById("toast");
 
-      if (orders.length === 0) {
-        tbody.innerHTML = "<tr><td colspan='5'>No orders found</td></tr>";
-        return;
-      }
+let allOrders=[]; let viewOrders=[]; let currentPage=1;
+const rowsPerPage=10; let currentUser=null;
 
-      orders.reverse().forEach((order, index) => {
-        let row = `
-          <tr>
-            <td>${index + 1}</td>
-            <td>${order.profileId}</td>
-            <td>💎 ${order.amount}</td>
-            <td>${formatDate(order.date)}</td>
-            <td class="status">${order.status}</td>
-          </tr>
-        `;
-        tbody.innerHTML += row;
+// CSV loader
+function parseCSV(text){
+  text=text.replace(/\r/g,"");
+  const lines=text.split("\n").filter(l=>l.trim().length>0);
+  return lines.map(l=>l.split(","));
+}
+async function fetchCSV(url){
+  const res=await fetch(url,{cache:"no-store"});
+  return parseCSV(await res.text());
+}
+const FINALDATA_CSV="https://docs.google.com/spreadsheets/d/e/2PACX-1vR4owbSc_h38ouaktOU30TYqH6wy93qYjmW0G5GWXhsBMzsrVSaWzPtVPA7YpyOUmlEpStByT8TxG0-/pub?gid=1098128992&single=true&output=csv";
+const normalize=v=>(v??"").toString().trim().toLowerCase();
+const statusClass=s=>{
+  if(s.toLowerCase().includes("cancel")) return "cancelled";
+  if(s.toLowerCase().includes("complete")) return "completed";
+  return "waiting";
+};
+function showToast(msg){ toast.textContent=msg; toast.className="show"; setTimeout(()=>toast.className="",3000); }
+async function refundIfNeeded(user,orders){
+  const userRef=doc(db,"users",user.uid);
+  const snap=await getDoc(userRef);
+  if(!snap.exists()) return;
+  const data=snap.data();
+  let refundedOrders=data.refundedOrders||[];
+  for(const row of orders){
+    const [time,number,amount,email,status]=row;
+    if(normalize(email)!==normalize(user.email)) continue;
+    if(!status.toLowerCase().includes("cancel")) continue;
+    if(refundedOrders.includes(time)) continue;
+    const refundAmount=Number(amount)||0;
+    if(refundAmount>0){
+      await updateDoc(userRef,{
+        balance:(data.balance||0)+refundAmount,
+        refundedOrders:arrayUnion(time)
       });
+      showToast(`💰 Refunded ${refundAmount}`);
     }
+  }
+}
+function renderTable(){
+  orderTable.innerHTML="";
+  const start=(currentPage-1)*rowsPerPage;
+  const end=start+rowsPerPage;
+  const slice=viewOrders.slice(start,end);
+  if(!slice.length){
+    orderTable.innerHTML="<tr><td colspan='5'>No orders found</td></tr>";
+  } else {
+    slice.forEach((row,idx)=>{
+      const [time,number,amount,email,status]=row;
+      orderTable.innerHTML+=`
+        <tr>
+          <td>${viewOrders.length-(start+idx)}</td>
+          <td>${number||"-"}</td>
+          <td>${amount||"-"}</td>
+          <td><span class="status-box ${statusClass(status)}">${status||"-"}</span></td>
+          <td>${time||"-"}</td>
+        </tr>`;
+    });
+  }
+  prevBtn.disabled=currentPage===1;
+  nextBtn.disabled=end>=viewOrders.length;
+}
+function applySearch(){
+  const t=normalize(searchInput.value);
+  viewOrders=t?allOrders.filter(r=>normalize(r[1]).includes(t)||normalize(r[2]).includes(t)||normalize(r[4]).includes(t)):[...allOrders];
+  currentPage=1; renderTable();
+}
+async function loadOrders(user){
+  orderTable.innerHTML="<tr><td colspan='5'>⏳ Loading...</td></tr>";
+  const rows=await fetchCSV(FINALDATA_CSV);
+  allOrders=rows.slice(1).reverse().filter(r=>normalize(r[3])===normalize(user.email));
+  viewOrders=[...allOrders];
+  currentPage=1;
+  renderTable();
+  await refundIfNeeded(user,allOrders);
+}
 
-    loadOrders();
-  </script>
+// Events
+prevBtn.onclick=()=>{if(currentPage>1){currentPage--;renderTable();}};
+nextBtn.onclick=()=>{if((currentPage*rowsPerPage)<viewOrders.length){currentPage++;renderTable();}};
+searchBtn.onclick=applySearch;
+searchInput.onkeydown=e=>{if(e.key==="Enter")applySearch();};
+clearBtn.onclick=()=>{searchInput.value="";applySearch();};
 
+// Auth check (secure)
+onAuthStateChanged(auth,user=>{
+  if(user){
+    currentUser=user;
+    authBtn.textContent="Logout";
+    authBtn.classList.add("logout");
+    authBtn.onclick=()=>signOut(auth);
+    loadOrders(user);
+  }else{
+    currentUser=null;
+    window.location.href="login.html"; // ✅ secure redirect
+  }
+});
+</script>
 </body>
 </html>
