@@ -1,171 +1,202 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Place Order - Sarkar Telecom</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css">
-<style>
-  body { font-family: 'Poppins', sans-serif; margin:0; padding:0; background:#0d0d0d; color:#fff; }
-  .container { padding:20px; }
-  h2 { text-align:center; margin-bottom:15px; color:#0ff; text-shadow:0 0 10px #0ff; }
-  input, .submit-btn {
-    width:100%; padding:12px; margin:10px 0; border:none; border-radius:10px;
-    background:rgba(255,255,255,0.1); color:#fff; font-size:16px; backdrop-filter:blur(10px);
-  }
-  .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:15px 0; }
-  .amt-btn {
-    padding:12px; border:none; border-radius:12px; font-weight:600; font-size:15px;
-    background:rgba(0,255,255,0.1); color:#0ff; cursor:pointer; transition:0.3s;
-    text-shadow:0 0 5px #0ff;
-  }
-  .amt-btn:hover { background:rgba(0,255,255,0.3); }
-  .amt-btn.active { background:#0ff; color:#000; }
-  .submit-btn {
-    background:#0ff; color:#000; font-weight:700; cursor:pointer;
-    box-shadow:0 0 15px #0ff;
-  }
-  .hint { font-size:13px; color:#aaa; margin-top:-5px; margin-bottom:10px; }
-  .card {
-    background:rgba(255,255,255,0.05); border-radius:16px; padding:20px; 
-    box-shadow:0 0 15px rgba(0,255,255,0.2); backdrop-filter:blur(12px);
-  }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Place New Order - Sarkar Telecom</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #000;
+      color: #fff;
+      text-align: center;
+    }
+
+    header {
+      background: #111;
+      color: cyan;
+      padding: 12px;
+      font-size: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #0ff;
+    }
+    header .logo {
+      font-weight: bold;
+    }
+    header .user {
+      font-size: 14px;
+    }
+
+    h2 {
+      color: cyan;
+      margin-top: 20px;
+      text-shadow: 0 0 10px cyan;
+    }
+
+    .order-box {
+      background: #111;
+      padding: 20px;
+      margin: 20px;
+      border-radius: 15px;
+      box-shadow: 0 0 20px #0ff;
+    }
+
+    input {
+      width: 90%;
+      padding: 12px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      text-align: center;
+    }
+
+    .amounts {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 20px 0;
+    }
+    .amounts button {
+      padding: 15px;
+      border: none;
+      border-radius: 10px;
+      background: #111;
+      color: cyan;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 0 10px cyan;
+      transition: 0.2s;
+    }
+    .amounts button:hover {
+      background: cyan;
+      color: #000;
+    }
+    .amounts button.active {
+      background: cyan;
+      color: #000;
+      font-weight: bold;
+    }
+
+    .confirm-btn {
+      background: cyan;
+      color: #000;
+      font-size: 18px;
+      padding: 15px;
+      width: 90%;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+
+    nav {
+      background: #111;
+      display: flex;
+      justify-content: space-around;
+      padding: 12px;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+    }
+    nav button {
+      background: #222;
+      color: #fff;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    nav button:hover {
+      background: cyan;
+      color: #000;
+    }
+  </style>
 </head>
 <body>
 
-<header class="header">
-  <div class="brand">
-    <div class="site-name">⚡ Sarkar Telecom</div>
-  </div>
-  <div class="actions">
-    <div id="userInfo" class="kv"><span class="muted">Checking login...</span></div>
-  </div>
-</header>
+  <header>
+    <div class="logo">⚡ Sarkar Telecom</div>
+    <div class="user">👤 saMrat IT</div>
+  </header>
 
-<main class="main container">
-  <div class="card">
-    <h2>📝 Place New Order</h2>
+  <h2>📝 Place New Order</h2>
 
-    <input type="text" id="number" placeholder="Enter Game ID / Number (with country code)">
-    <div class="hint">উদাহরণ: +8801XXXXXXXXX বা গেম প্রোফাইল আইডি</div>
+  <div class="order-box">
+    <input type="text" id="profileId" placeholder="Profile ID / Number (with country code)" />
+    <small>উদাহরণ: +8801XXXXXXXXX অথবা গেম প্রোফাইল আইডি</small>
 
-    <p style="margin:14px 0 8px;">Select Amount</p>
-    <div id="diamonds" class="grid">
-      <button class="amt-btn" onclick="selectAmount(10,this)">10</button>
-      <button class="amt-btn" onclick="selectAmount(50,this)">50</button>
-      <button class="amt-btn" onclick="selectAmount(100,this)">100</button>
-      <button class="amt-btn" onclick="selectAmount(200,this)">200</button>
-      <button class="amt-btn" onclick="selectAmount(500,this)">500</button>
-      <button class="amt-btn" onclick="selectAmount(1000,this)">1000</button>
-      <button class="amt-btn" onclick="selectAmount(2000,this)">2000</button>
-      <button class="amt-btn" onclick="selectAmount(5000,this)">5000</button>
-      <button class="amt-btn" onclick="selectAmount(10000,this)">10000</button>
+    <div class="amounts">
+      <button onclick="selectAmount(10)">10</button>
+      <button onclick="selectAmount(50)">50</button>
+      <button onclick="selectAmount(100)">100</button>
+      <button onclick="selectAmount(200)">200</button>
+      <button onclick="selectAmount(500)">500</button>
+      <button onclick="selectAmount(1000)">1000</button>
+      <button onclick="selectAmount(2000)">2000</button>
+      <button onclick="selectAmount(5000)">5000</button>
+      <button onclick="selectAmount(10000)">10000</button>
     </div>
 
-    <div class="hint">Selected: <span id="selected">None</span></div>
+    <p id="selected">Selected: None</p>
 
-    <button id="submitBtn" class="submit-btn" onclick="submitOrder()">✅ Confirm Order</button>
-    <p id="message"></p>
+    <button class="confirm-btn" onclick="confirmOrder()">✅ Confirm Order</button>
   </div>
 
-  <!-- Hidden Google Form submit -->
-  <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
-  <form id="gform" action="https://docs.google.com/forms/d/e/1FAIpQLScLsqajnZepD3HBTwnXwdjGQaItAVtnnGPRkD3TBsU3lPLzuQ/formResponse"
-        method="POST" target="hidden_iframe" style="display:none;">
-    <input type="text" name="entry.1172671786" id="f_number">
-    <input type="text" name="entry.1509335158" id="f_amount">
-    <input type="text" name="entry.588493421" id="f_status" value="Waiting">
-    <input type="text" name="entry.198105099" id="f_email">
-  </form>
-</main>
+  <nav>
+    <button onclick="location.href='dashboard.html'">🏠 Home</button>
+    <button onclick="location.href='order.html'">📱 Order</button>
+    <button onclick="location.href='order-history.html'">📜 Orders</button>
+    <button onclick="location.href='profile.html'">👤 Profile</button>
+  </nav>
 
-<footer class="site-footer">
-  <div class="footer-nav">
-    <a class="btn" href="index.html">🏠 Home</a>
-    <a class="btn active" href="order.html">📱 Order</a>
-    <a class="btn" href="order-history.html">📃 Orders</a>
-    <a class="btn" href="profile.html">👤 Profile</a>
-  </div>
-</footer>
+  <script>
+    let selectedAmount = null;
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-  import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+    function selectAmount(amount) {
+      selectedAmount = amount;
+      document.getElementById("selected").innerText = "Selected: " + amount;
 
-  // Firebase config
-  const firebaseConfig = {
-    apiKey: "AIzaSyBIIOv-2Laqugv5_HAIRNJllp8YUfYndF8",
-    authDomain: "diamond-recharge-f7f59.firebaseapp.com",
-    projectId: "diamond-recharge-f7f59",
-    storageBucket: "diamond-recharge-f7f59.appspot.com",
-    messagingSenderId: "657717928489",
-    appId: "1:657717928489:web:70431ebc9afb7002d4b238"
-  };
+      let buttons = document.querySelectorAll(".amounts button");
+      buttons.forEach(btn => btn.classList.remove("active"));
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
-
-  let currentUser=null, currentBalance=0;
-  const userInfo=document.getElementById("userInfo");
-
-  // ✅ Auth check: যদি login না থাকে → login.html এ redirect
-  onAuthStateChanged(auth, async (user)=>{
-    if(user){
-      currentUser=user;
-      userInfo.textContent="👤 "+(user.displayName || user.email);
-      const ref=doc(db,"users",user.uid);
-      const snap=await getDoc(ref);
-      if(snap.exists()){
-        currentBalance=snap.data().balance ?? 0;
-      }
-    }else{
-      window.location.href="login.html?redirect=order.html";
+      event.target.classList.add("active");
     }
-  });
 
-  // Select amount
-  let selectedAmount=null;
-  window.selectAmount=(amount,el)=>{
-    selectedAmount=amount;
-    document.querySelectorAll('.amt-btn').forEach(b=>b.classList.remove('active'));
-    el.classList.add('active');
-    document.getElementById('selected').textContent=amount;
-  };
+    function confirmOrder() {
+      let profileId = document.getElementById("profileId").value;
 
-  // Submit order
-  window.submitOrder=async ()=>{
-    const number=document.getElementById('number').value.trim();
-    const msgEl=document.getElementById('message');
-    const btn=document.getElementById('submitBtn');
+      if (!profileId || !selectedAmount) {
+        alert("⚠️ Please enter Profile ID and select an amount!");
+        return;
+      }
 
-    if(!currentUser){ msgEl.textContent="⚠️ Please login first!"; return; }
-    if(!number||!selectedAmount){ msgEl.textContent="⚠️ Enter number & select amount!"; return; }
-    if(selectedAmount>currentBalance){ msgEl.textContent="❌ Not enough balance!"; return; }
+      // Order Data Save LocalStorage
+      let orders = JSON.parse(localStorage.getItem("orders")) || [];
+      orders.push({
+        id: Date.now(),
+        profileId: profileId,
+        amount: selectedAmount,
+        date: new Date().toLocaleString(),
+        status: "Success"
+      });
+      localStorage.setItem("orders", JSON.stringify(orders));
 
-    document.getElementById('f_number').value=number;
-    document.getElementById('f_amount').value=String(selectedAmount);
-    document.getElementById('f_status').value="Waiting";
-    document.getElementById('f_email').value=currentUser.email;
+      // Balance Update
+      let balance = localStorage.getItem("balance") || 15000;
+      balance = parseInt(balance) - selectedAmount;
+      localStorage.setItem("balance", balance);
 
-    btn.disabled=true;
-    msgEl.textContent="⏳ Submitting...";
-    document.getElementById('gform').submit();
+      alert("✅ Order placed successfully!");
 
-    try{
-      const ref=doc(db,"users",currentUser.uid);
-      await updateDoc(ref,{ balance: currentBalance - selectedAmount });
-    }catch(e){ console.error("Balance update error",e); }
-
-    setTimeout(()=>{
-      msgEl.textContent="✅ Order submitted!";
-      window.location.href="order-history.html";
-    },2000);
-  };
-</script>
+      // Redirect to Order History
+      window.location.href = "order-history.html";
+    }
+  </script>
 
 </body>
 </html>
