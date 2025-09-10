@@ -1,352 +1,170 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Order History - Sarkar Telecom</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
   <style>
     body {
-      margin:0;
-      font-family:"Poppins",sans-serif;
-      background:#000;
-      color:#fff;
-      display:flex;
-      flex-direction:column;
-      min-height:100vh;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #000;
+      color: #fff;
+      text-align: center;
     }
+
     header {
-      width:100%;
-      background:#111;
-      padding:12px 20px;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      position:sticky;
-      top:0;
-      z-index:1000;
-      box-shadow:0 2px 12px rgba(0,255,255,0.2);
+      background: #111;
+      color: cyan;
+      padding: 12px;
+      font-size: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #0ff;
     }
-    header h1 {
-      color:cyan;
-      margin:0;
-      font-size:1.3em;
-      display:flex;
-      align-items:center;
+    header .logo {
+      font-weight: bold;
     }
-    .auth-btn {
-      background:#ff0057;
-      border:none;
-      padding:8px 16px;
-      border-radius:20px;
-      color:#fff;
-      font-weight:600;
-      cursor:pointer;
-      transition:0.3s;
+    header .user {
+      font-size: 14px;
     }
-    .auth-btn:hover { background:#ff3380; }
 
     h2 {
-      margin:20px auto;
-      color:cyan;
-      text-align:center;
+      color: cyan;
+      margin-top: 20px;
+      text-shadow: 0 0 10px cyan;
     }
 
-    .top-bar {
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      flex-wrap:wrap;
-      gap:10px;
-      margin-bottom:15px;
+    .history-box {
+      margin: 20px;
+      background: #111;
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px #0ff;
+      overflow-x: auto;
     }
-    .search-box input {
-      padding:10px;
-      border-radius:8px;
-      border:none;
-      outline:none;
-      background:#111;
-      color:#0ff;
-      box-shadow:0 0 10px rgba(0,255,255,0.4) inset;
-      width:240px;
-    }
-    .btn {
-      padding:10px 16px;
-      border:none;
-      border-radius:8px;
-      font-weight:600;
-      cursor:pointer;
-      transition:0.3s;
-    }
-    .btn-accent { background:cyan; color:#000; }
-    .btn-danger { background:#ff0057; color:#fff; }
-    .btn-go { background:#22c55e; color:#fff; }
-    .btn:hover { opacity:0.85; }
 
-    .card {
-      background:#111;
-      padding:15px;
-      margin:auto;
-      border-radius:15px;
-      box-shadow:0 0 25px rgba(0,255,255,0.4);
-      width:95%;
-      max-width:800px;
-    }
     table {
-      width:100%;
-      border-collapse:collapse;
-      font-size:14px;
+      width: 100%;
+      border-collapse: collapse;
+      color: #fff;
     }
     th, td {
-      padding:8px;
-      border-bottom:1px solid #222;
-      text-align:center;
+      padding: 10px;
+      border-bottom: 1px solid #444;
+      text-align: center;
     }
-    th { color:#000; background:cyan; }
-    tr:hover { background:rgba(0,255,255,0.05); }
-
-    .status-box {
-      padding:4px 8px;
-      border-radius:6px;
-      font-size:13px;
-      font-weight:bold;
+    th {
+      color: cyan;
     }
-    .waiting { background:#eab308; color:#000; }
-    .completed { background:#22c55e; color:#fff; }
-    .cancelled { background:#ef4444; color:#fff; }
-
-    .pagination { margin:15px auto; text-align:center; }
-    .pagination button {
-      background:cyan; color:#000;
-      border:none; border-radius:6px;
-      padding:6px 12px; margin:3px;
-      cursor:pointer;
+    tr:hover {
+      background: rgba(0,255,255,0.1);
     }
-    .pagination button:disabled {
-      background:#222; color:#777;
+    .status {
+      font-weight: bold;
+      color: lime;
     }
 
-    #toast {
-      visibility:hidden;
-      min-width:220px;
-      background:#333;
-      color:#fff;
-      text-align:center;
-      border-radius:6px;
-      padding:12px;
-      position:fixed;
-      z-index:1000;
-      left:50%;
-      bottom:30px;
-      transform:translateX(-50%);
+    nav {
+      background: #111;
+      display: flex;
+      justify-content: space-around;
+      padding: 12px;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
     }
-    #toast.show { visibility:visible; animation:fadein 0.5s, fadeout 0.5s 2.5s; }
-    @keyframes fadein { from{opacity:0;} to{opacity:1;} }
-    @keyframes fadeout { from{opacity:1;} to{opacity:0;} }
+    nav button {
+      background: #222;
+      color: #fff;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    nav button:hover {
+      background: cyan;
+      color: #000;
+    }
   </style>
 </head>
 <body>
 
-<header>
-  <h1>📜 Order History</h1>
-  <button id="authBtn" class="auth-btn">Login</button>
-</header>
+  <header>
+    <div class="logo">⚡ Sarkar Telecom</div>
+    <div class="user">👤 saMrat IT</div>
+  </header>
 
-<main>
-  <h2>Your Orders</h2>
+  <h2>📜 Order History</h2>
 
-  <div class="top-bar">
-    <div class="search-box">
-      <input type="text" id="searchInput" placeholder="🔍 Search by Number / Amount / Status">
-    </div>
-    <button id="searchBtn" class="btn btn-accent">Search</button>
-    <button id="clearBtn" class="btn btn-danger">❌ Clear</button>
-    <button class="btn btn-go" onclick="window.location.href='order.html'">➕ New Order</button>
-  </div>
-
-  <div class="card">
-    <table>
+  <div class="history-box">
+    <table id="orderTable">
       <thead>
         <tr>
-          <th>SL</th>
-          <th>Number</th>
+          <th>#</th>
+          <th>Profile ID</th>
           <th>Amount</th>
+          <th>Date</th>
           <th>Status</th>
-          <th>Time</th>
         </tr>
       </thead>
-      <tbody id="orderTable">
-        <tr><td colspan="5">⏳ Loading...</td></tr>
+      <tbody>
+        <!-- Orders will load here -->
       </tbody>
     </table>
   </div>
 
-  <div class="pagination">
-    <button id="prevBtn">⬅ Prev</button>
-    <button id="nextBtn">Next ➡</button>
-  </div>
-</main>
+  <nav>
+    <button onclick="location.href='dashboard.html'">🏠 Home</button>
+    <button onclick="location.href='order.html'">📱 Order</button>
+    <button onclick="location.href='order-history.html'">📜 Orders</button>
+    <button onclick="location.href='profile.html'">👤 Profile</button>
+  </nav>
 
-<div id="toast"></div>
+  <script>
+    function formatDate(dateString) {
+      let date = new Date(dateString);
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-  import { getFirestore, doc, getDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+      let options = {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "numeric",
+        minute: "numeric",
+        second: "numeric",
+        hour12: true
+      };
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyBIIOv-2Laqugv5_HAIRNJllp8YUfYndF8",
-    authDomain: "diamond-recharge-f7f59.firebaseapp.com",
-    projectId: "diamond-recharge-f7f59",
-    storageBucket: "diamond-recharge-f7f59.appspot.com",
-    messagingSenderId: "657717928489",
-    appId: "1:657717928489:web:70431ebc9afb7002d4b238"
-  };
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
+      return date.toLocaleString("en-US", options);
+    }
 
-  const orderTable=document.getElementById("orderTable");
-  const prevBtn=document.getElementById("prevBtn");
-  const nextBtn=document.getElementById("nextBtn");
-  const searchInput=document.getElementById("searchInput");
-  const searchBtn=document.getElementById("searchBtn");
-  const clearBtn=document.getElementById("clearBtn");
-  const authBtn=document.getElementById("authBtn");
-  const toast=document.getElementById("toast");
+    function loadOrders() {
+      let orders = JSON.parse(localStorage.getItem("orders")) || [];
+      let tbody = document.querySelector("#orderTable tbody");
+      tbody.innerHTML = "";
 
-  let allOrders=[], viewOrders=[], currentPage=1;
-  const rowsPerPage=10;
-
-  function showToast(msg){
-    toast.textContent=msg;
-    toast.className="show";
-    setTimeout(()=>{toast.className=toast.className.replace("show","");},3000);
-  }
-
-  function parseCSV(text){
-    text=text.replace(/\r/g,'');
-    const lines=text.split('\n').filter(l=>l.trim().length>0);
-    return lines.map(line=>{
-      const row=[]; let cur='',inQ=false;
-      for(let i=0;i<line.length;i++){
-        const ch=line[i];
-        if(ch==='"'){
-          if(inQ && line[i+1]==='"'){cur+='"';i++;}
-          else inQ=!inQ;
-        } else if(ch===',' && !inQ){row.push(cur);cur='';}
-        else cur+=ch;
+      if (orders.length === 0) {
+        tbody.innerHTML = "<tr><td colspan='5'>No orders found</td></tr>";
+        return;
       }
-      row.push(cur); return row;
-    });
-  }
-  async function fetchCSV(url){
-    const res=await fetch(url,{cache:"no-store"});
-    return parseCSV(await res.text());
-  }
 
-  const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vR4owbSc_h38ouaktOU30TYqH6wy93qYjmW0G5GWXhsBMzsrVSaWzPtVPA7YpyOUmlEpStByT8TxG0-/pub?gid=1098128992&single=true&output=csv";
-
-  const normalize=v=>(v??"").toString().trim().toLowerCase();
-  const statusClassOf=s=>{
-    const t=normalize(s);
-    if(t.includes("cancel")) return "cancelled";
-    if(t.includes("complete")) return "completed";
-    return "waiting";
-  }
-  function formatTimeCell(t){
-    if(!t) return "-";
-    let d; if(!isNaN(t)){
-      const millis=(Number(t)-25569)*86400*1000;
-      d=new Date(millis);
-    } else d=new Date(t);
-    if(isNaN(d)) return t;
-    const bdTime=new Date(d.getTime()+(6*60*60*1000));
-    return bdTime.toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit",hour12:true});
-  }
-
-  function renderTable(){
-    orderTable.innerHTML="";
-    const start=(currentPage-1)*rowsPerPage;
-    const page=viewOrders.slice(start,start+rowsPerPage);
-    if(!page.length){orderTable.innerHTML="<tr><td colspan='5'>No orders found.</td></tr>"; return;}
-    page.forEach((row,idx)=>{
-      const [time,number,amount,email,status]=row;
-      const tr=document.createElement("tr");
-      tr.innerHTML=`
-        <td>${viewOrders.length-(start+idx)}</td>
-        <td>${number||"-"}</td>
-        <td>${amount||"-"}</td>
-        <td><span class="status-box ${statusClassOf(status)}">${status||"-"}</span></td>
-        <td>${formatTimeCell(time)}</td>
-      `;
-      orderTable.appendChild(tr);
-    });
-    prevBtn.disabled=currentPage===1;
-    nextBtn.disabled=start+rowsPerPage>=viewOrders.length;
-  }
-
-  function applySearch(){
-    const term=normalize(searchInput.value);
-    viewOrders=term?allOrders.filter(r=>
-      normalize(r[1]).includes(term)||
-      normalize(r[2]).includes(term)||
-      normalize(r[4]).includes(term)
-    ):[...allOrders];
-    currentPage=1; renderTable();
-  }
-
-  async function refundIfNeeded(user,orders){
-    const ref=doc(db,"users",user.uid);
-    const snap=await getDoc(ref);
-    if(!snap.exists()) return;
-    const data=snap.data();
-    let refundedOrders=data.refundedOrders||[];
-    for(const row of orders){
-      const [time,number,amount,email,status]=row;
-      if(normalize(email)!==normalize(user.email)) continue;
-      if(!normalize(status).includes("cancel")) continue;
-      if(refundedOrders.includes(time)) continue;
-      const refund=Number(amount)||0;
-      if(refund>0){
-        await updateDoc(ref,{
-          balance:(data.balance||0)+refund,
-          refundedOrders:arrayUnion(time)
-        });
-        showToast(`💰 Refunded ${refund}`);
-      }
+      orders.reverse().forEach((order, index) => {
+        let row = `
+          <tr>
+            <td>${index + 1}</td>
+            <td>${order.profileId}</td>
+            <td>💎 ${order.amount}</td>
+            <td>${formatDate(order.date)}</td>
+            <td class="status">${order.status}</td>
+          </tr>
+        `;
+        tbody.innerHTML += row;
+      });
     }
-  }
 
-  async function loadOrders(user){
-    orderTable.innerHTML="<tr><td colspan='5'>⏳ Loading...</td></tr>";
-    try{
-      const rows=await fetchCSV(CSV_URL);
-      allOrders=rows.slice(1).reverse().filter(r=>normalize(r[3])===normalize(user.email));
-      viewOrders=[...allOrders]; currentPage=1;
-      renderTable();
-      await refundIfNeeded(user,allOrders);
-    }catch(e){
-      orderTable.innerHTML=`<tr><td colspan='5'>❌ Error: ${e.message}</td></tr>`;
-    }
-  }
-
-  prevBtn.onclick=()=>{if(currentPage>1){currentPage--;renderTable();}};
-  nextBtn.onclick=()=>{if((currentPage*rowsPerPage)<viewOrders.length){currentPage++;renderTable();}};
-  searchBtn.onclick=applySearch;
-  searchInput.onkeydown=e=>{if(e.key==="Enter")applySearch();};
-  clearBtn.onclick=()=>{searchInput.value="";applySearch();};
-
-  onAuthStateChanged(auth,user=>{
-    if(user){
-      authBtn.textContent="Logout";
-      authBtn.onclick=()=>signOut(auth);
-      loadOrders(user);
-    }else{
-      window.location.href="login.html?redirect=order-history.html";
-    }
-  });
-</script>
+    loadOrders();
+  </script>
 
 </body>
 </html>
