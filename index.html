@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Diamond Recharge — Neon Glass Template</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body class="has-sidebar">
+  <header class="header">
+    <button id="menuToggle" class="menu-btn" aria-label="Open menu">☰</button>
+    <div class="brand">
+      <img src="assets/logo.svg" alt="logo" class="logo">
+      <div class="brand-text">
+        <div class="site-name">Diamond Recharge</div>
+        <div class="site-sub">Neon glass template</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <div id="authBox" class="auth-box">
+        <img id="authAvatar" src="https://via.placeholder.com/36" class="avatar" alt="user">
+        <div class="auth-info">
+          <div id="authName">Guest</div>
+          <div id="authEmail" class="muted">not signed in</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <aside id="sidebar" class="sidebar" aria-hidden="true">
+    <div class="sidebar-inner">
+      <button id="closeSidebar" class="close-btn" aria-label="Close sidebar">✕</button>
+      <nav class="nav">
+        <a href="index.html" class="nav-link active">🏠 Dashboard</a>
+        <a href="order.html" class="nav-link">📱 New Order</a>
+        <a href="order-history.html" class="nav-link">📃 Orders</a>
+        <a href="balance.html" class="nav-link">💰 Balance</a>
+        <a href="admin.html" class="nav-link">⚙️ Admin</a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="footer-user">
+          <img src="https://via.placeholder.com/48" class="avatar" alt="avatar">
+          <div>
+            <div id="sbName">Guest</div>
+            <div id="sbEmail" class="muted">-</div>
+          </div>
+        </div>
+        <div class="sb-balance">💎 <span id="sbBalance">৳ 0</span></div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main container">
+    <section class="hero card neon">
+      <div class="hero-left">
+        <h1>Welcome to <span class="accent">Diamond Recharge</span></h1>
+        <p class="muted">Mobile-first neon glass template for recharge/topup services. Responsive & lightweight.</p>
+        <div class="cta-row">
+          <a class="btn primary" href="order.html">New Order</a>
+          <a class="btn" href="order-history.html">Order History</a>
+        </div>
+      </div>
+      <div class="hero-right">
+        <div class="profile-card card small">
+          <img id="profilePhoto" src="https://via.placeholder.com/80" alt="user" class="avatar-lg">
+          <div>
+            <div id="profileName">Guest</div>
+            <div id="profileEmail" class="muted">not signed in</div>
+            <div class="balance">💎 <span id="profileBalance">৳ 0</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid cards">
+      <article class="card neon">
+        <h3>Quick Top-up</h3>
+        <p class="muted">Create a quick order and deduct from user balance when order is placed.</p>
+      </article>
+      <article class="card neon">
+        <h3>Balance Refunds</h3>
+        <p class="muted">Process refunds and restore balance to the user. Works with Firebase/Sheets integration.</p>
+      </article>
+      <article class="card neon">
+        <h3>Orders</h3>
+        <p class="muted">View recent orders and their status (deduct balance on success).</p>
+      </article>
+      <article class="card neon">
+        <h3>Admin Tools</h3>
+        <p class="muted">Manual balance adjustment, export to Google Sheets, role-based actions.</p>
+      </article>
+    </section>
+
+    <footer class="site-footer card">
+      <div>© <span id="year"></span> Diamond Recharge</div>
+      <div class="muted">Built for mobile & desktop — neon glass UI</div>
+    </footer>
+  </main>
+
+<script src="assets/script.js" defer></script>
+</body>
+</html>
