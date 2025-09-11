@@ -9,6 +9,7 @@
       margin: 0;
       font-family: Arial, sans-serif;
       display: flex;
+      background: #fafafa;
     }
     header {
       position: fixed;
@@ -62,6 +63,43 @@
     .sidebar.active ~ .content {
       margin-left: 250px;
     }
+    /* Simple modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      width: 300px;
+    }
+    .modal-content h2 { margin-top: 0; }
+    .modal-content input {
+      width: 100%;
+      padding: 8px;
+      margin: 6px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .modal-content button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .close-btn {
+      float: right;
+      cursor: pointer;
+      font-size: 18px;
+    }
   </style>
 </head>
 <body>
@@ -81,6 +119,18 @@
   <div class="content">
     <h2>Welcome to Diamond Recharge BD</h2>
     <p>Your one-stop solution for diamond recharges!</p>
+  </div>
+
+  <!-- Login Modal -->
+  <div class="modal" id="loginModal">
+    <div class="modal-content">
+      <span class="close-btn" id="closeModal">&times;</span>
+      <h2>Login</h2>
+      <input type="email" id="emailInput" placeholder="Email" />
+      <input type="password" id="passwordInput" placeholder="Password" />
+      <button id="emailLoginBtn" style="background:#1976d2; color:#fff;">Login with Email</button>
+      <button id="googleLoginBtn" style="background:#db4437; color:#fff;">Login with Google</button>
+    </div>
   </div>
 
   <!-- Firebase SDK -->
@@ -104,21 +154,42 @@
     const db = firebase.firestore();
 
     // Sidebar toggle
-    const menuBtn = document.getElementById("menuBtn");
-    const sidebar = document.getElementById("sidebar");
-    menuBtn.addEventListener("click", () => {
-      sidebar.classList.toggle("active");
+    document.getElementById("menuBtn").addEventListener("click", () => {
+      document.getElementById("sidebar").classList.toggle("active");
     });
 
-    // Auth button
+    // Modal handling
+    const loginModal = document.getElementById("loginModal");
     const authBtn = document.getElementById("authBtn");
+    const closeModal = document.getElementById("closeModal");
+
     authBtn.addEventListener("click", () => {
       if (auth.currentUser) {
         auth.signOut();
       } else {
-        const provider = new firebase.auth.GoogleAuthProvider();
-        auth.signInWithPopup(provider);
+        loginModal.style.display = "flex";
       }
+    });
+    closeModal.addEventListener("click", () => {
+      loginModal.style.display = "none";
+    });
+    window.addEventListener("click", e => {
+      if (e.target === loginModal) loginModal.style.display = "none";
+    });
+
+    // Email login
+    document.getElementById("emailLoginBtn").addEventListener("click", () => {
+      const email = document.getElementById("emailInput").value;
+      const password = document.getElementById("passwordInput").value;
+      auth.signInWithEmailAndPassword(email, password)
+        .then(() => loginModal.style.display = "none")
+        .catch(err => alert(err.message));
+    });
+
+    // Google login
+    document.getElementById("googleLoginBtn").addEventListener("click", () => {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider).then(() => loginModal.style.display = "none");
     });
 
     // Show user info
