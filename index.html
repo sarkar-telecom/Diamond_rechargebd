@@ -1,208 +1,155 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Diamond Recharge — Neon Glass Template</title>
-  <link rel="stylesheet" href="assets/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Diamond Recharge BD</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+    }
+    header {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      background: #1976d2;
+      color: #fff;
+      padding: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 1000;
+    }
+    header h1 { margin: 0; font-size: 18px; }
+    header button {
+      background: #fff;
+      color: #1976d2;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .sidebar {
+      position: fixed;
+      top: 60px;
+      left: -250px;
+      width: 250px;
+      height: 100%;
+      background: #f5f5f5;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+      transition: left 0.3s ease;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .sidebar.active { left: 0; }
+    .sidebar img {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: block;
+      margin-bottom: 10px;
+    }
+    .sidebar h3, .sidebar p { margin: 5px 0; }
+    .content {
+      margin-top: 70px;
+      padding: 20px;
+      flex: 1;
+      margin-left: 0;
+      transition: margin-left 0.3s ease;
+    }
+    .sidebar.active ~ .content {
+      margin-left: 250px;
+    }
+  </style>
 </head>
-<body class="has-sidebar">
-  <header class="header">
-    <button id="menuToggle" class="menu-btn" aria-label="Open menu">☰</button>
-    <div class="brand">
-      <img src="assets/logo.svg" alt="logo" class="logo">
-      <div class="brand-text">
-        <div class="site-name">Diamond Recharge</div>
-        <div class="site-sub">Neon glass template</div>
-      </div>
-    </div>
-    <div class="header-actions">
-      <div id="authBox" class="auth-box">
-        <img id="authAvatar" src="https://via.placeholder.com/36" class="avatar" alt="user">
-        <div class="auth-info">
-          <div id="authName">Guest</div>
-          <div id="authEmail" class="muted">not signed in</div>
-        </div>
-        <button id="authBtn" class="btn small">Login</button>
-      </div>
-    </div>
+<body>
+  <header>
+    <button id="menuBtn">☰</button>
+    <h1>Diamond Recharge BD</h1>
+    <button id="authBtn">Login</button>
   </header>
 
-  <aside id="sidebar" class="sidebar" aria-hidden="true">
-    <div class="sidebar-inner">
-      <button id="closeSidebar" class="close-btn" aria-label="Close sidebar">✕</button>
-      <nav class="nav">
-        <a href="index.html" class="nav-link active">🏠 Dashboard</a>
-        <a href="order.html" class="nav-link">📱 New Order</a>
-        <a href="order-history.html" class="nav-link">📃 Orders</a>
-        <a href="balance.html" class="nav-link">💰 Balance</a>
-        <a href="admin.html" class="nav-link">⚙️ Admin</a>
-      </nav>
-      <div class="sidebar-footer">
-        <div class="footer-user">
-          <img id="sbAvatar" src="https://via.placeholder.com/48" class="avatar" alt="avatar">
-          <div>
-            <div id="sbName">Guest</div>
-            <div id="sbEmail" class="muted">-</div>
-          </div>
-        </div>
-        <div class="sb-balance">💎 <span id="sbBalance">৳ 0</span></div>
-      </div>
-    </div>
-  </aside>
+  <div class="sidebar" id="sidebar">
+    <img id="userAvatar" src="https://via.placeholder.com/60" alt="Avatar" />
+    <h3 id="userName">Guest</h3>
+    <p id="userEmail">Not logged in</p>
+    <p><strong>Balance:</strong> <span id="userBalance">0</span></p>
+  </div>
 
-  <main class="main container">
-    <section class="hero card neon">
-      <div class="hero-left">
-        <h1>Welcome to <span class="accent">Diamond Recharge</span></h1>
-        <p class="muted">Mobile-first neon glass template for recharge/topup services. Responsive & lightweight.</p>
-        <div class="cta-row">
-          <a class="btn primary" href="order.html">New Order</a>
-          <a class="btn" href="order-history.html">Order History</a>
-        </div>
-      </div>
-      <div class="hero-right">
-        <div class="profile-card card small">
-          <img id="profilePhoto" src="https://via.placeholder.com/80" alt="user" class="avatar-lg">
-          <div>
-            <div id="profileName">Guest</div>
-            <div id="profileEmail" class="muted">not signed in</div>
-            <div class="balance">💎 <span id="profileBalance">৳ 0</span></div>
-          </div>
-        </div>
-      </div>
-    </section>
+  <div class="content">
+    <h2>Welcome to Diamond Recharge BD</h2>
+    <p>Your one-stop solution for diamond recharges!</p>
+  </div>
 
-    <section class="grid cards">
-      <article class="card neon">
-        <h3>Quick Top-up</h3>
-        <p class="muted">Create a quick order and deduct from user balance when order is placed.</p>
-      </article>
-      <article class="card neon">
-        <h3>Balance Refunds</h3>
-        <p class="muted">Process refunds and restore balance to the user. Works with Firebase Firestore.</p>
-      </article>
-      <article class="card neon">
-        <h3>Orders</h3>
-        <p class="muted">View recent orders and their status (deduct balance on success).</p>
-      </article>
-      <article class="card neon">
-        <h3>Admin Tools</h3>
-        <p class="muted">Manual balance adjustment, export to Google Sheets, role-based actions.</p>
-      </article>
-    </section>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
-    <footer class="site-footer card">
-      <div>© <span id="year"></span> Diamond Recharge</div>
-      <div class="muted">Built for mobile & desktop — neon glass UI</div>
-    </footer>
-  </main>
-
-  <!-- Firebase + Firestore -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
-
+  <script>
+    // 🔹 Your Firebase Config
     const firebaseConfig = {
-      apiKey: "AIzaSyAyhjOsIXNAkBglpRllt0OZIOJYpdB_9-8",
-      authDomain: "diamond-recharge-f7f59.firebaseapp.com",
-      projectId: "diamond-recharge-f7f59",
-      storageBucket: "diamond-recharge-f7f59.firebasestorage.app",
-      messagingSenderId: "657717928489",
-      appId: "1:657717928489:web:70431ebc9afb7002d4b238",
-      measurementId: "G-TDK78BQ8SQ"
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_STORAGE_BUCKET",
+      messagingSenderId: "YOUR_MSG_ID",
+      appId: "YOUR_APP_ID"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    const provider = new GoogleAuthProvider();
-
-    // Elements
-    const authBtn = document.getElementById("authBtn");
-    const authName = document.getElementById("authName");
-    const authEmail = document.getElementById("authEmail");
-    const authAvatar = document.getElementById("authAvatar");
-    const sbName = document.getElementById("sbName");
-    const sbEmail = document.getElementById("sbEmail");
-    const sbAvatar = document.getElementById("sbAvatar");
-    const sbBalance = document.getElementById("sbBalance");
-    const profileName = document.getElementById("profileName");
-    const profileEmail = document.getElementById("profileEmail");
-    const profilePhoto = document.getElementById("profilePhoto");
-    const profileBalance = document.getElementById("profileBalance");
-
-    // Load Firestore balance + info
-    async function loadUserData(uid, user) {
-      const ref = doc(db, "users", uid);
-      const snap = await getDoc(ref);
-      if (snap.exists()) {
-        const data = snap.data();
-        const balance = data.balance || 0;
-
-        authName.textContent = data.name || user.displayName || "User";
-        authEmail.textContent = data.email || user.email;
-        authAvatar.src = data.photoURL || user.photoURL || "https://via.placeholder.com/36";
-
-        sbName.textContent = data.name || user.displayName || "User";
-        sbEmail.textContent = data.email || user.email;
-        sbAvatar.src = data.photoURL || user.photoURL || "https://via.placeholder.com/48";
-        sbBalance.textContent = "৳ " + balance;
-
-        profileName.textContent = data.name || user.displayName || "User";
-        profileEmail.textContent = data.email || user.email;
-        profilePhoto.src = data.photoURL || user.photoURL || "https://via.placeholder.com/80";
-        profileBalance.textContent = "৳ " + balance;
-      } else {
-        // If no record, create one
-        await setDoc(ref, {
-          name: user.displayName || "User",
-          email: user.email,
-          photoURL: user.photoURL || "",
-          balance: 0
-        });
-        loadUserData(uid, user);
-      }
-    }
-
-    // Auth state
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        authBtn.textContent = "Logout";
-        loadUserData(user.uid, user);
-      } else {
-        authName.textContent = "Guest";
-        authEmail.textContent = "not signed in";
-        authAvatar.src = "https://via.placeholder.com/36";
-        sbName.textContent = "Guest";
-        sbEmail.textContent = "-";
-        sbAvatar.src = "https://via.placeholder.com/48";
-        sbBalance.textContent = "৳ 0";
-        profileName.textContent = "Guest";
-        profileEmail.textContent = "not signed in";
-        profilePhoto.src = "https://via.placeholder.com/80";
-        profileBalance.textContent = "৳ 0";
-        authBtn.textContent = "Login";
-      }
-    });
-
-    // Login / Logout button
-    authBtn.addEventListener("click", () => {
-      if (auth.currentUser) {
-        signOut(auth);
-      } else {
-        signInWithPopup(auth, provider);
-      }
-    });
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
 
     // Sidebar toggle
+    const menuBtn = document.getElementById("menuBtn");
     const sidebar = document.getElementById("sidebar");
-    document.getElementById("menuToggle").onclick = () => sidebar.setAttribute("aria-hidden", "false");
-    document.getElementById("closeSidebar").onclick = () => sidebar.setAttribute("aria-hidden", "true");
+    menuBtn.addEventListener("click", () => {
+      sidebar.classList.toggle("active");
+    });
 
-    // Year
-    document.getElementById("year").textContent = new Date().getFullYear();
+    // Auth button
+    const authBtn = document.getElementById("authBtn");
+    authBtn.addEventListener("click", () => {
+      if (auth.currentUser) {
+        auth.signOut();
+      } else {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        auth.signInWithPopup(provider);
+      }
+    });
+
+    // Show user info
+    auth.onAuthStateChanged(user => {
+      const userName = document.getElementById("userName");
+      const userEmail = document.getElementById("userEmail");
+      const userAvatar = document.getElementById("userAvatar");
+      const userBalance = document.getElementById("userBalance");
+
+      if (user) {
+        authBtn.textContent = "Logout";
+        userName.textContent = user.displayName || "User";
+        userEmail.textContent = user.email;
+        userAvatar.src = user.photoURL || "https://via.placeholder.com/60";
+
+        // 🔹 Load balance from Firestore
+        db.collection("users").doc(user.uid).onSnapshot(doc => {
+          if (doc.exists) {
+            userBalance.textContent = doc.data().balance || 0;
+          } else {
+            userBalance.textContent = "0";
+          }
+        });
+      } else {
+        authBtn.textContent = "Login";
+        userName.textContent = "Guest";
+        userEmail.textContent = "Not logged in";
+        userAvatar.src = "https://via.placeholder.com/60";
+        userBalance.textContent = "0";
+      }
+    });
   </script>
 </body>
 </html>
