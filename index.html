@@ -1,113 +1,146 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>SARKAR TELECOM - Virtual Gifting Services</title>
-  <link rel="stylesheet" href="assets/style.css">
-
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Diamond Recharge BD</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+    header { background: #222; color: #fff; padding: 1rem; display: flex; justify-content: space-between; align-items: center; }
+    header h1 { margin: 0; font-size: 1.2rem; }
+    #auth-btn { cursor: pointer; background: #f90; border: none; padding: 0.5rem 1rem; border-radius: 4px; }
+    .container { padding: 1rem; }
+    .hidden { display: none; }
+    .profile { margin-top: 1rem; border: 1px solid #ccc; padding: 1rem; border-radius: 8px; }
+  </style>
 </head>
-<body class="has-sidebar">
-  <header class="header">
-    <button id="menuToggle" class="menu-btn" aria-label="Open menu">☰</button>
-    <div class="brand">
-      <img src="assets/logo.svg" alt="logo" class="logo">
-      <div class="brand-text">
-        <div class="site-name">SARKAR TELECOM</div>
-        <div class="site-sub">Virtual Gifting Services</div>
-      </div>
-    </div>
-    <div class="header-actions">
-      <div id="authBox" class="auth-box">
-        <img id="authAvatar" src="https://via.placeholder.com/36" class="avatar" alt="user">
-        <div class="auth-info">
-          <div id="authName">Guest</div>
-          <div id="authEmail" class="muted">Not signed in</div>
-        </div>
-      </div>
-    </div>
+<body>
+  <header>
+    <h1>Diamond Recharge BD</h1>
+    <button id="auth-btn">Login</button>
   </header>
 
-  <aside id="sidebar" class="sidebar" aria-hidden="true">
-    <div class="sidebar-inner">
-      <button id="closeSidebar" class="close-btn" aria-label="Close sidebar">✕</button>
-      <nav class="nav">
-        <a href="#" class="nav-link active">Home 🛖</a>
-        <a href="#" class="nav-link">➕ Order 🛒</a>
-        <a href="#" class="nav-link">My Orders ⌛</a>
-        <a href="#" class="nav-link">💎 Balance</a>
-        <a href="#" class="nav-link">Admin ⚙️</a>
-      </nav>
+  <div class="container">
+    <div id="login-form" class="hidden">
+      <h2>Email Login</h2>
+      <input type="email" id="email" placeholder="Email"><br><br>
+      <input type="password" id="password" placeholder="Password"><br><br>
+      <button id="email-login">Login with Email</button>
+      <button id="google-login">Login with Google</button>
+    </div>
 
-      <div class="sidebar-footer">
-        <div class="footer-user">
-          <img src="https://via.placeholder.com/48" class="avatar" alt="avatar">
-          <div>
-            <div id="sbName">Guest</div>
-            <div id="sbEmail" class="muted">-</div>
-          </div>
-        </div>
-        <div class="sb-balance">💎 <span id="sbBalance">0</span></div>
-
-        <!-- Login / Logout -->
-        <div id="loginBox" class="auth-actions card">
-          <input id="emailInput" type="email" placeholder="Email" class="btn">
-          <input id="passInput" type="password" placeholder="Password" class="btn">
-          <button id="emailLoginBtn" class="btn primary">Login</button>
-          <button id="emailRegisterBtn" class="btn">Sign Up</button>
-          <button id="googleBtn" class="btn">Login with Google</button>
-        </div>
-        <button id="logoutBtn" class="btn" style="display:none;">Logout</button>
+    <div id="user-info" class="hidden">
+      <h2>Welcome!</h2>
+      <div class="profile">
+        <p><strong>Name:</strong> <span id="user-name"></span></p>
+        <p><strong>Email:</strong> <span id="user-email"></span></p>
+        <p><strong>Phone:</strong> <span id="user-phone"></span></p>
+        <p><strong>Balance:</strong> <span id="user-balance"></span></p>
+        <p><strong>Role:</strong> <span id="user-role"></span></p>
       </div>
     </div>
-  </aside>
+  </div>
 
-  <main class="main container">
-    <section class="hero card neon">
-      <div class="hero-left">
-        <h1> 👋 Welcome to <span class="accent">SARKAR TELECOM</span></h1>
-        <p class="muted">Fast & Secure Mobile Gifting Service</p>
-      </div>
-      <div class="hero-right">
-        <div class="profile-card card small">
-          <img id="profilePhoto" src="https://via.placeholder.com/80" alt="user" class="avatar-lg">
-          <div>
-            <div id="profileName">Guest</div>
-            <div id="profileEmail" class="muted">Not signed in</div>
-            <div class="balance">💎<span id="profileBalance">0</span></div>
-          </div>
-        </div>
-      </div>
-    </section>
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js"></script>
 
-    <section class="grid cards">
-      <article class="card neon">
-        <h3>Easy Top-Up</h3>
-        <p class="muted">Load Balance, Place Orders, Wait & You Are Ready 😇</p>
-      </article>
-      <article class="card neon">
-        <h3>💎 Balance Refunds</h3>
-        <p class="muted">Process refunds for cancelled orders automatically.</p>
-      </article>
-      <article class="card neon">
-        <h3>Orders Management</h3>
-        <p class="muted">Check status: Waiting, Cancelled, or Completed quickly.</p>
-      </article>
-      <article class="card neon">
-        <h3>Secure Login</h3>
-        <p class="muted">Secure login & data protection with Firebase & Google Auth.</p>
-      </article>
-    </section>
-  </main>
+  <script type="module">
+    // ✅ Your Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyAyhjOsIXNAkBglpRllt0OZIOJYpdB_9-8",
+      authDomain: "diamond-recharge-f7f59.firebaseapp.com",
+      projectId: "diamond-recharge-f7f59",
+      storageBucket: "diamond-recharge-f7f59.firebasestorage.app",
+      messagingSenderId: "657717928489",
+      appId: "1:657717928489:web:70431ebc9afb7002d4b238",
+      measurementId: "G-TDK78BQ8SQ"
+    };
 
-  <footer class="site-footer card">
-    <div>© <span id="year"></span> - SARKAR TELECOM</div>
-    <div class="muted">Fast & Secure Mobile Recharge</div>
-  </footer>
+    // ✅ Init Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
-  <script src="assets/script.js" defer></script>
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Elements
+    const authBtn = document.getElementById("auth-btn");
+    const loginForm = document.getElementById("login-form");
+    const userInfo = document.getElementById("user-info");
+
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+    const emailLoginBtn = document.getElementById("email-login");
+    const googleLoginBtn = document.getElementById("google-login");
+
+    const userName = document.getElementById("user-name");
+    const userEmail = document.getElementById("user-email");
+    const userPhone = document.getElementById("user-phone");
+    const userBalance = document.getElementById("user-balance");
+    const userRole = document.getElementById("user-role");
+
+    // Toggle login/logout
+    authBtn.addEventListener("click", async () => {
+      if (auth.currentUser) {
+        await signOut(auth);
+      } else {
+        loginForm.classList.toggle("hidden");
+      }
+    });
+
+    // Google Login
+    googleLoginBtn.addEventListener("click", async () => {
+      const provider = new GoogleAuthProvider();
+      try {
+        await signInWithPopup(auth, provider);
+      } catch (err) {
+        alert("Google login failed: " + err.message);
+      }
+    });
+
+    // Email/Password Login
+    emailLoginBtn.addEventListener("click", async () => {
+      try {
+        await signInWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
+      } catch (err) {
+        alert("Email login failed: " + err.message);
+      }
+    });
+
+    // Auth state observer
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        authBtn.textContent = "Logout";
+        loginForm.classList.add("hidden");
+        userInfo.classList.remove("hidden");
+
+        // Fetch Firestore profile
+        const docRef = doc(db, "users", user.uid);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          userName.textContent = data.name || "N/A";
+          userEmail.textContent = data.email || user.email;
+          userPhone.textContent = data.phone || "N/A";
+          userBalance.textContent = data.balance ?? "0";
+          userRole.textContent = data.role || "user";
+        } else {
+          userName.textContent = "Unknown User";
+          userEmail.textContent = user.email;
+          userPhone.textContent = "-";
+          userBalance.textContent = "0";
+          userRole.textContent = "user";
+        }
+
+      } else {
+        authBtn.textContent = "Login";
+        userInfo.classList.add("hidden");
+      }
+    });
+  </script>
 </body>
 </html>
