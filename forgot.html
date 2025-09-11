@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Forgot Password - Sarkar Telecom</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<header class="header" role="banner" aria-label="Site header">
+  <div class="brand">
+    <img src="logo.png" class="logo" alt="logo">
+    <div>
+      <div class="site-name">Sarkar Telecom</div>
+      <div class="muted small">Recharge & Topup</div>
+    </div>
+  </div>
+  <div class="actions">
+    <button class="sidebar-toggle" id="sidebarToggle" aria-label="Open menu" title="Menu">
+      <svg width="18" height="14" viewBox="0 0 24 24" fill="none" aria-hidden><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
+    <div id="userInfo" class="kv"><span class="muted">Not signed in</span></div>
+  </div>
+</header>
+
+<aside class="sidebar" id="rightSidebar" aria-hidden="true">
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div style="font-weight:700">Navigation</div>
+      <button class="btn btn-close">✕</button>
+    </div>
+    <nav class="nav">
+      <a href="index.html" class="btn">🏠 Home</a>
+      <a href="dashboard.html" class="btn">📊 Dashboard</a>
+      <a href="order.html" class="btn">📱 New Order</a>
+      <a href="order-history.html" class="btn">📃 Orders</a>
+      <a href="profile.html" class="btn">👤 Profile</a>
+      <a href="balance.html" class="btn">💰 Balance</a>
+      <a href="admin.html" class="btn">⚙️ Admin</a>
+    </nav>
+  </div>
+</aside>
+
+<main class="main container">
+  <div class="card">
+<div class="login-card">
+  <h2>Forgot Password</h2>
+
+  <input type="email" id="email" placeholder="Enter your email" required>
+
+  <!-- Reset Button -->
+  <button class="btn" id="resetBtn">Send Reset Link</button>
+
+  <!-- Navigation style buttons -->
+  <button class="btn-alt" onclick="window.location.href='login.html'">🔑 Back to Login</button>
+  <button class="btn-alt" onclick="window.location.href='register.html'">📝 Register</button>
+
+  <p class="error" id="errorBox"></p>
+  <p class="success" id="successBox"></p>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+  import { getAuth, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDJRm9-jRkxVrTLYBzK1gGrRmAEu29jVrU",
+    authDomain: "diamond-recharge-f7f59.firebaseapp.com",
+    projectId: "diamond-recharge-f7f59",
+    storageBucket: "diamond-recharge-f7f59.appspot.com",
+    messagingSenderId: "657717928489",
+    appId: "1:657717928489:web:70431ebc9afb7002d4b238",
+    measurementId: "G-TDK78BQ8SQ"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  const resetBtn = document.getElementById("resetBtn");
+  const emailInput = document.getElementById("email");
+  const errorBox = document.getElementById("errorBox");
+  const successBox = document.getElementById("successBox");
+
+  resetBtn.addEventListener("click", async () => {
+    const email = emailInput.value.trim();
+    errorBox.textContent = "";
+    successBox.textContent = "";
+
+    if (!email) {
+      errorBox.textContent = "⚠ Please enter your email address.";
+      return;
+    }
+
+    try {
+      await sendPasswordResetEmail(auth, email);
+      successBox.textContent = "✅ Password reset link sent! Check your inbox.";
+    } catch (error) {
+      errorBox.textContent = error.message;
+    }
+  });
+</script>
+  </div>
+</main>
+
+
+<footer class="site-footer" role="contentinfo">
+  <div class="footer-nav">
+    <a class="btn" href="index.html">🏠 Home</a>
+    <a class="btn" href="order.html">📱 Order</a>
+    <a class="btn" href="order-history.html">📃 Orders</a>
+    <a class="btn" href="profile.html">👤 Profile</a>
+  </div>
+</footer>
+
+
+
+<script src="header-loader.js" defer></script>
+<script src="header-script.js" defer></script>
+
+<script>
+(function(){
+  function setup(sidebarId, toggleId, closeSelector){
+    const sidebar = document.getElementById(sidebarId);
+    const toggle = document.getElementById(toggleId);
+    if(!sidebar || !toggle) return;
+    let closeBtn = sidebar.querySelector(closeSelector);
+    if(!closeBtn){
+      closeBtn = document.createElement('button');
+      closeBtn.className = 'btn btn-close';
+      closeBtn.innerText = '✕';
+      closeBtn.style.marginLeft = 'auto';
+      sidebar.insertBefore(closeBtn, sidebar.firstChild);
+    }
+    function setOpen(v){
+      if(v){ sidebar.classList.add('open'); document.body.style.overflow='hidden'; }
+      else { sidebar.classList.remove('open'); document.body.style.overflow=''; }
+    }
+    toggle.addEventListener('click', ()=> setOpen(true));
+    closeBtn.addEventListener('click', ()=> setOpen(false));
+    document.addEventListener('click', (e)=> { if(sidebar.classList.contains('open') && !sidebar.contains(e.target) && !toggle.contains(e.target)) setOpen(false)});
+    document.addEventListener('keydown', (e)=> { if(e.key==='Escape') setOpen(false) });
+  }
+  setup('rightSidebar','sidebarToggle','.btn-close');
+  setup('rightSidebar','sidebarToggleLogin','.btn-close');
+})();
+</script>
+
+</body>
+</html>

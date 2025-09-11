@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Sarkar Telecom</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #000;
+      color: #fff;
+      text-align: center;
+    }
+    header {
+      background: #111;
+      color: cyan;
+      padding: 12px;
+      font-size: 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #0ff;
+    }
+    header .logo {
+      font-weight: bold;
+    }
+    header button {
+      background: crimson;
+      border: none;
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    header button:hover {
+      background: red;
+    }
+
+    .card {
+      margin: 30px auto;
+      background: #111;
+      padding: 20px;
+      width: 320px;
+      border-radius: 16px;
+      box-shadow: 0 0 20px cyan;
+    }
+    .card img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      margin-bottom: 12px;
+    }
+    .card h2 {
+      margin: 5px 0;
+      color: cyan;
+    }
+    .card p {
+      margin: 3px 0;
+      font-size: 14px;
+    }
+    .balance {
+      margin: 10px 0;
+      font-size: 18px;
+      color: lime;
+      font-weight: bold;
+    }
+
+    .card button {
+      display: block;
+      width: 100%;
+      margin: 8px 0;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      background: cyan;
+      color: #000;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .card button:hover {
+      background: #0ff;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">📊 Dashboard</div>
+    <button onclick="logout()">Logout</button>
+  </header>
+
+  <div class="card">
+    <img id="userPhoto" src="https://via.placeholder.com/100" alt="User">
+    <h2 id="userName">Loading...</h2>
+    <p id="userEmail"></p>
+    <div class="balance">💎 Balance: <span id="userBalance">0</span></div>
+
+    <button onclick="location.href='order.html'">📱 New Order</button>
+    <button onclick="location.href='order-history.html'">📜 Order History</button>
+    <button onclick="location.href='profile.html'">👤 Profile</button>
+    <button onclick="location.href='balance.html'">💰 Balance</button>
+  </div>
+
+  <script type="module">
+    // Firebase Import
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    // Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyAyhjOsIXNAkBglpRllt0OZIOJYpdB_9-8",
+      authDomain: "diamond-recharge-f7f59.firebaseapp.com",
+      projectId: "diamond-recharge-f7f59",
+      storageBucket: "diamond-recharge-f7f59.appspot.com",
+      messagingSenderId: "657717928489",
+      appId: "1:657717928489:web:70431ebc9afb7002d4b238",
+      measurementId: "G-TDK78BQ8SQ"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Show User Info
+    async function loadUserData(user) {
+      if (!user) return;
+
+      document.getElementById("userName").innerText = user.displayName || "Unknown User";
+      document.getElementById("userEmail").innerText = user.email;
+      document.getElementById("userPhoto").src = user.photoURL || "https://via.placeholder.com/100";
+
+      let userRef = doc(db, "users", user.uid);
+      let snap = await getDoc(userRef);
+
+      let balance = 0;
+      if (snap.exists()) {
+        balance = snap.data().balance || 0;
+      }
+
+      // Local override if balance updated from order page
+      let localBalance = localStorage.getItem("userBalance");
+      if (localBalance) {
+        balance = localBalance;
+      }
+
+      document.getElementById("userBalance").innerText = balance;
+    }
+
+    // Auth Check
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        loadUserData(user);
+      } else {
+        window.location.href = "login.html";
+      }
+    });
+
+    // Logout
+    window.logout = function() {
+      signOut(auth).then(() => {
+        localStorage.removeItem("userBalance");
+        window.location.href = "login.html";
+      });
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,1 @@
+CHANGELOG: Unified dark glass theme applied to all pages. Header+sidebar+footer standardized. Buttons and cards restyled. Header shows user info & balance via Firebase.
