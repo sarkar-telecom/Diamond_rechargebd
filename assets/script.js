@@ -1,4 +1,4 @@
-// 🔹 Firebase Config
+// 🔹 Firebase Config (your project)
 const firebaseConfig = {
   apiKey: "AIzaSyAyhjOsIXNAkBglpRllt0OZIOJYpdB_9-8",
   authDomain: "diamond-recharge-f7f59.firebaseapp.com",
