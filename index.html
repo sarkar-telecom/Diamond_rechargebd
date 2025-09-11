@@ -80,7 +80,7 @@
       </article>
       <article class="card neon">
         <h3>Balance Refunds</h3>
-        <p class="muted">Process refunds and restore balance to the user. Works with Firebase/Sheets integration.</p>
+        <p class="muted">Process refunds and restore balance to the user. Works with Firebase Firestore.</p>
       </article>
       <article class="card neon">
         <h3>Orders</h3>
@@ -98,11 +98,11 @@
     </footer>
   </main>
 
-  <!-- Firebase + App Script -->
+  <!-- Firebase + Firestore -->
   <script type="module">
-    // Firebase
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
     import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAyhjOsIXNAkBglpRllt0OZIOJYpdB_9-8",
@@ -116,8 +116,10 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const db = getFirestore(app);
     const provider = new GoogleAuthProvider();
 
+    // Elements
     const authBtn = document.getElementById("authBtn");
     const authName = document.getElementById("authName");
     const authEmail = document.getElementById("authEmail");
@@ -131,44 +133,44 @@
     const profilePhoto = document.getElementById("profilePhoto");
     const profileBalance = document.getElementById("profileBalance");
 
-    const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4owbSc_h38ouaktOU30TYqH6wy93qYjmW0G5GWXhsBMzsrVSaWzPtVPA7YpyOUmlEpStByT8TxG0-/pub?gid=117579495&single=true&output=csv";
+    // Load Firestore balance + info
+    async function loadUserData(uid, user) {
+      const ref = doc(db, "users", uid);
+      const snap = await getDoc(ref);
+      if (snap.exists()) {
+        const data = snap.data();
+        const balance = data.balance || 0;
 
-    function fetchBalance(userEmail) {
-      fetch(sheetURL)
-        .then(res => res.text())
-        .then(csv => {
-          const rows = csv.split("\n").map(r => r.split(","));
-          const headers = rows[0];
-          const emailIndex = headers.indexOf("Email");
-          const amountIndex = headers.indexOf("Amount");
+        authName.textContent = data.name || user.displayName || "User";
+        authEmail.textContent = data.email || user.email;
+        authAvatar.src = data.photoURL || user.photoURL || "https://via.placeholder.com/36";
 
-          // filter rows for this user
-          const userRows = rows.filter(r => r[emailIndex] === userEmail);
-          if (userRows.length > 0) {
-            const lastRow = userRows[userRows.length - 1];
-            const amount = lastRow[amountIndex] || "0";
+        sbName.textContent = data.name || user.displayName || "User";
+        sbEmail.textContent = data.email || user.email;
+        sbAvatar.src = data.photoURL || user.photoURL || "https://via.placeholder.com/48";
+        sbBalance.textContent = "৳ " + balance;
 
-            sbBalance.textContent = "৳ " + amount;
-            profileBalance.textContent = "৳ " + amount;
-          }
-        })
-        .catch(err => console.error("Balance fetch error:", err));
+        profileName.textContent = data.name || user.displayName || "User";
+        profileEmail.textContent = data.email || user.email;
+        profilePhoto.src = data.photoURL || user.photoURL || "https://via.placeholder.com/80";
+        profileBalance.textContent = "৳ " + balance;
+      } else {
+        // If no record, create one
+        await setDoc(ref, {
+          name: user.displayName || "User",
+          email: user.email,
+          photoURL: user.photoURL || "",
+          balance: 0
+        });
+        loadUserData(uid, user);
+      }
     }
 
+    // Auth state
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        authName.textContent = user.displayName || "User";
-        authEmail.textContent = user.email;
-        authAvatar.src = user.photoURL || "https://via.placeholder.com/36";
-        sbName.textContent = user.displayName || "User";
-        sbEmail.textContent = user.email;
-        sbAvatar.src = user.photoURL || "https://via.placeholder.com/48";
-        profileName.textContent = user.displayName || "User";
-        profileEmail.textContent = user.email;
-        profilePhoto.src = user.photoURL || "https://via.placeholder.com/80";
         authBtn.textContent = "Logout";
-
-        fetchBalance(user.email);
+        loadUserData(user.uid, user);
       } else {
         authName.textContent = "Guest";
         authEmail.textContent = "not signed in";
@@ -185,6 +187,7 @@
       }
     });
 
+    // Login / Logout button
     authBtn.addEventListener("click", () => {
       if (auth.currentUser) {
         signOut(auth);
@@ -193,10 +196,13 @@
       }
     });
 
+    // Sidebar toggle
+    const sidebar = document.getElementById("sidebar");
+    document.getElementById("menuToggle").onclick = () => sidebar.setAttribute("aria-hidden", "false");
+    document.getElementById("closeSidebar").onclick = () => sidebar.setAttribute("aria-hidden", "true");
+
     // Year
     document.getElementById("year").textContent = new Date().getFullYear();
   </script>
-
-  <script src="assets/script.js" defer></script>
 </body>
 </html>
