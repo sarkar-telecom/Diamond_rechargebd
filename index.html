@@ -1,16 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>SARKAR TELECOM - Your Virtual Gifting Services</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>SARKAR TELECOM - Virtual Gifting Services</title>
   <link rel="stylesheet" href="assets/style.css">
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"></script>
 </head>
 <body class="has-sidebar">
   <header class="header">
     <button id="menuToggle" class="menu-btn" aria-label="Open menu">☰</button>
     <div class="brand">
-      <img src="assets/logo.svg" alt="Sarkar Telecom Logo" class="logo">
+      <img src="assets/logo.svg" alt="logo" class="logo">
       <div class="brand-text">
         <div class="site-name">SARKAR TELECOM</div>
         <div class="site-sub">Virtual Gifting Services</div>
@@ -21,7 +25,7 @@
         <img id="authAvatar" src="https://via.placeholder.com/36" class="avatar" alt="user">
         <div class="auth-info">
           <div id="authName">Guest</div>
-          <div id="authEmail" class="muted">not signed in</div>
+          <div id="authEmail" class="muted">Not signed in</div>
         </div>
       </div>
     </div>
@@ -31,12 +35,13 @@
     <div class="sidebar-inner">
       <button id="closeSidebar" class="close-btn" aria-label="Close sidebar">✕</button>
       <nav class="nav">
-        <a href="index.html" class="nav-link active">Home <span aria-hidden="true">🛖</span></a>
-        <a href="order.html" class="nav-link"><span aria-hidden="true">➕</span> Order <span aria-hidden="true">🛒</span></a>
-        <a href="order-history.html" class="nav-link">My Orders <span aria-hidden="true">⌛</span></a>
-        <a href="balance.html" class="nav-link">💎 Balance</a>
-        <a href="admin.html" class="nav-link">Admin ⚙️</a>
+        <a href="#" class="nav-link active">Home 🛖</a>
+        <a href="#" class="nav-link">➕ Order 🛒</a>
+        <a href="#" class="nav-link">My Orders ⌛</a>
+        <a href="#" class="nav-link">💎 Balance</a>
+        <a href="#" class="nav-link">Admin ⚙️</a>
       </nav>
+
       <div class="sidebar-footer">
         <div class="footer-user">
           <img src="https://via.placeholder.com/48" class="avatar" alt="avatar">
@@ -46,6 +51,16 @@
           </div>
         </div>
         <div class="sb-balance">💎 <span id="sbBalance">0</span></div>
+
+        <!-- Login / Logout -->
+        <div id="loginBox" class="auth-actions card">
+          <input id="emailInput" type="email" placeholder="Email" class="btn">
+          <input id="passInput" type="password" placeholder="Password" class="btn">
+          <button id="emailLoginBtn" class="btn primary">Login</button>
+          <button id="emailRegisterBtn" class="btn">Sign Up</button>
+          <button id="googleBtn" class="btn">Login with Google</button>
+        </div>
+        <button id="logoutBtn" class="btn" style="display:none;">Logout</button>
       </div>
     </div>
   </aside>
@@ -55,40 +70,17 @@
       <div class="hero-left">
         <h1> 👋 Welcome to <span class="accent">SARKAR TELECOM</span></h1>
         <p class="muted">Fast & Secure Mobile Gifting Service</p>
-        <div class="cta-row">
-          <a class="btn primary" href="order.html">New Order</a>
-          <a class="btn" href="order-history.html">Order History</a>
-        </div>
       </div>
       <div class="hero-right">
         <div class="profile-card card small">
           <img id="profilePhoto" src="https://via.placeholder.com/80" alt="user" class="avatar-lg">
           <div>
             <div id="profileName">Guest</div>
-            <div id="profileEmail" class="muted">not signed in</div>
-            <div class="balance">💎 <span id="profileBalance">0</span></div>
+            <div id="profileEmail" class="muted">Not signed in</div>
+            <div class="balance">💎<span id="profileBalance">0</span></div>
           </div>
         </div>
       </div>
-    </section>
-
-    <section class="grid cards">
-      <article class="card neon">
-        <h3>Easy Top-Up</h3>
-        <p class="muted">Load Balance, Place Orders, Wait For a While & You Are Ready To Go 😇</p>
-      </article>
-      <article class="card neon">
-        <h3>💎 Balance Refunds</h3>
-        <p class="muted">Process Balance Refunds For Any Cancelled Order As Soon As Order Cancelled</p>
-      </article>
-      <article class="card neon">
-        <h3>Orders Management</h3>
-        <p class="muted">Place Orders And Check Their Status: Waiting, Cancelled Or Completed within 5 Minutes (deduct balance on success).</p>
-      </article>
-      <article class="card neon">
-        <h3>Secure Login</h3>
-        <p class="muted">Secure Login, Balance Management, Data Protection Security With Google & Firebase Integrations</p>
-      </article>
     </section>
   </main>
 
