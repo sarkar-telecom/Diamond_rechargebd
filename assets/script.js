@@ -3,7 +3,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyAyhjOsIXNAkBglpRllt0OZIOJYpdB_9-8",
   authDomain: "diamond-recharge-f7f59.firebaseapp.com",
   projectId: "diamond-recharge-f7f59",
-  storageBucket: "diamond-recharge-f7f59.appspot.com", // ✅ fixed
+  storageBucket: "diamond-recharge-f7f59.appspot.com",
   messagingSenderId: "657717928489",
   appId: "1:657717928489:web:70431ebc9afb7002d4b238",
   measurementId: "G-TDK78BQ8SQ"
@@ -12,16 +12,16 @@ const firebaseConfig = {
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
-const db = firebase.firestore(); // ✅ Firestore for balance
+const db = firebase.firestore();
 
-// 🔹 Populate UI
+// Populate UI
 function populate(u) {
   const name = u?.displayName || u?.email || 'Guest User';
   const email = u?.email || 'Not signed in';
   const photo = u?.photoURL || 'https://via.placeholder.com/80?text=👤';
   const balance = u?.balance !== undefined ? u.balance : 0;
 
-  // Topbar
+  // Header
   document.getElementById('authName').textContent = name;
   document.getElementById('authEmail').textContent = email;
   document.getElementById('authAvatar').src = photo;
@@ -35,8 +35,10 @@ function populate(u) {
   // Sidebar
   document.getElementById('sbName').textContent = name;
   document.getElementById('sbEmail').textContent = email;
+  document.getElementById('sbPhoto').src = photo;
   document.getElementById('sbBalance').textContent = '৳ ' + balance;
 
+  // Login/logout toggle
   if (u) {
     document.getElementById('loginBox').style.display = 'none';
     document.getElementById('logoutBtn').style.display = 'inline-flex';
@@ -46,7 +48,7 @@ function populate(u) {
   }
 }
 
-// 🔹 Auth Methods
+// Auth Methods
 function loginWithGoogle() {
   const provider = new firebase.auth.GoogleAuthProvider();
   auth.signInWithPopup(provider).catch(err => alert(err.message));
@@ -76,33 +78,28 @@ function logout() {
   auth.signOut().catch(err => alert(err.message));
 }
 
-// 🔹 Listen for auth state changes
+// Listen for auth state changes
 auth.onAuthStateChanged(async (user) => {
   if (user) {
-    try {
-      const docRef = db.collection("users").doc(user.uid);
-      const docSnap = await docRef.get();
-      let userData = { ...user };
+    // Fetch Firestore data
+    const docRef = db.collection("users").doc(user.uid);
+    const docSnap = await docRef.get();
+    let userData = { ...user };
 
-      if (docSnap.exists) {
-        userData.balance = docSnap.data().balance || 0;
-      } else {
-        // First time login → create record
-        await docRef.set({ balance: 0, email: user.email });
-        userData.balance = 0;
-      }
-
-      populate(userData);
-    } catch (err) {
-      console.error("Error fetching user data:", err);
-      populate(user); // fallback
+    if (docSnap.exists) {
+      userData.balance = docSnap.data().balance || 0;
+    } else {
+      await docRef.set({ balance: 0, email: user.email });
+      userData.balance = 0;
     }
+
+    populate(userData);
   } else {
     populate(null);
   }
 });
 
-// 🔹 Sidebar toggle + year
+// Sidebar toggle + year
 document.addEventListener('DOMContentLoaded', () => {
   const menu = document.getElementById('menuToggle');
   const sidebar = document.getElementById('sidebar');
@@ -127,7 +124,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // Prevent clicks inside sidebar from closing
   sidebar.addEventListener('click', (e) => e.stopPropagation());
 
-  // Current year
   document.getElementById('year').textContent = new Date().getFullYear();
 
   // Button events
