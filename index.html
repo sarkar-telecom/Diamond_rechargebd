@@ -5,10 +5,6 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Diamond Recharge — Neon Glass Template</title>
   <link rel="stylesheet" href="assets/style.css">
-
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 </head>
 <body class="has-sidebar">
   <header class="header">
@@ -27,15 +23,8 @@
           <div id="authName">Guest</div>
           <div id="authEmail" class="muted">not signed in</div>
         </div>
+        <button id="authBtn" class="btn small">Login</button>
       </div>
-      <div id="loginBox" style="margin-left:10px;">
-        <input type="email" id="emailInput" placeholder="Email">
-        <input type="password" id="passInput" placeholder="Password">
-        <button id="googleBtn">Google</button>
-        <button id="emailLoginBtn">Login</button>
-        <button id="emailRegisterBtn">Register</button>
-      </div>
-      <button id="logoutBtn" style="display:none;">Logout</button>
     </div>
   </header>
 
@@ -109,122 +98,105 @@
     </footer>
   </main>
 
-<script>
-  // 🔹 Firebase Config
-  const firebaseConfig = {
-    apiKey: "AIzaSyAyhjOsIXNAkBglpRllt0OZIOJYpdB_9-8",
-    authDomain: "diamond-recharge-f7f59.firebaseapp.com",
-    projectId: "diamond-recharge-f7f59",
-    storageBucket: "diamond-recharge-f7f59.firebasestorage.app",
-    messagingSenderId: "657717928489",
-    appId: "1:657717928489:web:70431ebc9afb7002d4b238",
-    measurementId: "G-TDK78BQ8SQ"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
+  <!-- Firebase + App Script -->
+  <script type="module">
+    // Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
-  // Fetch balance from Google Sheets
-  async function fetchBalance(email) {
-    const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4owbSc_h38ouaktOU30TYqH6wy93qYjmW0G5GWXhsBMzsrVSaWzPtVPA7YpyOUmlEpStByT8TxG0-/pub?gid=117579495&single=true&output=csv";
-    const res = await fetch(url);
-    const text = await res.text();
-    const rows = text.split("\n").map(r => r.split(","));
-    const headers = rows[0];
-    const emailIndex = headers.indexOf("Email");
-    const amountIndex = headers.indexOf("Amount");
-    let balance = 0;
-    rows.slice(1).forEach(r => {
-      if (r[emailIndex] && r[emailIndex].trim() === email) {
-        balance += parseFloat(r[amountIndex]) || 0;
-      }
-    });
-    return balance;
-  }
+    const firebaseConfig = {
+      apiKey: "AIzaSyAyhjOsIXNAkBglpRllt0OZIOJYpdB_9-8",
+      authDomain: "diamond-recharge-f7f59.firebaseapp.com",
+      projectId: "diamond-recharge-f7f59",
+      storageBucket: "diamond-recharge-f7f59.firebasestorage.app",
+      messagingSenderId: "657717928489",
+      appId: "1:657717928489:web:70431ebc9afb7002d4b238",
+      measurementId: "G-TDK78BQ8SQ"
+    };
 
-  // Populate UI
-  async function populate(u) {
-    const name = u?.displayName || u?.email || 'Guest User';
-    const email = u?.email || 'Not signed in';
-    const photo = u?.photoURL || 'https://via.placeholder.com/80?text=👤';
-    let balance = 0;
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
 
-    if (u && email !== 'Not signed in') {
-      balance = await fetchBalance(email);
+    const authBtn = document.getElementById("authBtn");
+    const authName = document.getElementById("authName");
+    const authEmail = document.getElementById("authEmail");
+    const authAvatar = document.getElementById("authAvatar");
+    const sbName = document.getElementById("sbName");
+    const sbEmail = document.getElementById("sbEmail");
+    const sbAvatar = document.getElementById("sbAvatar");
+    const sbBalance = document.getElementById("sbBalance");
+    const profileName = document.getElementById("profileName");
+    const profileEmail = document.getElementById("profileEmail");
+    const profilePhoto = document.getElementById("profilePhoto");
+    const profileBalance = document.getElementById("profileBalance");
+
+    const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4owbSc_h38ouaktOU30TYqH6wy93qYjmW0G5GWXhsBMzsrVSaWzPtVPA7YpyOUmlEpStByT8TxG0-/pub?gid=117579495&single=true&output=csv";
+
+    function fetchBalance(userEmail) {
+      fetch(sheetURL)
+        .then(res => res.text())
+        .then(csv => {
+          const rows = csv.split("\n").map(r => r.split(","));
+          const headers = rows[0];
+          const emailIndex = headers.indexOf("Email");
+          const amountIndex = headers.indexOf("Amount");
+
+          // filter rows for this user
+          const userRows = rows.filter(r => r[emailIndex] === userEmail);
+          if (userRows.length > 0) {
+            const lastRow = userRows[userRows.length - 1];
+            const amount = lastRow[amountIndex] || "0";
+
+            sbBalance.textContent = "৳ " + amount;
+            profileBalance.textContent = "৳ " + amount;
+          }
+        })
+        .catch(err => console.error("Balance fetch error:", err));
     }
 
-    document.getElementById('authName').textContent = name;
-    document.getElementById('authEmail').textContent = email;
-    document.getElementById('authAvatar').src = photo;
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        authName.textContent = user.displayName || "User";
+        authEmail.textContent = user.email;
+        authAvatar.src = user.photoURL || "https://via.placeholder.com/36";
+        sbName.textContent = user.displayName || "User";
+        sbEmail.textContent = user.email;
+        sbAvatar.src = user.photoURL || "https://via.placeholder.com/48";
+        profileName.textContent = user.displayName || "User";
+        profileEmail.textContent = user.email;
+        profilePhoto.src = user.photoURL || "https://via.placeholder.com/80";
+        authBtn.textContent = "Logout";
 
-    document.getElementById('profileName').textContent = name;
-    document.getElementById('profileEmail').textContent = email;
-    document.getElementById('profilePhoto').src = photo;
-    document.getElementById('profileBalance').textContent = '৳ ' + balance;
-
-    document.getElementById('sbName').textContent = name;
-    document.getElementById('sbEmail').textContent = email;
-    document.getElementById('sbBalance').textContent = '৳ ' + balance;
-    document.getElementById('sbAvatar').src = photo;
-
-    if (u) {
-      document.getElementById('loginBox').style.display = 'none';
-      document.getElementById('logoutBtn').style.display = 'inline-flex';
-    } else {
-      document.getElementById('loginBox').style.display = 'block';
-      document.getElementById('logoutBtn').style.display = 'none';
-    }
-  }
-
-  // Auth Methods
-  function loginWithGoogle() {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    auth.signInWithPopup(provider).catch(err => alert(err.message));
-  }
-  function loginWithEmail() {
-    const email = document.getElementById('emailInput').value;
-    const pass = document.getElementById('passInput').value;
-    auth.signInWithEmailAndPassword(email, pass).catch(err => alert(err.message));
-  }
-  function registerWithEmail() {
-    const email = document.getElementById('emailInput').value;
-    const pass = document.getElementById('passInput').value;
-    auth.createUserWithEmailAndPassword(email, pass).catch(err => alert(err.message));
-  }
-  function logout() {
-    auth.signOut().catch(err => alert(err.message));
-  }
-
-  // Listen for auth state
-  auth.onAuthStateChanged(user => {
-    populate(user);
-  });
-
-  // Sidebar toggle + year
-  document.addEventListener('DOMContentLoaded', () => {
-    const menu = document.getElementById('menuToggle');
-    const sidebar = document.getElementById('sidebar');
-    const closeBtn = document.getElementById('closeSidebar');
-
-    menu.addEventListener('click', (e) => {
-      e.stopPropagation();
-      sidebar.classList.add('open');
-    });
-    closeBtn.addEventListener('click', () => sidebar.classList.remove('open'));
-    document.addEventListener('click', (e) => {
-      if (!sidebar.contains(e.target) && !menu.contains(e.target)) {
-        sidebar.classList.remove('open');
+        fetchBalance(user.email);
+      } else {
+        authName.textContent = "Guest";
+        authEmail.textContent = "not signed in";
+        authAvatar.src = "https://via.placeholder.com/36";
+        sbName.textContent = "Guest";
+        sbEmail.textContent = "-";
+        sbAvatar.src = "https://via.placeholder.com/48";
+        sbBalance.textContent = "৳ 0";
+        profileName.textContent = "Guest";
+        profileEmail.textContent = "not signed in";
+        profilePhoto.src = "https://via.placeholder.com/80";
+        profileBalance.textContent = "৳ 0";
+        authBtn.textContent = "Login";
       }
     });
-    sidebar.addEventListener('click', (e) => e.stopPropagation());
 
-    document.getElementById('year').textContent = new Date().getFullYear();
+    authBtn.addEventListener("click", () => {
+      if (auth.currentUser) {
+        signOut(auth);
+      } else {
+        signInWithPopup(auth, provider);
+      }
+    });
 
-    // Buttons
-    document.getElementById('googleBtn').addEventListener('click', loginWithGoogle);
-    document.getElementById('emailLoginBtn').addEventListener('click', loginWithEmail);
-    document.getElementById('emailRegisterBtn').addEventListener('click', registerWithEmail);
-    document.getElementById('logoutBtn').addEventListener('click', logout);
-  });
-</script>
+    // Year
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+
+  <script src="assets/script.js" defer></script>
 </body>
 </html>
