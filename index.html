@@ -1,156 +1,117 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>SARKAR TELECOM</title>
-  <!-- Firebase SDKs (v8) -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Diamond Recharge — Neon Glass Template</title>
+  <link rel="stylesheet" href="assets/style.css">
+
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 </head>
-<body>
-  <header>
-    <div>
-      <img id="authAvatar" src="https://via.placeholder.com/40?text=👤" alt="avatar" width="40" height="40">
-      <span id="authName">Guest</span> |
-      <span id="authEmail">Not signed in</span>
-    </div>
-    <div>
-      <div id="loginBox">
-        <input type="email" id="emailInput" placeholder="Email"><br>
-        <input type="password" id="passInput" placeholder="Password"><br>
-        <button id="emailLoginBtn">Login</button>
-        <button id="emailRegisterBtn">Register</button>
-        <button id="googleBtn">Login with Google</button>
+<body class="has-sidebar">
+  <header class="header">
+    <button id="menuToggle" class="menu-btn" aria-label="Open menu">☰</button>
+    <div class="brand">
+      <img src="assets/logo.svg" alt="logo" class="logo">
+      <div class="brand-text">
+        <div class="site-name">Diamond Recharge</div>
+        <div class="site-sub">Neon glass template</div>
       </div>
-      <button id="logoutBtn" style="display:none;">Logout</button>
+    </div>
+    <div class="header-actions">
+      <div id="authBox" class="auth-box">
+        <img id="authAvatar" src="https://via.placeholder.com/36" class="avatar" alt="user">
+        <div class="auth-info">
+          <div id="authName">Guest</div>
+          <div id="authEmail" class="muted">not signed in</div>
+        </div>
+      </div>
+      <!-- 🔹 Login/Logout buttons -->
+      <div id="loginBox" style="margin-left:10px;">
+        <button id="googleBtn" class="btn small">Login with Google</button>
+        <input type="email" id="emailInput" placeholder="Email" class="input small">
+        <input type="password" id="passInput" placeholder="Password" class="input small">
+        <button id="emailLoginBtn" class="btn small">Login</button>
+        <button id="emailRegisterBtn" class="btn small">Register</button>
+      </div>
+      <button id="logoutBtn" class="btn small" style="display:none;margin-left:10px;">Logout</button>
     </div>
   </header>
 
-  <section class="profile">
-    <h2>Your Profile</h2>
-    <img id="profilePhoto" src="https://via.placeholder.com/80?text=👤" width="80" height="80">
-    <p>Name: <span id="profileName">Guest</span></p>
-    <p>Email: <span id="profileEmail">Not signed in</span></p>
-    <p>Balance: <span id="profileBalance">৳ 0</span></p>
-  </section>
-
-  <aside id="sidebar">
-    <img id="sbPhoto" src="https://via.placeholder.com/80?text=👤" width="80" height="80">
-    <p>Name: <span id="sbName">Guest</span></p>
-    <p>Email: <span id="sbEmail">Not signed in</span></p>
-    <p>Balance: <span id="sbBalance">৳ 0</span></p>
+  <aside id="sidebar" class="sidebar" aria-hidden="true">
+    <div class="sidebar-inner">
+      <button id="closeSidebar" class="close-btn" aria-label="Close sidebar">✕</button>
+      <nav class="nav">
+        <a href="index.html" class="nav-link active">🏠 Dashboard</a>
+        <a href="order.html" class="nav-link">📱 New Order</a>
+        <a href="order-history.html" class="nav-link">📃 Orders</a>
+        <a href="balance.html" class="nav-link">💰 Balance</a>
+        <a href="admin.html" class="nav-link">⚙️ Admin</a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="footer-user">
+          <img id="sbAvatar" src="https://via.placeholder.com/48" class="avatar" alt="avatar">
+          <div>
+            <div id="sbName">Guest</div>
+            <div id="sbEmail" class="muted">-</div>
+          </div>
+        </div>
+        <div class="sb-balance">💎 <span id="sbBalance">৳ 0</span></div>
+      </div>
+    </div>
   </aside>
 
-  <footer>
-    <p>© <span id="year"></span> SARKAR TELECOM</p>
-  </footer>
+  <main class="main container">
+    <section class="hero card neon">
+      <div class="hero-left">
+        <h1>Welcome to <span class="accent">Diamond Recharge</span></h1>
+        <p class="muted">Mobile-first neon glass template for recharge/topup services. Responsive & lightweight.</p>
+        <div class="cta-row">
+          <a class="btn primary" href="order.html">New Order</a>
+          <a class="btn" href="order-history.html">Order History</a>
+        </div>
+      </div>
+      <div class="hero-right">
+        <div class="profile-card card small">
+          <img id="profilePhoto" src="https://via.placeholder.com/80" alt="user" class="avatar-lg">
+          <div>
+            <div id="profileName">Guest</div>
+            <div id="profileEmail" class="muted">not signed in</div>
+            <div class="balance">💎 <span id="profileBalance">৳ 0</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-  <script>
-    // Firebase config
-    const firebaseConfig = {
-      apiKey: "AIzaSyAyhjOsIXNAkBglpRllt0OZIOJYpdB_9-8",
-      authDomain: "diamond-recharge-f7f59.firebaseapp.com",
-      projectId: "diamond-recharge-f7f59",
-      storageBucket: "diamond-recharge-f7f59.appspot.com", // fixed
-      messagingSenderId: "657717928489",
-      appId: "1:657717928489:web:70431ebc9afb7002d4b238",
-      measurementId: "G-TDK78BQ8SQ"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+    <section class="grid cards">
+      <article class="card neon">
+        <h3>Quick Top-up</h3>
+        <p class="muted">Create a quick order and deduct from user balance when order is placed.</p>
+      </article>
+      <article class="card neon">
+        <h3>Balance Refunds</h3>
+        <p class="muted">Process refunds and restore balance to the user. Works with Firebase/Sheets integration.</p>
+      </article>
+      <article class="card neon">
+        <h3>Orders</h3>
+        <p class="muted">View recent orders and their status (deduct balance on success).</p>
+      </article>
+      <article class="card neon">
+        <h3>Admin Tools</h3>
+        <p class="muted">Manual balance adjustment, export to Google Sheets, role-based actions.</p>
+      </article>
+    </section>
 
-    function populate(userWithData) {
-      const name = userWithData.displayName || userWithData.email || 'Guest';
-      const email = userWithData.email || 'Not signed in';
-      const photo = userWithData.photoURL || 'https://via.placeholder.com/80?text=👤';
-      const bal = userWithData.balance ?? 0;
+    <footer class="site-footer card">
+      <div>© <span id="year"></span> Diamond Recharge</div>
+      <div class="muted">Built for mobile & desktop — neon glass UI</div>
+    </footer>
+  </main>
 
-      document.getElementById('authName').textContent = name;
-      document.getElementById('authEmail').textContent = email;
-      document.getElementById('authAvatar').src = photo;
-
-      document.getElementById('profileName').textContent = name;
-      document.getElementById('profileEmail').textContent = email;
-      document.getElementById('profilePhoto').src = photo;
-      document.getElementById('profileBalance').textContent = '৳ ' + bal;
-
-      document.getElementById('sbName').textContent = name;
-      document.getElementById('sbEmail').textContent = email;
-      document.getElementById('sbPhoto').src = photo;
-      document.getElementById('sbBalance').textContent = '৳ ' + bal;
-
-      if (auth.currentUser) {
-        document.getElementById('loginBox').style.display = 'none';
-        document.getElementById('logoutBtn').style.display = 'inline-block';
-      } else {
-        document.getElementById('loginBox').style.display = 'block';
-        document.getElementById('logoutBtn').style.display = 'none';
-      }
-    }
-
-    function loginWithGoogle() {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      auth.signInWithPopup(provider).catch(e => console.error("Google Login Error:", e));
-    }
-
-    function loginWithEmail() {
-      const email = document.getElementById('emailInput').value;
-      const pass = document.getElementById('passInput').value;
-      auth.signInWithEmailAndPassword(email, pass).catch(e => console.error("Email Login Error:", e));
-    }
-
-    function registerWithEmail() {
-      const email = document.getElementById('emailInput').value;
-      const pass = document.getElementById('passInput').value;
-      auth.createUserWithEmailAndPassword(email, pass)
-        .then(async cred => {
-          // create Firestore doc
-          await db.collection('users').doc(cred.user.uid).set({
-            email: cred.user.email,
-            balance: 0
-          });
-        })
-        .catch(e => console.error("Registration Error:", e));
-    }
-
-    function logout() {
-      auth.signOut().catch(e => console.error("Logout Error:", e));
-    }
-
-    auth.onAuthStateChanged(async user => {
-      if (user) {
-        // fetch Firestore data
-        try {
-          const docRef = db.collection('users').doc(user.uid);
-          const docSnap = await docRef.get();
-          let info = { ...user };
-          if (docSnap.exists) {
-            info.balance = docSnap.data().balance;
-          } else {
-            // new user, create doc
-            await docRef.set({ email: user.email, balance: 0 });
-            info.balance = 0;
-          }
-          populate(info);
-        } catch (err) {
-          console.error("Error fetching user doc:", err);
-          populate(user);  // fallback
-        }
-      } else {
-        populate(null);
-      }
-    });
-
-    document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('googleBtn').addEventListener('click', loginWithGoogle);
-      document.getElementById('emailLoginBtn').addEventListener('click', loginWithEmail);
-      document.getElementById('emailRegisterBtn').addEventListener('click', registerWithEmail);
-      document.getElementById('logoutBtn').addEventListener('click', logout);
-      document.getElementById('year').textContent = new Date().getFullYear();
-    });
-  </script>
+  <!-- Script -->
+  <script src="assets/script.js" defer></script>
 </body>
 </html>
