@@ -18,7 +18,7 @@ const db = firebase.firestore();
 function populate(u, balance = 0) {
   const name = u?.displayName || u?.email || 'Guest User';
   const email = u?.email || 'Not signed in';
-  const photo = u?.photoURL || 'https://via.placeholder.com/80?text=👤';
+  const photo = u?.photoURL || 'https://scontent.fdac110-1.fna.fbcdn.net/v/t39.30808-6/463744798_1535978883703781_7881387006422647165_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeFRmJ9K3v4YzY1mzAuX72tmutP8LgSkH8e60_wuBKQfx5ALlGesHbz-xDi_1njXgxmuFkc0yTpdpJkVSYwMJ0QX&_nc_ohc=lefecAd3iRkQ7kNvwGsdypF&_nc_oc=Adm8jPqT_7SkZW-P4Cg8t6ElJiFhyKIJGfCDiFTaAGBcP1hVN1dY_P_i0sfxCoAf0EM&_nc_zt=23&_nc_ht=scontent.fdac110-1.fna&_nc_gid=EG5pxh35CnO24PgbBnifUw&oh=00_AfagLP6aA5TjST0_IwvXDfPeACKF6NbyCpA_e_0p0_-ulw&oe=68C900F4?text=👤';
 
   // Header
   document.getElementById('authName').textContent = name;
