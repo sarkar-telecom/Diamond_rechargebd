@@ -3,7 +3,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyAyhjOsIXNAkBglpRllt0OZIOJYpdB_9-8",
   authDomain: "diamond-recharge-f7f59.firebaseapp.com",
   projectId: "diamond-recharge-f7f59",
-  storageBucket: "diamond-recharge-f7f59.appspot.com",
+  storageBucket: "diamond-recharge-f7f59.firebasestorage.app",
   messagingSenderId: "657717928489",
   appId: "1:657717928489:web:70431ebc9afb7002d4b238",
   measurementId: "G-TDK78BQ8SQ"
@@ -15,18 +15,17 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 
 // Populate UI
-function populate(u) {
+function populate(u, balance = 0) {
   const name = u?.displayName || u?.email || 'Guest User';
   const email = u?.email || 'Not signed in';
   const photo = u?.photoURL || 'https://via.placeholder.com/80?text=👤';
-  const balance = u?.balance !== undefined ? u.balance : 0;
 
   // Header
   document.getElementById('authName').textContent = name;
   document.getElementById('authEmail').textContent = email;
   document.getElementById('authAvatar').src = photo;
 
-  // Profile
+  // Profile card
   document.getElementById('profileName').textContent = name;
   document.getElementById('profileEmail').textContent = email;
   document.getElementById('profilePhoto').src = photo;
@@ -35,16 +34,30 @@ function populate(u) {
   // Sidebar
   document.getElementById('sbName').textContent = name;
   document.getElementById('sbEmail').textContent = email;
-  document.getElementById('sbPhoto').src = photo;
+  document.getElementById('sbAvatar').src = photo;
   document.getElementById('sbBalance').textContent = '৳ ' + balance;
 
-  // Login/logout toggle
   if (u) {
     document.getElementById('loginBox').style.display = 'none';
     document.getElementById('logoutBtn').style.display = 'inline-flex';
   } else {
     document.getElementById('loginBox').style.display = 'block';
     document.getElementById('logoutBtn').style.display = 'none';
+  }
+}
+
+// 🔹 Fetch balance from Firestore
+async function getBalance(user) {
+  try {
+    const docRef = db.collection("users").doc(user.uid);
+    const doc = await docRef.get();
+    if (doc.exists) {
+      return doc.data().balance || 0;
+    }
+    return 0;
+  } catch (e) {
+    console.error("Balance fetch error:", e);
+    return 0;
   }
 }
 
@@ -63,11 +76,11 @@ function loginWithEmail() {
 function registerWithEmail() {
   const email = document.getElementById('emailInput').value;
   const pass = document.getElementById('passInput').value;
-
   auth.createUserWithEmailAndPassword(email, pass)
-    .then(async (cred) => {
-      await db.collection("users").doc(cred.user.uid).set({
-        email,
+    .then(cred => {
+      // Create Firestore record with default balance
+      return db.collection("users").doc(cred.user.uid).set({
+        email: email,
         balance: 0
       });
     })
@@ -79,23 +92,12 @@ function logout() {
 }
 
 // Listen for auth state changes
-auth.onAuthStateChanged(async (user) => {
+auth.onAuthStateChanged(async user => {
   if (user) {
-    // Fetch Firestore data
-    const docRef = db.collection("users").doc(user.uid);
-    const docSnap = await docRef.get();
-    let userData = { ...user };
-
-    if (docSnap.exists) {
-      userData.balance = docSnap.data().balance || 0;
-    } else {
-      await docRef.set({ balance: 0, email: user.email });
-      userData.balance = 0;
-    }
-
-    populate(userData);
+    const balance = await getBalance(user);
+    populate(user, balance);
   } else {
-    populate(null);
+    populate(null, 0);
   }
 });
 
