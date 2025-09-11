@@ -13,26 +13,32 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 
+// --------------------------
 // Populate UI
+// --------------------------
 function populate(u) {
   const name = u?.displayName || u?.email || 'Guest User';
   const email = u?.email || 'Not signed in';
   const photo = u?.photoURL || 'https://via.placeholder.com/80?text=👤';
   const balance = u?.balance !== undefined ? u.balance : 0;
 
+  // Header
   document.getElementById('authName').textContent = name;
   document.getElementById('authEmail').textContent = email;
   document.getElementById('authAvatar').src = photo;
 
+  // Hero profile
   document.getElementById('profileName').textContent = name;
   document.getElementById('profileEmail').textContent = email;
   document.getElementById('profilePhoto').src = photo;
   document.getElementById('profileBalance').textContent = u ? '৳ ' + balance : '৳ 0';
 
+  // Sidebar footer
   document.getElementById('sbName').textContent = name;
   document.getElementById('sbEmail').textContent = email;
   document.getElementById('sbBalance').textContent = u ? '৳ ' + balance : '৳ 0';
 
+  // Toggle login/logout
   if (u) {
     document.getElementById('loginBox').style.display = 'none';
     document.getElementById('logoutBtn').style.display = 'inline-flex';
@@ -42,7 +48,9 @@ function populate(u) {
   }
 }
 
-// Auth Methods
+// --------------------------
+// Auth methods
+// --------------------------
 function loginWithGoogle() {
   const provider = new firebase.auth.GoogleAuthProvider();
   auth.signInWithPopup(provider).catch(err => alert(err.message));
@@ -64,23 +72,40 @@ function logout() {
   auth.signOut().catch(err => alert(err.message));
 }
 
+// --------------------------
 // Listen for auth state changes
+// --------------------------
 auth.onAuthStateChanged(user => {
   window.authUser = user || null;
   populate(user);
 });
 
+// --------------------------
 // Sidebar toggle + year
+// --------------------------
 document.addEventListener('DOMContentLoaded', () => {
   const menu = document.getElementById('menuToggle');
   const sidebar = document.getElementById('sidebar');
   const closeBtn = document.getElementById('closeSidebar');
 
-  menu.addEventListener('click', () => sidebar.classList.add('open'));
-  closeBtn.addEventListener('click', () => sidebar.classList.remove('open'));
-  document.addEventListener('click', e => {
-    if (!sidebar.contains(e.target) && !menu.contains(e.target)) sidebar.classList.remove('open');
+  // Open sidebar
+  menu.addEventListener('click', (e) => {
+    e.stopPropagation();
+    sidebar.classList.add('open');
   });
+
+  // Close sidebar
+  closeBtn.addEventListener('click', () => sidebar.classList.remove('open'));
+
+  // Close sidebar if clicking outside
+  document.addEventListener('click', (e) => {
+    if (!sidebar.contains(e.target) && !menu.contains(e.target)) {
+      sidebar.classList.remove('open');
+    }
+  });
+
+  // Prevent clicks inside sidebar from closing
+  sidebar.addEventListener('click', (e) => e.stopPropagation());
 
   document.getElementById('year').textContent = new Date().getFullYear();
 
