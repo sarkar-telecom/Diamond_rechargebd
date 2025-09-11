@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Reset Password — Diamond Recharge</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <style>
+    .auth-card {
+      max-width: 420px;
+      margin: 2rem auto;
+      padding: 2rem;
+      text-align: center;
+    }
+    .auth-card h2 { margin-bottom: 1rem; }
+    .auth-card .form-group { margin-bottom: 1rem; text-align: left; }
+    .auth-card input {
+      width: 100%; padding: .6rem; border-radius: .5rem; border: none;
+    }
+    .auth-card label { display: block; margin-bottom: .3rem; font-size: .9rem; }
+    .auth-card .links { margin-top: 1rem; font-size: .85rem; }
+    .auth-card .links a { margin: 0 .5rem; }
+  </style>
+</head>
+<body class="has-sidebar">
+
+  <!-- Header -->
+  <header class="header">
+    <button id="menuToggle" class="menu-btn">☰</button>
+    <div class="brand">
+      <img src="assets/logo.svg" alt="logo" class="logo">
+      <div class="brand-text">
+        <div class="site-name">Diamond Recharge</div>
+        <div class="site-sub">Neon glass template</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button id="authToggle" class="btn small">Login</button>
+    </div>
+  </header>
+
+  <!-- Sidebar -->
+  <aside id="sidebar" class="sidebar" aria-hidden="true">
+    <div class="sidebar-inner">
+      <button id="closeSidebar" class="close-btn">✕</button>
+      <nav class="nav">
+        <a href="index.html" class="nav-link">🏠 Dashboard</a>
+        <a href="order.html" class="nav-link">📱 New Order</a>
+        <a href="order-history.html" class="nav-link">📃 Orders</a>
+        <a href="balance.html" class="nav-link">💰 Balance</a>
+        <a href="admin.html" class="nav-link">⚙️ Admin</a>
+      </nav>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main container">
+    <div class="auth-card card neon">
+      <h2>Reset Password</h2>
+      <form id="resetForm" style="display:none;">
+        <div class="form-group">
+          <label>New Password</label>
+          <input type="password" id="newPassword" required minlength="6">
+        </div>
+        <div class="form-group">
+          <label>Confirm Password</label>
+          <input type="password" id="confirmPassword" required minlength="6">
+        </div>
+        <button type="submit" class="btn primary">Update Password</button>
+      </form>
+      <p id="resetMsg" class="muted">Checking reset link...</p>
+    </div>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getAuth, verifyPasswordResetCode, confirmPasswordReset } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyAyhjOsIXNAkBglpRllt0OZIOJYpdB_9-8",
+      authDomain: "diamond-recharge-f7f59.firebaseapp.com",
+      projectId: "diamond-recharge-f7f59",
+      storageBucket: "diamond-recharge-f7f59.firebasestorage.app",
+      messagingSenderId: "657717928489",
+      appId: "1:657717928489:web:70431ebc9afb7002d4b238",
+      measurementId: "G-TDK78BQ8SQ"
+    };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const oobCode = urlParams.get("oobCode");
+
+    const form = document.getElementById("resetForm");
+    const msg = document.getElementById("resetMsg");
+
+    async function initReset() {
+      if (!oobCode) {
+        msg.textContent = "❌ Invalid reset link.";
+        return;
+      }
+      try {
+        await verifyPasswordResetCode(auth, oobCode);
+        msg.textContent = "✔️ Reset link verified. Enter your new password.";
+        form.style.display = "block";
+      } catch (err) {
+        msg.textContent = "❌ " + err.message;
+      }
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const pass = document.getElementById("newPassword").value;
+      const confirm = document.getElementById("confirmPassword").value;
+      if (pass !== confirm) {
+        msg.textContent = "❌ Passwords do not match!";
+        return;
+      }
+      try {
+        await confirmPasswordReset(auth, oobCode, pass);
+        msg.textContent = "✅ Password updated successfully. You can now log in.";
+        form.style.display = "none";
+      } catch (err) {
+        msg.textContent = "❌ " + err.message;
+      }
+    });
+
+    // Sidebar toggle
+    document.getElementById("menuToggle").onclick = () => {
+      document.getElementById("sidebar").setAttribute("aria-hidden", false);
+    };
+    document.getElementById("closeSidebar").onclick = () => {
+      document.getElementById("sidebar").setAttribute("aria-hidden", true);
+    };
+
+    initReset();
+  </script>
+</body>
+</html>
