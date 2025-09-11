@@ -114,4 +114,4 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('emailLoginBtn').addEventListener('click', loginWithEmail);
   document.getElementById('emailRegisterBtn').addEventListener('click', registerWithEmail);
   document.getElementById('logoutBtn').addEventListener('click', logout);
-});
+}); 
