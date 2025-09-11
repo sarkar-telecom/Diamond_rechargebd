@@ -1,225 +1,201 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Diamond Recharge BD</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      display: flex;
-      background: #fafafa;
-    }
-    header {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%;
-      background: #1976d2;
-      color: #fff;
-      padding: 15px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      z-index: 1000;
-    }
-    header h1 { margin: 0; font-size: 18px; }
-    header button {
-      background: #fff;
-      color: #1976d2;
-      border: none;
-      padding: 8px 12px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    .sidebar {
-      position: fixed;
-      top: 60px;
-      left: -250px;
-      width: 250px;
-      height: 100%;
-      background: #f5f5f5;
-      box-shadow: 2px 0 5px rgba(0,0,0,0.2);
-      transition: left 0.3s ease;
-      padding: 20px;
-      box-sizing: border-box;
-    }
-    .sidebar.active { left: 0; }
-    .sidebar img {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      display: block;
-      margin-bottom: 10px;
-    }
-    .sidebar h3, .sidebar p { margin: 5px 0; }
-    .content {
-      margin-top: 70px;
-      padding: 20px;
-      flex: 1;
-      margin-left: 0;
-      transition: margin-left 0.3s ease;
-    }
-    .sidebar.active ~ .content {
-      margin-left: 250px;
-    }
-    /* Simple modal */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5);
-      justify-content: center;
-      align-items: center;
-    }
-    .modal-content {
-      background: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      width: 300px;
-    }
-    .modal-content h2 { margin-top: 0; }
-    .modal-content input {
-      width: 100%;
-      padding: 8px;
-      margin: 6px 0;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-    .modal-content button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    .close-btn {
-      float: right;
-      cursor: pointer;
-      font-size: 18px;
-    }
-  </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Diamond Recharge — Neon Glass Template</title>
+  <link rel="stylesheet" href="assets/style.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 </head>
-<body>
-  <header>
-    <button id="menuBtn">☰</button>
-    <h1>Diamond Recharge BD</h1>
-    <button id="authBtn">Login</button>
+<body class="has-sidebar">
+  <!-- Header -->
+  <header class="header">
+    <button id="menuToggle" class="menu-btn" aria-label="Open menu">☰</button>
+    <div class="brand">
+      <img src="assets/logo.svg" alt="logo" class="logo">
+      <div class="brand-text">
+        <div class="site-name">Diamond Recharge</div>
+        <div class="site-sub">Neon glass template</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <div id="authBox" class="auth-box">
+        <img id="authAvatar" src="https://via.placeholder.com/36" class="avatar" alt="user">
+        <div class="auth-info">
+          <div id="authName">Guest</div>
+          <div id="authRole" class="muted">not signed in</div>
+        </div>
+      </div>
+      <button id="authToggleBtn" class="btn small">Login</button>
+    </div>
   </header>
 
-  <div class="sidebar" id="sidebar">
-    <img id="userAvatar" src="https://via.placeholder.com/60" alt="Avatar" />
-    <h3 id="userName">Guest</h3>
-    <p id="userEmail">Not logged in</p>
-    <p><strong>Balance:</strong> <span id="userBalance">0</span></p>
-  </div>
-
-  <div class="content">
-    <h2>Welcome to Diamond Recharge BD</h2>
-    <p>Your one-stop solution for diamond recharges!</p>
-  </div>
-
-  <!-- Login Modal -->
-  <div class="modal" id="loginModal">
-    <div class="modal-content">
-      <span class="close-btn" id="closeModal">&times;</span>
-      <h2>Login</h2>
-      <input type="email" id="emailInput" placeholder="Email" />
-      <input type="password" id="passwordInput" placeholder="Password" />
-      <button id="emailLoginBtn" style="background:#1976d2; color:#fff;">Login with Email</button>
-      <button id="googleLoginBtn" style="background:#db4437; color:#fff;">Login with Google</button>
+  <!-- Sidebar -->
+  <aside id="sidebar" class="sidebar" aria-hidden="true">
+    <div class="sidebar-inner">
+      <button id="closeSidebar" class="close-btn" aria-label="Close sidebar">✕</button>
+      <nav class="nav">
+        <a href="index.html" class="nav-link active">🏠 Dashboard</a>
+        <a href="order.html" class="nav-link">📱 New Order</a>
+        <a href="order-history.html" class="nav-link">📃 Orders</a>
+        <a href="balance.html" class="nav-link">💰 Balance</a>
+        <a href="admin.html" class="nav-link">⚙️ Admin</a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="footer-user">
+          <img id="sbAvatar" src="https://via.placeholder.com/48" class="avatar" alt="avatar">
+          <div>
+            <div id="sbName">Guest</div>
+            <div id="sbEmail" class="muted">-</div>
+          </div>
+        </div>
+        <div class="sb-balance">💎 <span id="sbBalance">৳ 0</span></div>
+      </div>
     </div>
-  </div>
+  </aside>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <!-- Main Content -->
+  <main class="main container">
+    <section class="hero card neon">
+      <div class="hero-left">
+        <h1>Welcome to <span class="accent">Diamond Recharge</span></h1>
+        <p class="muted">Mobile-first neon glass template for recharge/topup services. Responsive & lightweight.</p>
+        <div class="cta-row">
+          <a class="btn primary" href="order.html">New Order</a>
+          <a class="btn" href="order-history.html">Order History</a>
+        </div>
+      </div>
+      <div class="hero-right">
+        <div class="profile-card card small">
+          <img id="profilePhoto" src="https://via.placeholder.com/80" alt="user" class="avatar-lg">
+          <div>
+            <div id="profileName">Guest</div>
+            <div id="profileRole" class="muted">not signed in</div>
+            <div id="profileEmail" class="muted">-</div>
+            <div class="balance">💎 <span id="profileBalance">৳ 0</span></div>
+            <div class="muted">Weekly Total: <span id="profileWeeklyTotal">0</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
 
+    <section class="grid cards">
+      <article class="card neon">
+        <h3>Quick Top-up</h3>
+        <p class="muted">Create a quick order and deduct from user balance when order is placed.</p>
+      </article>
+      <article class="card neon">
+        <h3>Balance Refunds</h3>
+        <p class="muted">Process refunds and restore balance to the user.</p>
+      </article>
+      <article class="card neon">
+        <h3>Orders</h3>
+        <p class="muted">View recent orders and their status.</p>
+      </article>
+      <article class="card neon">
+        <h3>Admin Tools</h3>
+        <p class="muted">Manual balance adjustment, export to Google Sheets, role-based actions.</p>
+      </article>
+    </section>
+
+    <footer class="site-footer card">
+      <div>© <span id="year"></span> Diamond Recharge</div>
+      <div class="muted">Built for mobile & desktop — neon glass UI</div>
+    </footer>
+  </main>
+
+  <!-- Firebase + Script -->
   <script>
-    // 🔹 Your Firebase Config
+    // 🔹 Firebase Config
     const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_AUTH_DOMAIN",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_STORAGE_BUCKET",
-      messagingSenderId: "YOUR_MSG_ID",
-      appId: "YOUR_APP_ID"
+      apiKey: "AIzaSyAyhjOsIXNAkBglpRllt0OZIOJYpdB_9-8",
+      authDomain: "diamond-recharge-f7f59.firebaseapp.com",
+      projectId: "diamond-recharge-f7f59",
+      storageBucket: "diamond-recharge-f7f59.firebasestorage.app",
+      messagingSenderId: "657717928489",
+      appId: "1:657717928489:web:70431ebc9afb7002d4b238",
+      measurementId: "G-TDK78BQ8SQ"
     };
-
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // Sidebar toggle
-    document.getElementById("menuBtn").addEventListener("click", () => {
-      document.getElementById("sidebar").classList.toggle("active");
+    // Populate UI
+    function populate(userData) {
+      const name = userData?.name || 'Guest';
+      const role = userData?.role || 'not signed in';
+      const email = userData?.email || '-';
+      const photo = userData?.avatar || 'https://via.placeholder.com/80?text=👤';
+      const balance = userData?.balance ?? 0;
+      const weeklyTotal = userData?.weeklyTotal ?? 0;
+
+      // Header
+      document.getElementById('authName').textContent = name;
+      document.getElementById('authRole').textContent = role;
+      document.getElementById('authAvatar').src = photo;
+
+      // Sidebar
+      document.getElementById('sbName').textContent = name;
+      document.getElementById('sbEmail').textContent = email;
+      document.getElementById('sbAvatar').src = photo;
+      document.getElementById('sbBalance').textContent = '৳ ' + balance;
+
+      // Profile Card
+      document.getElementById('profileName').textContent = name;
+      document.getElementById('profileRole').textContent = role;
+      document.getElementById('profileEmail').textContent = email;
+      document.getElementById('profilePhoto').src = photo;
+      document.getElementById('profileBalance').textContent = '৳ ' + balance;
+      document.getElementById('profileWeeklyTotal').textContent = weeklyTotal;
+    }
+
+    // Auth State
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        const ref = db.collection("users").doc(user.uid);
+        const snap = await ref.get();
+        if (snap.exists) {
+          populate(snap.data());
+          document.getElementById('authToggleBtn').textContent = "Logout";
+        } else {
+          populate(user);
+        }
+      } else {
+        populate(null);
+        document.getElementById('authToggleBtn').textContent = "Login";
+      }
     });
 
-    // Modal handling
-    const loginModal = document.getElementById("loginModal");
-    const authBtn = document.getElementById("authBtn");
-    const closeModal = document.getElementById("closeModal");
-
-    authBtn.addEventListener("click", () => {
+    // Toggle button → redirect later
+    document.getElementById('authToggleBtn').addEventListener('click', () => {
       if (auth.currentUser) {
         auth.signOut();
       } else {
-        loginModal.style.display = "flex";
+        window.location.href = "login.html"; // later create login page
       }
     });
-    closeModal.addEventListener("click", () => {
-      loginModal.style.display = "none";
-    });
-    window.addEventListener("click", e => {
-      if (e.target === loginModal) loginModal.style.display = "none";
-    });
 
-    // Email login
-    document.getElementById("emailLoginBtn").addEventListener("click", () => {
-      const email = document.getElementById("emailInput").value;
-      const password = document.getElementById("passwordInput").value;
-      auth.signInWithEmailAndPassword(email, password)
-        .then(() => loginModal.style.display = "none")
-        .catch(err => alert(err.message));
-    });
-
-    // Google login
-    document.getElementById("googleLoginBtn").addEventListener("click", () => {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      auth.signInWithPopup(provider).then(() => loginModal.style.display = "none");
-    });
-
-    // Show user info
-    auth.onAuthStateChanged(user => {
-      const userName = document.getElementById("userName");
-      const userEmail = document.getElementById("userEmail");
-      const userAvatar = document.getElementById("userAvatar");
-      const userBalance = document.getElementById("userBalance");
-
-      if (user) {
-        authBtn.textContent = "Logout";
-        userName.textContent = user.displayName || "User";
-        userEmail.textContent = user.email;
-        userAvatar.src = user.photoURL || "https://via.placeholder.com/60";
-
-        // 🔹 Load balance from Firestore
-        db.collection("users").doc(user.uid).onSnapshot(doc => {
-          if (doc.exists) {
-            userBalance.textContent = doc.data().balance || 0;
-          } else {
-            userBalance.textContent = "0";
-          }
-        });
-      } else {
-        authBtn.textContent = "Login";
-        userName.textContent = "Guest";
-        userEmail.textContent = "Not logged in";
-        userAvatar.src = "https://via.placeholder.com/60";
-        userBalance.textContent = "0";
-      }
+    // Sidebar Toggle
+    document.addEventListener('DOMContentLoaded', () => {
+      const menu = document.getElementById('menuToggle');
+      const sidebar = document.getElementById('sidebar');
+      const closeBtn = document.getElementById('closeSidebar');
+      menu.addEventListener('click', (e) => {
+        e.stopPropagation();
+        sidebar.classList.add('open');
+      });
+      closeBtn.addEventListener('click', () => sidebar.classList.remove('open'));
+      document.addEventListener('click', (e) => {
+        if (!sidebar.contains(e.target) && !menu.contains(e.target)) {
+          sidebar.classList.remove('open');
+        }
+      });
+      sidebar.addEventListener('click', (e) => e.stopPropagation());
+      document.getElementById('year').textContent = new Date().getFullYear();
     });
   </script>
 </body>
