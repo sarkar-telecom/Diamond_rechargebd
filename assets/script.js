@@ -3,7 +3,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyAyhjOsIXNAkBglpRllt0OZIOJYpdB_9-8",
   authDomain: "diamond-recharge-f7f59.firebaseapp.com",
   projectId: "diamond-recharge-f7f59",
-  storageBucket: "diamond-recharge-f7f59.firebasestorage.app",
+  storageBucket: "diamond-recharge-f7f59.appspot.com", // ✅ fixed
   messagingSenderId: "657717928489",
   appId: "1:657717928489:web:70431ebc9afb7002d4b238",
   measurementId: "G-TDK78BQ8SQ"
@@ -12,26 +12,30 @@ const firebaseConfig = {
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
+const db = firebase.firestore(); // ✅ Firestore for balance
 
-// Populate UI
+// 🔹 Populate UI
 function populate(u) {
   const name = u?.displayName || u?.email || 'Guest User';
   const email = u?.email || 'Not signed in';
   const photo = u?.photoURL || 'https://via.placeholder.com/80?text=👤';
   const balance = u?.balance !== undefined ? u.balance : 0;
 
+  // Topbar
   document.getElementById('authName').textContent = name;
   document.getElementById('authEmail').textContent = email;
   document.getElementById('authAvatar').src = photo;
 
+  // Profile
   document.getElementById('profileName').textContent = name;
   document.getElementById('profileEmail').textContent = email;
   document.getElementById('profilePhoto').src = photo;
-  document.getElementById('profileBalance').textContent = u ? '৳ ' + balance : '৳ 0';
+  document.getElementById('profileBalance').textContent = '৳ ' + balance;
 
+  // Sidebar
   document.getElementById('sbName').textContent = name;
   document.getElementById('sbEmail').textContent = email;
-  document.getElementById('sbBalance').textContent = u ? '৳ ' + balance : '৳ 0';
+  document.getElementById('sbBalance').textContent = '৳ ' + balance;
 
   if (u) {
     document.getElementById('loginBox').style.display = 'none';
@@ -42,7 +46,7 @@ function populate(u) {
   }
 }
 
-// Auth Methods
+// 🔹 Auth Methods
 function loginWithGoogle() {
   const provider = new firebase.auth.GoogleAuthProvider();
   auth.signInWithPopup(provider).catch(err => alert(err.message));
@@ -57,20 +61,48 @@ function loginWithEmail() {
 function registerWithEmail() {
   const email = document.getElementById('emailInput').value;
   const pass = document.getElementById('passInput').value;
-  auth.createUserWithEmailAndPassword(email, pass).catch(err => alert(err.message));
+
+  auth.createUserWithEmailAndPassword(email, pass)
+    .then(async (cred) => {
+      await db.collection("users").doc(cred.user.uid).set({
+        email,
+        balance: 0
+      });
+    })
+    .catch(err => alert(err.message));
 }
 
 function logout() {
   auth.signOut().catch(err => alert(err.message));
 }
 
-// Listen for auth state changes
-auth.onAuthStateChanged(user => {
-  window.authUser = user || null;
-  populate(user);
+// 🔹 Listen for auth state changes
+auth.onAuthStateChanged(async (user) => {
+  if (user) {
+    try {
+      const docRef = db.collection("users").doc(user.uid);
+      const docSnap = await docRef.get();
+      let userData = { ...user };
+
+      if (docSnap.exists) {
+        userData.balance = docSnap.data().balance || 0;
+      } else {
+        // First time login → create record
+        await docRef.set({ balance: 0, email: user.email });
+        userData.balance = 0;
+      }
+
+      populate(userData);
+    } catch (err) {
+      console.error("Error fetching user data:", err);
+      populate(user); // fallback
+    }
+  } else {
+    populate(null);
+  }
 });
 
-// Sidebar toggle + year
+// 🔹 Sidebar toggle + year
 document.addEventListener('DOMContentLoaded', () => {
   const menu = document.getElementById('menuToggle');
   const sidebar = document.getElementById('sidebar');
@@ -95,6 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Prevent clicks inside sidebar from closing
   sidebar.addEventListener('click', (e) => e.stopPropagation());
 
+  // Current year
   document.getElementById('year').textContent = new Date().getFullYear();
 
   // Button events
