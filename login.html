@@ -1,147 +1,71 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Login | Diamond Recharge</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Login — Diamond Recharge</title>
   <link rel="stylesheet" href="assets/style.css">
 
-  <!-- Firebase v9 SDK -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-    import { 
-      getAuth, setPersistence, browserLocalPersistence, browserSessionPersistence,
-      signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut
-    } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+</head>
+<body>
+  <main class="container">
+    <div class="login-card card neon">
+      <h2>🔑 Sign In</h2>
+      <p class="muted">Access your dashboard</p>
 
+      <button id="googleLogin" class="btn primary full">Sign in with Google</button>
+      <hr>
+      <button id="guestLogin" class="btn full">Continue as Guest</button>
+    </div>
+  </main>
+
+  <script>
     // 🔹 Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyAyhjOsIXNAkBglpRllt0OZIOJYpdB_9-8",
       authDomain: "diamond-recharge-f7f59.firebaseapp.com",
       projectId: "diamond-recharge-f7f59",
-      storageBucket: "diamond-recharge-f7f59.appspot.com",
+      storageBucket: "diamond-recharge-f7f59.firebasestorage.app",
       messagingSenderId: "657717928489",
       appId: "1:657717928489:web:70431ebc9afb7002d4b238",
       measurementId: "G-TDK78BQ8SQ"
     };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
+    // Google Login
+    document.getElementById("googleLogin").addEventListener("click", async () => {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      try {
+        const result = await auth.signInWithPopup(provider);
+        const user = result.user;
+        const ref = db.collection("users").doc(user.uid);
+        const snap = await ref.get();
 
-    // 🟢 Auth state listener → redirect if already logged in
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
+        if (!snap.exists) {
+          await ref.set({
+            name: user.displayName,
+            email: user.email,
+            avatar: user.photoURL,
+            role: "member",
+            balance: 0,
+            weeklyTotal: 0
+          });
+        }
         window.location.href = "index.html";
+      } catch (err) {
+        alert("Login failed: " + err.message);
       }
     });
 
-    // 🟢 Login form submit
-    window.handleLogin = async (e) => {
-      e.preventDefault();
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      const rememberMe = document.getElementById("rememberMe").checked;
-
-      try {
-        await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence);
-        await signInWithEmailAndPassword(auth, email, password);
-        alert("Login successful!");
-        window.location.href = "index.html";
-      } catch (err) {
-        alert(err.message);
-      }
-    };
-
-    // 🟢 Google Login
-    window.googleLogin = async () => {
-      try {
-        const provider = new GoogleAuthProvider();
-        await signInWithPopup(auth, provider);
-        alert("Google login successful!");
-        window.location.href = "index.html";
-      } catch (err) {
-        alert("Google login failed: " + err.message);
-      }
-    };
-
-    // 🟢 Show Password toggle
-    window.togglePassword = () => {
-      const pass = document.getElementById("password");
-      pass.type = pass.type === "password" ? "text" : "password";
-    };
-  </script>
-</head>
-<body class="has-sidebar">
-  <!-- Header -->
-  <header class="header">
-    <button id="menuToggle" class="menu-btn" aria-label="Open menu">☰</button>
-    <div class="brand">
-      <img src="assets/logo.svg" alt="logo" class="logo">
-      <div class="brand-text">
-        <div class="site-name">Diamond Recharge</div>
-        <div class="site-sub">Neon glass template</div>
-      </div>
-    </div>
-  </header>
-
-  <!-- Sidebar -->
-  <aside id="sidebar" class="sidebar" aria-hidden="true">
-    <div class="sidebar-inner">
-      <button id="closeSidebar" class="close-btn" aria-label="Close sidebar">✕</button>
-      <nav class="nav">
-        <a href="index.html" class="nav-link">🏠 Dashboard</a>
-        <a href="order.html" class="nav-link">📱 New Order</a>
-        <a href="order-history.html" class="nav-link">📃 Orders</a>
-        <a href="balance.html" class="nav-link">💰 Balance</a>
-        <a href="admin.html" class="nav-link">⚙️ Admin</a>
-        <a href="login.html" class="nav-link active">🔐 Login</a>
-      </nav>
-    </div>
-  </aside>
-
-  <!-- Main Content -->
-  <main class="main container">
-    <section class="card neon" style="max-width:420px; margin:auto; padding:2rem; text-align:center;">
-      <h2 class="accent">Login</h2>
-      <form id="loginForm" onsubmit="handleLogin(event)">
-        <div class="form-group">
-          <label>Email</label>
-          <input type="email" id="email" required/>
-        </div>
-        <div class="form-group">
-          <label>Password</label>
-          <input type="password" id="password" required/>
-          <label><input type="checkbox" onclick="togglePassword()"> Show Password</label>
-        </div>
-        <div class="form-actions">
-          <label><input type="checkbox" id="rememberMe"> Remember me</label>
-          <a href="forgot.html">Forgot?</a>
-        </div>
-        <button type="submit" class="btn primary" style="width:100%">Login</button>
-      </form>
-
-      <button type="button" class="btn" onclick="googleLogin()" style="margin-top:10px;width:100%;background:#fff;color:#444;display:flex;align-items:center;justify-content:center;">
-        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" style="width:20px;margin-right:8px;"/> Continue with Google
-      </button>
-
-      <div class="muted" style="margin-top:15px;">Don’t have an account? <a href="register.html">Register</a></div>
-    </section>
-  </main>
-
-  <!-- Sidebar Script -->
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const menu = document.getElementById('menuToggle');
-      const sidebar = document.getElementById('sidebar');
-      const closeBtn = document.getElementById('closeSidebar');
-      menu.addEventListener('click', (e) => {
-        e.stopPropagation(); sidebar.classList.add('open');
-      });
-      closeBtn.addEventListener('click', () => sidebar.classList.remove('open'));
-      document.addEventListener('click', (e) => {
-        if (!sidebar.contains(e.target) && !menu.contains(e.target)) sidebar.classList.remove('open');
-      });
-      sidebar.addEventListener('click', (e) => e.stopPropagation());
+    // Guest Login
+    document.getElementById("guestLogin").addEventListener("click", () => {
+      window.location.href = "index.html";
     });
   </script>
 </body>
