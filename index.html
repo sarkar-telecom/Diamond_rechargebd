@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Diamond Recharge — Neon Glass Template</title>
+  <title>Diamond Recharge — Dashboard</title>
   <link rel="stylesheet" href="assets/style.css">
 
   <!-- Firebase SDKs -->
@@ -14,7 +14,7 @@
 <body class="has-sidebar">
   <!-- Header -->
   <header class="header">
-    <button id="menuToggle" class="menu-btn" aria-label="Open menu">☰</button>
+    <button id="menuToggle" class="menu-btn">☰</button>
     <div class="brand">
       <img src="assets/logo.svg" alt="logo" class="logo">
       <div class="brand-text">
@@ -37,7 +37,7 @@
   <!-- Sidebar -->
   <aside id="sidebar" class="sidebar" aria-hidden="true">
     <div class="sidebar-inner">
-      <button id="closeSidebar" class="close-btn" aria-label="Close sidebar">✕</button>
+      <button id="closeSidebar" class="close-btn">✕</button>
       <nav class="nav">
         <a href="index.html" class="nav-link active">🏠 Dashboard</a>
         <a href="order.html" class="nav-link">📱 New Order</a>
@@ -58,12 +58,12 @@
     </div>
   </aside>
 
-  <!-- Main Content -->
+  <!-- Main -->
   <main class="main container">
     <section class="hero card neon">
       <div class="hero-left">
         <h1>Welcome to <span class="accent">Diamond Recharge</span></h1>
-        <p class="muted">Mobile-first neon glass template for recharge/topup services. Responsive & lightweight.</p>
+        <p class="muted">Mobile-first neon glass template for recharge/topup services.</p>
         <div class="cta-row">
           <a class="btn primary" href="order.html">New Order</a>
           <a class="btn" href="order-history.html">Order History</a>
@@ -71,7 +71,7 @@
       </div>
       <div class="hero-right">
         <div class="profile-card card small">
-          <img id="profilePhoto" src="https://via.placeholder.com/80" alt="user" class="avatar-lg">
+          <img id="profilePhoto" src="https://via.placeholder.com/80" class="avatar-lg" alt="user">
           <div>
             <div id="profileName">Guest</div>
             <div id="profileRole" class="muted">not signed in</div>
@@ -83,32 +83,13 @@
       </div>
     </section>
 
-    <section class="grid cards">
-      <article class="card neon">
-        <h3>Quick Top-up</h3>
-        <p class="muted">Create a quick order and deduct from user balance when order is placed.</p>
-      </article>
-      <article class="card neon">
-        <h3>Balance Refunds</h3>
-        <p class="muted">Process refunds and restore balance to the user.</p>
-      </article>
-      <article class="card neon">
-        <h3>Orders</h3>
-        <p class="muted">View recent orders and their status.</p>
-      </article>
-      <article class="card neon">
-        <h3>Admin Tools</h3>
-        <p class="muted">Manual balance adjustment, export to Google Sheets, role-based actions.</p>
-      </article>
-    </section>
-
     <footer class="site-footer card">
       <div>© <span id="year"></span> Diamond Recharge</div>
       <div class="muted">Built for mobile & desktop — neon glass UI</div>
     </footer>
   </main>
 
-  <!-- Firebase + Script -->
+  <!-- Firebase Script -->
   <script>
     // 🔹 Firebase Config
     const firebaseConfig = {
@@ -133,18 +114,15 @@
       const balance = userData?.balance ?? 0;
       const weeklyTotal = userData?.weeklyTotal ?? 0;
 
-      // Header
       document.getElementById('authName').textContent = name;
       document.getElementById('authRole').textContent = role;
       document.getElementById('authAvatar').src = photo;
 
-      // Sidebar
       document.getElementById('sbName').textContent = name;
       document.getElementById('sbEmail').textContent = email;
       document.getElementById('sbAvatar').src = photo;
       document.getElementById('sbBalance').textContent = '৳ ' + balance;
 
-      // Profile Card
       document.getElementById('profileName').textContent = name;
       document.getElementById('profileRole').textContent = role;
       document.getElementById('profileEmail').textContent = email;
@@ -160,41 +138,48 @@
         const snap = await ref.get();
         if (snap.exists) {
           populate(snap.data());
-          document.getElementById('authToggleBtn').textContent = "Logout";
         } else {
-          populate(user);
+          populate({
+            name: user.displayName,
+            email: user.email,
+            avatar: user.photoURL,
+            role: "member",
+            balance: 0,
+            weeklyTotal: 0
+          });
         }
+        document.getElementById('authToggleBtn').textContent = "Logout";
       } else {
         populate(null);
         document.getElementById('authToggleBtn').textContent = "Login";
       }
     });
 
-    // Toggle button → redirect later
+    // Login/Logout Button
     document.getElementById('authToggleBtn').addEventListener('click', () => {
       if (auth.currentUser) {
         auth.signOut();
       } else {
-        window.location.href = "login.html"; // later create login page
+        window.location.href = "login.html";
       }
     });
 
-    // Sidebar Toggle
+    // Sidebar
     document.addEventListener('DOMContentLoaded', () => {
       const menu = document.getElementById('menuToggle');
       const sidebar = document.getElementById('sidebar');
       const closeBtn = document.getElementById('closeSidebar');
-      menu.addEventListener('click', (e) => {
+      menu.addEventListener('click', e => {
         e.stopPropagation();
         sidebar.classList.add('open');
       });
       closeBtn.addEventListener('click', () => sidebar.classList.remove('open'));
-      document.addEventListener('click', (e) => {
+      document.addEventListener('click', e => {
         if (!sidebar.contains(e.target) && !menu.contains(e.target)) {
           sidebar.classList.remove('open');
         }
       });
-      sidebar.addEventListener('click', (e) => e.stopPropagation());
+      sidebar.addEventListener('click', e => e.stopPropagation());
       document.getElementById('year').textContent = new Date().getFullYear();
     });
   </script>
