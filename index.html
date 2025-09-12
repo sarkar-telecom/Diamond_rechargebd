@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Diamond Recharge — Dashboard</title>
   <link rel="stylesheet" href="style.css">
+
   <!-- Firebase compat SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -76,8 +77,10 @@
             <div id="profileName">Guest</div>
             <div id="profileRole" class="muted">not signed in</div>
             <div id="profileEmail" class="muted">-</div>
+            <div id="profilePhone" class="muted">-</div>
             <div class="balance">💎 <span id="profileBalance">৳ 0</span></div>
-            <div class="muted">Weekly Total: <span id="profileWeeklyTotal">0</span></div>
+            <div class="muted">Approved: <span id="profileApproved">❌</span></div>
+            <div class="muted">Refunded Orders: <span id="profileRefunded">0</span></div>
           </div>
         </div>
       </div>
@@ -109,116 +112,134 @@
   </main>
 
   <script>
-    // =========================
-    // Firebase Config
-    // =========================
-    const firebaseConfig = {
-      apiKey: "AIzaSyAyhjOsIXNAkBglpRllt0OZIOJYpdB_9-8",
-      authDomain: "diamond-recharge-f7f59.firebaseapp.com",
-      projectId: "diamond-recharge-f7f59",
-      storageBucket: "diamond-recharge-f7f59.firebasestorage.app",
-      messagingSenderId: "657717928489",
-      appId: "1:657717928489:web:70431ebc9afb7002d4b238",
-      measurementId: "G-TDK78BQ8SQ"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
+<script>
+  // ==== Firebase Init ====
+  const firebaseConfig = {
+    apiKey: "AIzaSyAyhjOsIXNAkBglpRllt0OZIOJYpdB_9-8",
+    authDomain: "diamond-recharge-f7f59.firebaseapp.com",
+    projectId: "diamond-recharge-f7f59",
+    storageBucket: "diamond-recharge-f7f59.firebasestorage.app",
+    messagingSenderId: "657717928489",
+    appId: "1:657717928489:web:70431ebc9afb7002d4b238",
+    measurementId: "G-TDK78BQ8SQ"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
 
-    // =========================
-    // Sidebar Toggle
-    // =========================
-    const sidebar = document.getElementById("sidebar");
-    const menuToggle = document.getElementById("menuToggle");
-    const closeSidebar = document.getElementById("closeSidebar");
+  // ==== Sidebar Toggle ====
+  const sidebar = document.getElementById("sidebar");
+  document.getElementById("menuToggle").onclick = () => sidebar.setAttribute("aria-hidden", "false");
+  document.getElementById("closeSidebar").onclick = () => sidebar.setAttribute("aria-hidden", "true");
 
-    menuToggle?.addEventListener("click", () => {
-      sidebar.setAttribute("aria-hidden", "false");
-    });
+  // ==== Auth Toggle ====
+  const authBtn = document.getElementById("authToggleBtn");
+  authBtn.addEventListener("click", () => {
+    if (auth.currentUser) {
+      auth.signOut();
+    } else {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider);
+    }
+  });
 
-    closeSidebar?.addEventListener("click", () => {
-      sidebar.setAttribute("aria-hidden", "true");
-    });
+  // ==== Default user schema ====
+  const defaultUserData = (user) => ({
+    approved: false,
+    avatar: user.photoURL || "https://via.placeholder.com/80",
+    balance: 0,
+    email: user.email || "",
+    name: user.displayName || "User",
+    phone: "-",
+    refundedOrders: [],
+    role: "user",
+    tier: 0,
+    weekBoundary: Date.now(),
+    weeklyDiamonds: 0,
+    weeklyTotal: 0,
+    createdAt: new Date()
+  });
 
-    // =========================
-    // Auth Elements
-    // =========================
-    const loginBtn = document.getElementById("authToggleBtn");
-    const authName = document.getElementById("authName");
-    const authRole = document.getElementById("authRole");
-    const authAvatar = document.getElementById("authAvatar");
+  // ==== Update UI ====
+  function updateUI(data, user) {
+    // --- Header ---
+    document.getElementById("authName").textContent = data.name || user.displayName || "User";
+    document.getElementById("authRole").textContent = data.role || "Signed in";
+    document.getElementById("authAvatar").src = data.avatar || user.photoURL || "https://via.placeholder.com/36";
 
-    const sbName = document.getElementById("sbName");
-    const sbEmail = document.getElementById("sbEmail");
-    const sbAvatar = document.getElementById("sbAvatar");
+    // --- Sidebar ---
+    document.getElementById("sbName").textContent = data.name || "User";
+    document.getElementById("sbEmail").textContent = data.email || user.email || "-";
+    document.getElementById("sbAvatar").src = data.avatar || user.photoURL || "https://via.placeholder.com/48";
+    document.getElementById("sbBalance").textContent = "৳ " + (data.balance || 0);
 
-    const profileName = document.getElementById("profileName");
-    const profileRole = document.getElementById("profileRole");
-    const profileEmail = document.getElementById("profileEmail");
-    const profilePhoto = document.getElementById("profilePhoto");
+    // --- Profile Card ---
+    document.getElementById("profileName").textContent = data.name || "User";
+    document.getElementById("profileRole").textContent = data.role || "Signed in";
+    document.getElementById("profileEmail").textContent = data.email || user.email || "-";
+    document.getElementById("profilePhone").textContent = data.phone || "-";
+    document.getElementById("profilePhoto").src = data.avatar || user.photoURL || "https://via.placeholder.com/80";
+    document.getElementById("profileBalance").textContent = "৳ " + (data.balance || 0);
+    document.getElementById("profileApproved").textContent = data.approved ? "✔" : "❌";
+    document.getElementById("profileRefunded").textContent = Array.isArray(data.refundedOrders) ? data.refundedOrders.length : 0;
+  }
 
-    const profileBalance = document.getElementById("profileBalance");
-    const profileWeeklyTotal = document.getElementById("profileWeeklyTotal");
-    const sbBalance = document.getElementById("sbBalance");
+  // ==== Auth State Change ====
+  auth.onAuthStateChanged(async (user) => {
+    if (user) {
+      authBtn.textContent = "Logout";
+      const docRef = db.collection("users").doc(user.uid);
 
-    // =========================
-    // Login / Logout
-    // =========================
-    loginBtn?.addEventListener("click", () => {
-      if (auth.currentUser) {
-        auth.signOut();
+      // Create if not exist, merge missing fields if exist
+      const snap = await docRef.get();
+      if (!snap.exists) {
+        await docRef.set(defaultUserData(user));
       } else {
-        const provider = new firebase.auth.GoogleAuthProvider();
-        auth.signInWithPopup(provider).catch(err => alert(err.message));
+        const existingData = snap.data();
+        const defaults = defaultUserData(user);
+        let updates = {};
+        for (let key in defaults) {
+          if (!(key in existingData)) {
+            updates[key] = defaults[key];
+          }
+        }
+        if (Object.keys(updates).length > 0) {
+          await docRef.set(updates, { merge: true });
+        }
       }
-    });
 
-    // =========================
-    // On Auth State Change
-    // =========================
-    auth.onAuthStateChanged((user) => {
-      if (user) {
-        // Update UI with user info
-        authName.textContent = user.displayName || "User";
-        authRole.textContent = "Member";
-        authAvatar.src = user.photoURL || "assets/default-avatar.png";
+      // Live listener
+      docRef.onSnapshot((snap) => {
+        if (snap.exists) {
+          updateUI(snap.data(), user);
+        }
+      });
 
-        sbName.textContent = user.displayName || "User";
-        sbEmail.textContent = user.email || "-";
-        sbAvatar.src = user.photoURL || "assets/default-avatar.png";
+    } else {
+      // Reset UI for guest
+      authBtn.textContent = "Login";
+      document.getElementById("authName").textContent = "Guest";
+      document.getElementById("authRole").textContent = "not signed in";
+      document.getElementById("authAvatar").src = "https://via.placeholder.com/36";
 
-        profileName.textContent = user.displayName || "User";
-        profileRole.textContent = "Member";
-        profileEmail.textContent = user.email || "-";
-        profilePhoto.src = user.photoURL || "assets/default-avatar.png";
+      document.getElementById("sbName").textContent = "Guest";
+      document.getElementById("sbEmail").textContent = "-";
+      document.getElementById("sbAvatar").src = "https://via.placeholder.com/48";
+      document.getElementById("sbBalance").textContent = "৳ 0";
 
-        loginBtn.textContent = "Logout";
-      } else {
-        // Guest UI
-        authName.textContent = "Guest";
-        authRole.textContent = "not signed in";
-        authAvatar.src = "https://via.placeholder.com/36";
+      document.getElementById("profileName").textContent = "Guest";
+      document.getElementById("profileRole").textContent = "not signed in";
+      document.getElementById("profileEmail").textContent = "-";
+      document.getElementById("profilePhone").textContent = "-";
+      document.getElementById("profilePhoto").src = "https://via.placeholder.com/80";
+      document.getElementById("profileBalance").textContent = "৳ 0";
+      document.getElementById("profileApproved").textContent = "❌";
+      document.getElementById("profileRefunded").textContent = "0";
+    }
+  });
 
-        sbName.textContent = "Guest";
-        sbEmail.textContent = "-";
-        sbAvatar.src = "https://via.placeholder.com/48";
-
-        profileName.textContent = "Guest";
-        profileRole.textContent = "not signed in";
-        profileEmail.textContent = "-";
-        profilePhoto.src = "https://via.placeholder.com/80";
-
-        profileBalance.textContent = "৳ 0";
-        profileWeeklyTotal.textContent = "0";
-        sbBalance.textContent = "৳ 0";
-
-        loginBtn.textContent = "Login";
-      }
-    });
-
-    // =========================
-    // Footer Year Auto Update
-    // =========================
-    document.getElementById("year").textContent = new Date().getFullYear();
-  </script>
+  // ==== Footer Year ====
+  document.getElementById("year").textContent = new Date().getFullYear();
+</script>
 </body>
 </html>
