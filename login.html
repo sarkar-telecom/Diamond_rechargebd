@@ -1,64 +1,87 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Login | Diamond Recharge</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="assets/style.css">
 </head>
-<body>
-  <!-- Sidebar -->
-  <div id="sidebar" class="sidebar">
-    <h2>Menu</h2>
-    <ul>
-      <li><a href="index.html">Dashboard</a></li>
-      <li><a href="order.html">Order</a></li>
-      <li><a href="order-history.html">History</a></li>
-      <li><a href="login.html">Login</a></li>
-    </ul>
-  </div>
+<body class="has-sidebar">
 
   <!-- Header -->
-  <div class="header">
-    <button id="menu-toggle">☰</button>
-    <h1>Login</h1>
-    <button id="auth-toggle">Login</button>
-  </div>
+  <header class="header">
+    <button id="menuToggle" class="menu-btn" aria-label="Open menu">☰</button>
+    <div class="brand">
+      <img src="assets/logo.svg" alt="logo" class="logo">
+      <div class="brand-text">
+        <div class="site-name">Diamond Recharge</div>
+        <div class="site-sub">Neon glass template</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button id="auth-toggle" class="btn small">Login</button>
+    </div>
+  </header>
+
+  <!-- Sidebar -->
+  <aside id="sidebar" class="sidebar" aria-hidden="true">
+    <div class="sidebar-inner">
+      <button id="closeSidebar" class="close-btn" aria-label="Close sidebar">✕</button>
+      <nav class="nav">
+        <a href="index.html" class="nav-link">🏠 Dashboard</a>
+        <a href="order.html" class="nav-link">📱 New Order</a>
+        <a href="order-history.html" class="nav-link">📃 Orders</a>
+        <a href="balance.html" class="nav-link">💰 Balance</a>
+        <a href="admin.html" class="nav-link">⚙️ Admin</a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="footer-user">
+          <img id="avatar" src="https://via.placeholder.com/48" class="avatar" alt="avatar">
+          <div>
+            <div id="name">Guest</div>
+            <div id="email" class="muted">-</div>
+          </div>
+        </div>
+        <div class="sb-balance">💎 <span id="balance">৳ 0</span></div>
+      </div>
+    </div>
+  </aside>
 
   <!-- Main Content -->
-  <div class="main">
-    <div class="card login-card">
+  <main class="main container">
+    <section class="card neon auth-card">
       <h2>Login</h2>
       <form id="loginForm">
         <label>Email</label>
-        <input type="email" id="email" required>
-        
+        <input type="email" id="loginEmail" required placeholder="Enter your email">
+
         <label>Password</label>
-        <input type="password" id="password" required>
-        <div>
-          <input type="checkbox" id="showPass"> Show Password
-        </div>
-        <div>
-          <input type="checkbox" id="rememberMe"> Remember Me
+        <div class="password-box">
+          <input type="password" id="loginPassword" required placeholder="Enter password">
+          <button type="button" id="showPassword" class="btn small">👁</button>
         </div>
 
-        <button type="submit">Login</button>
-        <button type="button" id="googleLogin">Login with Google</button>
-        <p><a href="forgot.html">Forgot Password?</a></p>
-        <p><a href="register.html">Create an Account</a></p>
+        <label class="remember">
+          <input type="checkbox" id="rememberMe"> Remember me
+        </label>
+
+        <button type="submit" class="btn primary">Login</button>
+        <button type="button" id="googleLogin" class="btn">Login with Google</button>
       </form>
-    </div>
-  </div>
 
-  <script>
-    document.getElementById("menu-toggle").addEventListener("click", function () {
-      document.getElementById("sidebar").classList.toggle("active");
-    });
+      <div class="auth-links">
+        <a href="register.html">Create account</a> · 
+        <a href="reset.html">Forgot password?</a>
+      </div>
+    </section>
+  </main>
 
-    document.getElementById("showPass").addEventListener("change", function () {
-      const pass = document.getElementById("password");
-      pass.type = this.checked ? "text" : "password";
-    });
-  </script>
+  <footer class="site-footer card">
+    <div>© <span id="year"></span> Diamond Recharge</div>
+    <div class="muted">Built for mobile & desktop — neon glass UI</div>
+  </footer>
+
+  <!-- Firebase + Main JS -->
+  <script type="module" src="assets/main.js"></script>
 </body>
 </html>
