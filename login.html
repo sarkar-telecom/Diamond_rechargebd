@@ -238,5 +238,60 @@
         .catch(err => alert("Google login failed: " + err.message));
     });
   </script>
+<script type="module">
+  // Import Firebase v9 modules
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+  import { getAuth, setPersistence, browserLocalPersistence, browserSessionPersistence, 
+           signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } 
+           from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+
+  // Your Firebase config
+  const firebaseConfig = {
+    apiKey: "AIzaSyAyhjOsIXNAkBglpRllt0OZIOJYpdB_9-8",
+    authDomain: "diamond-recharge-f7f59.firebaseapp.com",
+    projectId: "diamond-recharge-f7f59",
+    storageBucket: "diamond-recharge-f7f59.appspot.com",
+    messagingSenderId: "657717928489",
+    appId: "1:657717928489:web:70431ebc9afb7002d4b238",
+    measurementId: "G-TDK78BQ8SQ"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  // Show password toggle
+  document.getElementById("showPassword").addEventListener("change", function() {
+    document.getElementById("password").type = this.checked ? "text" : "password";
+  });
+
+  // Email login
+  document.getElementById("loginForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    const rememberMe = document.getElementById("rememberMe").checked;
+
+    try {
+      await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence);
+      await signInWithEmailAndPassword(auth, email, password);
+      alert("Login successful!");
+      window.location.href = "index.html";
+    } catch (err) {
+      alert(err.message);
+    }
+  });
+
+  // Google login
+  document.getElementById("googleLogin").addEventListener("click", async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+      alert("Google login successful!");
+      window.location.href = "index.html";
+    } catch (err) {
+      alert("Google login failed: " + err.message);
+    }
+  });
+</script>
 </body>
 </html>
