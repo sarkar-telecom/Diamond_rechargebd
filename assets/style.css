@@ -83,3 +83,71 @@ body{
 /* small helpers */
 .muted{color:var(--muted);font-size:13px} 
 .center{display:flex;align-items:center;justify-content:center}
+/* 🔹 Login Card */
+.login-card {
+  max-width: 400px;
+  margin: 80px auto;
+  padding: 30px;
+  border-radius: 20px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  animation: fadeIn 0.6s ease-in-out;
+}
+
+.login-card h2 {
+  font-size: 1.6rem;
+  margin-bottom: 10px;
+  color: #fff;
+}
+
+.login-card p {
+  margin-bottom: 20px;
+  font-size: 0.95rem;
+}
+
+.login-card hr {
+  border: 0;
+  height: 1px;
+  margin: 20px 0;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* 🔹 Button Full Width */
+.btn.full {
+  width: 100%;
+  margin: 8px 0;
+  padding: 12px;
+  font-size: 1rem;
+  border-radius: 10px;
+}
+
+/* 🔹 Button Hover Effects */
+.btn.primary {
+  background: linear-gradient(135deg, #00d4ff, #0077ff);
+  color: #fff;
+  border: none;
+}
+
+.btn.primary:hover {
+  background: linear-gradient(135deg, #0099ff, #0051cc);
+}
+
+.btn {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* 🔹 Simple Fade Animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
