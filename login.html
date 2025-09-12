@@ -6,22 +6,15 @@
   <title>Login — Diamond Recharge</title>
   <link rel="stylesheet" href="assets/style.css">
   <style>
-    .auth-card {
-      max-width: 400px;
-      margin: 2rem auto;
-      padding: 2rem;
-      text-align: center;
-    }
+    .auth-card { max-width: 420px; margin: 2rem auto; padding: 2rem; text-align: center; }
     .auth-card h2 { margin-bottom: 1rem; }
     .auth-card .form-group { margin-bottom: 1rem; text-align: left; }
-    .auth-card input[type="email"],
-    .auth-card input[type="password"] {
-      width: 100%; padding: .6rem; border-radius: .5rem; border: none;
-    }
+    .auth-card input { width: 100%; padding: .6rem; border-radius: .5rem; border: none; }
     .auth-card label { display: block; margin-bottom: .3rem; font-size: .9rem; }
+    .toggle-pass { cursor: pointer; position: absolute; right: 10px; top: 36px; font-size: .9rem; }
+    .remember { display: flex; align-items: center; gap: .4rem; margin-bottom: 1rem; }
     .auth-card .links { margin-top: 1rem; font-size: .85rem; }
     .auth-card .links a { margin: 0 .5rem; }
-    .toggle-pass { cursor: pointer; font-size: .8rem; color: #0ff; float: right; }
   </style>
 </head>
 <body class="has-sidebar">
@@ -37,7 +30,7 @@
       </div>
     </div>
     <div class="header-actions">
-      <button id="authToggle" class="btn small">Login</button>
+      <button id="authToggle" class="btn small">Register</button>
     </div>
   </header>
 
@@ -52,16 +45,6 @@
         <a href="balance.html" class="nav-link">💰 Balance</a>
         <a href="admin.html" class="nav-link">⚙️ Admin</a>
       </nav>
-      <div class="sidebar-footer">
-        <div class="footer-user">
-          <img id="sbAvatar" src="https://via.placeholder.com/48" class="avatar">
-          <div>
-            <div id="sbName">Guest</div>
-            <div id="sbEmail" class="muted">-</div>
-          </div>
-        </div>
-        <div class="sb-balance">💎 <span id="sbBalance">৳ 0</span></div>
-      </div>
     </div>
   </aside>
 
@@ -74,29 +57,32 @@
           <label>Email</label>
           <input type="email" id="loginEmail" required>
         </div>
-        <div class="form-group">
-          <label>Password <span class="toggle-pass" id="togglePass">Show</span></label>
+        <div class="form-group" style="position:relative;">
+          <label>Password</label>
           <input type="password" id="loginPassword" required>
+          <span class="toggle-pass" onclick="togglePassword('loginPassword')">👁️</span>
         </div>
-        <div class="form-group">
-          <label><input type="checkbox" id="rememberMe"> Remember Me</label>
+        <div class="remember">
+          <input type="checkbox" id="rememberMe">
+          <label for="rememberMe">Remember Me</label>
         </div>
         <button type="submit" class="btn primary">Login</button>
       </form>
-      <button id="googleLogin" class="btn">Login with Google</button>
-      <div class="links">
-        <a href="register.html">Register</a> | 
-        <a href="forgot.html">Forgot Password?</a>
-      </div>
+
+      <p style="margin:1rem 0;">or</p>
+      <button id="googleLogin" class="btn secondary">Continue with Google</button>
       <p id="loginMsg" class="muted"></p>
+
+      <div class="links">
+        <a href="register.html">Create account</a> |
+        <a href="forgot.html">Forgot password?</a>
+      </div>
     </div>
   </main>
 
   <script type="module">
-    // Firebase imports
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, setPersistence, browserLocalPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+    import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, setPersistence, browserLocalPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
 
     // Firebase config
     const firebaseConfig = {
@@ -110,52 +96,41 @@
     };
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
-    const db = getFirestore(app);
 
-    // Elements
-    const loginForm = document.getElementById("loginForm");
-    const loginEmail = document.getElementById("loginEmail");
-    const loginPassword = document.getElementById("loginPassword");
-    const loginMsg = document.getElementById("loginMsg");
-    const rememberMe = document.getElementById("rememberMe");
-    const togglePass = document.getElementById("togglePass");
+    const form = document.getElementById("loginForm");
+    const msg = document.getElementById("loginMsg");
 
-    // Show/Hide password
-    togglePass.addEventListener("click", () => {
-      if (loginPassword.type === "password") {
-        loginPassword.type = "text";
-        togglePass.textContent = "Hide";
-      } else {
-        loginPassword.type = "password";
-        togglePass.textContent = "Show";
-      }
-    });
-
-    // Email login
-    loginForm.addEventListener("submit", async (e) => {
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
+      const email = document.getElementById("loginEmail").value;
+      const pass = document.getElementById("loginPassword").value;
+      const remember = document.getElementById("rememberMe").checked;
+
       try {
-        const persistence = rememberMe.checked ? browserLocalPersistence : browserSessionPersistence;
-        await setPersistence(auth, persistence);
-        await signInWithEmailAndPassword(auth, loginEmail.value, loginPassword.value);
-        loginMsg.textContent = "✅ Login successful! Redirecting...";
-        setTimeout(() => window.location.href = "index.html", 1000);
+        await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
+        await signInWithEmailAndPassword(auth, email, pass);
+        msg.textContent = "✅ Login successful! Redirecting...";
+        setTimeout(() => location.href = "index.html", 1500);
       } catch (err) {
-        loginMsg.textContent = "❌ " + err.message;
+        msg.textContent = "❌ " + err.message;
       }
     });
 
-    // Google login
     document.getElementById("googleLogin").addEventListener("click", async () => {
       try {
         const provider = new GoogleAuthProvider();
         await signInWithPopup(auth, provider);
-        loginMsg.textContent = "✅ Google login successful! Redirecting...";
-        setTimeout(() => window.location.href = "index.html", 1000);
+        msg.textContent = "✅ Google login successful!";
+        setTimeout(() => location.href = "index.html", 1500);
       } catch (err) {
-        loginMsg.textContent = "❌ " + err.message;
+        msg.textContent = "❌ " + err.message;
       }
     });
+
+    function togglePassword(id) {
+      const input = document.getElementById(id);
+      input.type = input.type === "password" ? "text" : "password";
+    }
 
     // Sidebar toggle
     document.getElementById("menuToggle").onclick = () => {
