@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Login — Diamond Recharge</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+</head>
+<body>
+  <main class="container">
+    <div class="login-card card neon">
+      <h2>🔑 Sign In</h2>
+      <p class="muted">Continue with your account to access dashboard</p>
+
+      <form id="emailForm" onsubmit="emailLogin(event)">
+        <div style="text-align:left;margin-bottom:10px;">
+          <label style="font-size:14px;color:var(--muted)">Email</label>
+          <input id="email" type="email" required style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);margin-top:6px;background:transparent;color:var(--text)"/>
+        </div>
+        <div style="text-align:left;margin-bottom:6px;">
+          <label style="font-size:14px;color:var(--muted)">Password</label>
+          <input id="password" type="password" required style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);margin-top:6px;background:transparent;color:var(--text)"/>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <label style="font-size:13px;color:var(--muted)"><input id="rememberMe" type="checkbox" /> Remember me</label>
+          <a href="forgot.html" style="color:var(--accent);text-decoration:none;font-weight:600">Forgot?</a>
+        </div>
+        <button type="submit" class="btn primary full">Login</button>
+      </form>
+
+      <div style="margin:12px 0;text-align:center;color:var(--muted)">or</div>
+
+      <button id="googleBtn" class="btn default full" onclick="googleLogin()">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" style="width:18px;margin-right:8px"/> Continue with Google
+      </button>
+
+      <button class="btn default full" style="margin-top:8px" onclick="guestLogin()">Continue as Guest</button>
+
+      <hr>
+      <div class="muted">Don’t have an account? <a href="register.html" style="color:var(--accent);font-weight:600">Register</a></div>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

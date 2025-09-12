@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Register — Diamond Recharge</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+</head>
+<body>
+  <main class="container">
+    <div class="login-card card neon">
+      <h2>📝 Register</h2>
+      <p class="muted">Create a new account</p>
+      <form id="regForm" onsubmit="registerUser(event)">
+        <div style="text-align:left;margin-bottom:10px;">
+          <label style="font-size:14px;color:var(--muted)">Full name</label>
+          <input id="regName" type="text" required style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);margin-top:6px;background:transparent;color:var(--text)"/>
+        </div>
+        <div style="text-align:left;margin-bottom:10px;">
+          <label style="font-size:14px;color:var(--muted)">Email</label>
+          <input id="regEmail" type="email" required style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);margin-top:6px;background:transparent;color:var(--text)"/>
+        </div>
+        <div style="text-align:left;margin-bottom:6px;">
+          <label style="font-size:14px;color:var(--muted)">Password</label>
+          <input id="regPassword" type="password" required minlength="6" style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);margin-top:6px;background:transparent;color:var(--text)"/>
+        </div>
+        <button type="submit" class="btn primary full">Create Account</button>
+      </form>
+
+      <hr>
+      <div class="muted">Already have an account? <a href="login.html" style="color:var(--accent);font-weight:600">Login</a></div>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
