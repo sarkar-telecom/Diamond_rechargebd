@@ -81,7 +81,37 @@
     <div class="muted">Built for mobile & desktop — neon glass UI</div>
   </footer>
 
-  <!-- Firebase + Main JS -->
+  <!-- Firebase + Auth Logic -->
   <script type="module" src="assets/main.js"></script>
+
+  <!-- Sidebar Toggle Script -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const menu = document.getElementById('menuToggle');
+      const sidebar = document.getElementById('sidebar');
+      const closeBtn = document.getElementById('closeSidebar');
+
+      // open sidebar
+      menu.addEventListener('click', (e) => {
+        e.stopPropagation();
+        sidebar.classList.add('open');
+      });
+
+      // close sidebar
+      closeBtn.addEventListener('click', () => sidebar.classList.remove('open'));
+
+      // close if click outside
+      document.addEventListener('click', (e) => {
+        if (!sidebar.contains(e.target) && !menu.contains(e.target)) {
+          sidebar.classList.remove('open');
+        }
+      });
+
+      sidebar.addEventListener('click', (e) => e.stopPropagation());
+
+      // year footer
+      document.getElementById('year').textContent = new Date().getFullYear();
+    });
+  </script>
 </body>
 </html>
