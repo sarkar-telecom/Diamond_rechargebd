@@ -4,8 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Login | Topup</title>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"></script>
   <style>
     body {
       margin: 0;
@@ -14,8 +12,6 @@
       min-height: 100vh;
       display: flex;
     }
-
-    /* Sidebar */
     .sidebar {
       width: 250px;
       background: rgba(20,20,20,0.85);
@@ -33,7 +29,6 @@
     .sidebar ul li { padding: 15px; }
     .sidebar ul li a { color: #00f2fe; text-decoration: none; font-weight: 500; }
 
-    /* Header */
     header {
       width: 100%;
       background: rgba(20,20,20,0.9);
@@ -50,7 +45,6 @@
     }
     .menu-toggle { font-size: 22px; cursor: pointer; }
 
-    /* Main content */
     .main-content {
       margin-left: 0;
       padding: 100px 20px;
@@ -59,8 +53,6 @@
       justify-content: center;
       align-items: center;
     }
-
-    /* Glass card */
     .login-card {
       background: rgba(255,255,255,0.1);
       backdrop-filter: blur(12px);
@@ -93,7 +85,6 @@
     .form-group input:focus {
       box-shadow: 0 0 10px #00f2fe;
     }
-
     .form-actions {
       display: flex;
       justify-content: space-between;
@@ -103,7 +94,6 @@
     }
     .form-actions label { cursor: pointer; color: #ccc; }
     .form-actions a { color: #00f2fe; text-decoration: none; }
-
     .btn {
       display: inline-block;
       padding: 12px;
@@ -120,7 +110,6 @@
       transition: 0.3s;
     }
     .btn:hover { transform: scale(1.03); }
-
     .google-btn {
       background: #fff;
       color: #444;
@@ -132,7 +121,6 @@
       width: 20px;
       margin-right: 8px;
     }
-
     .links {
       text-align: center;
       margin-top: 15px;
@@ -188,64 +176,19 @@
     </div>
   </div>
 
-  <script>
-    // Sidebar toggle
-    function toggleSidebar() {
-      document.getElementById("sidebar").classList.toggle("active");
-    }
+<script>
+  function toggleSidebar() {
+    document.getElementById("sidebar").classList.toggle("active");
+  }
+</script>
 
-    // Firebase config (replace with your keys)
-    const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_AUTH_DOMAIN",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_STORAGE_BUCKET",
-      messagingSenderId: "YOUR_MSG_ID",
-      appId: "YOUR_APP_ID"
-    };
-    const app = firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-
-    // Show password toggle
-    document.getElementById("showPassword").addEventListener("change", function() {
-      document.getElementById("password").type = this.checked ? "text" : "password";
-    });
-
-    // Login with Email
-    document.getElementById("loginForm").addEventListener("submit", function(e) {
-      e.preventDefault();
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      const rememberMe = document.getElementById("rememberMe").checked;
-
-      const persistence = rememberMe ? firebase.auth.Auth.Persistence.LOCAL : firebase.auth.Auth.Persistence.SESSION;
-      auth.setPersistence(persistence).then(() => {
-        return auth.signInWithEmailAndPassword(email, password);
-      }).then(() => {
-        alert("Login successful!");
-        window.location.href = "index.html";
-      }).catch(err => alert(err.message));
-    });
-
-    // Login with Google
-    document.getElementById("googleLogin").addEventListener("click", function() {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      auth.signInWithPopup(provider)
-        .then(() => {
-          alert("Google login successful!");
-          window.location.href = "index.html";
-        })
-        .catch(err => alert("Google login failed: " + err.message));
-    });
-  </script>
 <script type="module">
-  // Import Firebase v9 modules
   import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-  import { getAuth, setPersistence, browserLocalPersistence, browserSessionPersistence, 
+  import { getAuth, setPersistence, browserLocalPersistence, browserSessionPersistence,
            signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } 
            from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
-  // Your Firebase config
+  // Firebase config
   const firebaseConfig = {
     apiKey: "AIzaSyAyhjOsIXNAkBglpRllt0OZIOJYpdB_9-8",
     authDomain: "diamond-recharge-f7f59.firebaseapp.com",
