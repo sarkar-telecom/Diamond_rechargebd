@@ -1,245 +1,202 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Diamond Recharge — Dashboard</title>
-  <link rel="stylesheet" href="style.css">
+/* =========================
+   🌌 Neon Glass Template CSS
+   ========================= */
+:root {
+  --bg: #060608;
+  --card: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.06);
+  --muted: rgba(255, 255, 255, 0.6);
+  --text: #e9f0f6;
+  --accent: #06b6d4;
+  --accent2: #8b5cf6;
+  --neon: #39ffcc;
+  --radius: 14px;
+}
 
-  <!-- Firebase compat SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-</head>
-<body class="has-sidebar">
-  <!-- Header -->
-  <header class="header">
-    <button id="menuToggle" class="menu-btn" aria-label="Open menu">☰</button>
-    <div class="brand">
-      <img src="assets/logo.svg" alt="logo" class="logo">
-      <div class="brand-text">
-        <div class="site-name">Diamond Recharge</div>
-        <div class="site-sub">Neon glass template</div>
-      </div>
-    </div>
-    <div class="header-actions">
-      <div id="authBox" class="auth-box">
-        <img id="authAvatar" src="https://via.placeholder.com/36" class="avatar" alt="user">
-        <div class="auth-info">
-          <div id="authName">Guest</div>
-          <div id="authRole" class="muted">not signed in</div>
-        </div>
-      </div>
-      <button id="authToggleBtn" class="btn default">Login</button>
-    </div>
-  </header>
+/* Reset */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Poppins', Arial;
+  background: radial-gradient(800px 400px at 10% 10%, rgba(139, 92, 246, 0.03), transparent),
+              radial-gradient(700px 400px at 90% 90%, rgba(6, 182, 212, 0.02), transparent),
+              var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.4;
+  padding-top: 72px;
+}
+.container { max-width: 900px; margin: 0 auto; padding: 16px; }
 
-  <!-- Sidebar -->
-  <aside id="sidebar" class="sidebar" aria-hidden="true">
-    <div class="sidebar-inner">
-      <button id="closeSidebar" class="close-btn" aria-label="Close sidebar">✕</button>
-      <nav class="nav">
-        <a href="index.html" class="nav-link active">🏠 Dashboard</a>
-        <a href="order.html" class="nav-link">📱 New Order</a>
-        <a href="order-history.html" class="nav-link">📃 Orders</a>
-        <a href="balance.html" class="nav-link">💰 Balance</a>
-        <a href="admin.html" class="nav-link">⚙️ Admin</a>
-        <a href="login.html" class="nav-link">🔐 Login</a>
-      </nav>
-      <div class="sidebar-footer">
-        <div class="footer-user">
-          <img id="sbAvatar" src="https://via.placeholder.com/48" class="avatar" alt="avatar">
-          <div>
-            <div id="sbName">Guest</div>
-            <div id="sbEmail" class="muted">-</div>
-          </div>
-        </div>
-        <div class="sb-balance">💎 <span id="sbBalance">৳ 0</span></div>
-      </div>
-    </div>
-  </aside>
+/* =========================
+   🔹 Header
+   ========================= */
+.header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 72px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 16px;
+  z-index: 1300;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border-bottom: 1px solid var(--glass-border);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+}
+.brand { display: flex; align-items: center; gap: 12px; }
+.logo { width: 44px; height: 44px; border-radius: 10px; object-fit: cover; }
+.site-name { font-weight: 700; font-size: 15px; color: var(--neon); text-shadow: 0 2px 12px rgba(57,255,204,0.06); }
+.site-sub { font-size: 12px; color: var(--muted); }
+.menu-btn {
+  width: 44px; height: 44px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.04);
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+}
 
-  <!-- Main -->
-  <main class="main container">
-    <section class="hero card neon">
-      <div class="hero-left">
-        <h1>Welcome to <span class="accent">Diamond Recharge</span></h1>
-        <p class="muted">Mobile-first neon glass template for recharge/topup services.</p>
-        <div class="cta-row">
-          <a class="btn primary" href="order.html">New Order</a>
-          <a class="btn" href="order-history.html">Order History</a>
-        </div>
-      </div>
-      <div class="hero-right">
-        <div class="profile-card card small" id="profileCard">
-          <img id="profilePhoto" src="https://via.placeholder.com/80" class="avatar-lg" alt="user">
-          <div>
-            <div id="profileName">Guest</div>
-            <div id="profileRole" class="muted">not signed in</div>
-            <div id="profileEmail" class="muted">-</div>
-            <div id="profilePhone" class="muted">-</div>
-            <div class="balance">💎 <span id="profileBalance">৳ 0</span></div>
-            <div class="muted">Approved: <span id="profileApproved">❌</span></div>
-            <div class="muted">Refunded Orders: <span id="profileRefunded">0</span></div>
-          </div>
-        </div>
-      </div>
-    </section>
+/* =========================
+   🔹 Sidebar
+   ========================= */
+.sidebar {
+  position: fixed; top: 72px; left: -320px; width: 280px; bottom: 12px;
+  z-index: 1400;
+  padding: 14px;
+  transition: left .28s cubic-bezier(.2,.9,.25,1);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.sidebar.open { left: 12px; }
+.sidebar-inner {
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border-radius: 12px; padding: 12px;
+  border: 1px solid var(--glass-border);
+}
+.close-btn { float: right; background: transparent; border: 0; font-size: 18px; cursor: pointer; color: var(--muted); }
 
-    <section class="grid cards">
-      <article class="card neon">
-        <h3>Quick Top-up</h3>
-        <p class="muted">Create a quick order and deduct from user balance when order is placed.</p>
-      </article>
-      <article class="card neon">
-        <h3>Balance Refunds</h3>
-        <p class="muted">Process refunds and restore balance to the user.</p>
-      </article>
-      <article class="card neon">
-        <h3>Orders</h3>
-        <p class="muted">View recent orders and their status.</p>
-      </article>
-      <article class="card neon">
-        <h3>Admin Tools</h3>
-        <p class="muted">Manual balance adjustment, export to Google Sheets, role-based actions.</p>
-      </article>
-    </section>
+/* Nav */
+.nav { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+.nav-link {
+  display: block; padding: 10px; border-radius: 10px;
+  text-decoration: none; color: var(--text); font-weight: 600;
+  border: 1px solid transparent;
+}
+.nav-link.active {
+  background: linear-gradient(90deg, rgba(6,182,212,0.06), rgba(139,92,246,0.03));
+  box-shadow: 0 8px 24px rgba(6,182,212,0.04);
+}
 
-    <footer class="site-footer card">
-      <div>© <span id="year"></span> Diamond Recharge</div>
-      <div class="muted">Built for mobile & desktop — neon glass UI</div>
-    </footer>
-  </main>
+/* =========================
+   🔹 Cards
+   ========================= */
+.card {
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border-radius: 12px;
+  padding: 14px;
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 8px 40px rgba(2,6,23,0.6);
+}
+.neon { box-shadow: 0 8px 30px rgba(57,255,204,0.04), inset 0 0 18px rgba(139,92,246,0.02); }
 
-  <script>
-<script>
-  // ==== Firebase Init ====
-  const firebaseConfig = {
-    apiKey: "AIzaSyAyhjOsIXNAkBglpRllt0OZIOJYpdB_9-8",
-    authDomain: "diamond-recharge-f7f59.firebaseapp.com",
-    projectId: "diamond-recharge-f7f59",
-    storageBucket: "diamond-recharge-f7f59.firebasestorage.app",
-    messagingSenderId: "657717928489",
-    appId: "1:657717928489:web:70431ebc9afb7002d4b238",
-    measurementId: "G-TDK78BQ8SQ"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.firestore();
+/* Hero */
+.hero { display: flex; gap: 12px; align-items: center; justify-content: space-between; margin-bottom: 12px; padding: 16px; }
+.hero-left { flex: 1; text-align: left; }
+.hero-right { width: 180px; display: flex; align-items: center; justify-content: center; }
 
-  // ==== Sidebar Toggle ====
-  const sidebar = document.getElementById("sidebar");
-  document.getElementById("menuToggle").onclick = () => sidebar.setAttribute("aria-hidden", "false");
-  document.getElementById("closeSidebar").onclick = () => sidebar.setAttribute("aria-hidden", "true");
+/* Profile Card */
+.profile-card { display: flex; gap: 12px; align-items: center; padding: 10px; }
+.avatar-lg { width: 80px; height: 80px; border-radius: 12px; object-fit: cover; }
+.avatar { width: 36px; height: 36px; border-radius: 10px; object-fit: cover; }
 
-  // ==== Auth Toggle ====
-  const authBtn = document.getElementById("authToggleBtn");
-  authBtn.addEventListener("click", () => {
-    if (auth.currentUser) {
-      auth.signOut();
-    } else {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      auth.signInWithPopup(provider);
-    }
-  });
+/* Grid */
+.grid.cards { display: grid; grid-template-columns: repeat(2,1fr); gap: 12px; margin-bottom: 16px; }
+@media(max-width:720px) {
+  .grid.cards { grid-template-columns: 1fr; }
+  .hero { flex-direction: column; }
+  .hero-right { width: 100%; }
+  .sidebar { left: -100%; }
+  .sidebar.open { left: 0; }
+  .container { padding: 12px; }
+  body { padding-top: 64px; }
+  .header { height: 64px; }
+  .site-name { font-size: 13px; }
+}
 
-  // ==== Default user schema ====
-  const defaultUserData = (user) => ({
-    approved: false,
-    avatar: user.photoURL || "https://via.placeholder.com/80",
-    balance: 0,
-    email: user.email || "",
-    name: user.displayName || "User",
-    phone: "-",
-    refundedOrders: [],
-    role: "user",
-    tier: 0,
-    weekBoundary: Date.now(),
-    weeklyDiamonds: 0,
-    weeklyTotal: 0,
-    createdAt: new Date()
-  });
+/* =========================
+   🔹 Buttons
+   ========================= */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.25s ease-in-out;
+}
 
-  // ==== Update UI ====
-  function updateUI(data, user) {
-    // --- Header ---
-    document.getElementById("authName").textContent = data.name || user.displayName || "User";
-    document.getElementById("authRole").textContent = data.role || "Signed in";
-    document.getElementById("authAvatar").src = data.avatar || user.photoURL || "https://via.placeholder.com/36";
+.btn.default {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.btn.default:hover { background: rgba(255, 255, 255, 0.25); }
 
-    // --- Sidebar ---
-    document.getElementById("sbName").textContent = data.name || "User";
-    document.getElementById("sbEmail").textContent = data.email || user.email || "-";
-    document.getElementById("sbAvatar").src = data.avatar || user.photoURL || "https://via.placeholder.com/48";
-    document.getElementById("sbBalance").textContent = "৳ " + (data.balance || 0);
+.btn.primary {
+  background: linear-gradient(135deg, #00d4ff, #0077ff);
+  color: #fff;
+  border: none;
+  box-shadow: 0 6px 20px rgba(6,182,212,0.15);
+}
+.btn.primary:hover { background: linear-gradient(135deg, #0099ff, #0051cc); }
 
-    // --- Profile Card ---
-    document.getElementById("profileName").textContent = data.name || "User";
-    document.getElementById("profileRole").textContent = data.role || "Signed in";
-    document.getElementById("profileEmail").textContent = data.email || user.email || "-";
-    document.getElementById("profilePhone").textContent = data.phone || "-";
-    document.getElementById("profilePhoto").src = data.avatar || user.photoURL || "https://via.placeholder.com/80";
-    document.getElementById("profileBalance").textContent = "৳ " + (data.balance || 0);
-    document.getElementById("profileApproved").textContent = data.approved ? "✔" : "❌";
-    document.getElementById("profileRefunded").textContent = Array.isArray(data.refundedOrders) ? data.refundedOrders.length : 0;
-  }
+.btn.full { width: 100%; margin: 8px 0; padding: 12px; font-size: 1rem; border-radius: 10px; }
 
-  // ==== Auth State Change ====
-  auth.onAuthStateChanged(async (user) => {
-    if (user) {
-      authBtn.textContent = "Logout";
-      const docRef = db.collection("users").doc(user.uid);
+/* =========================
+   🔹 Footer
+   ========================= */
+.site-footer {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px;
+  border-radius: 10px;
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 13px;
+}
 
-      // Create if not exist, merge missing fields if exist
-      const snap = await docRef.get();
-      if (!snap.exists) {
-        await docRef.set(defaultUserData(user));
-      } else {
-        const existingData = snap.data();
-        const defaults = defaultUserData(user);
-        let updates = {};
-        for (let key in defaults) {
-          if (!(key in existingData)) {
-            updates[key] = defaults[key];
-          }
-        }
-        if (Object.keys(updates).length > 0) {
-          await docRef.set(updates, { merge: true });
-        }
-      }
+/* Helpers */
+.muted { color: var(--muted); font-size: 13px; }
+.center { display: flex; align-items: center; justify-content: center; }
 
-      // Live listener
-      docRef.onSnapshot((snap) => {
-        if (snap.exists) {
-          updateUI(snap.data(), user);
-        }
-      });
+/* =========================
+   🔹 Login Card
+   ========================= */
+.login-card {
+  max-width: 420px;
+  margin: 80px auto;
+  padding: 28px;
+  border-radius: 18px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  animation: fadeIn 0.5s ease-in-out;
+}
+.login-card h2 {
+  font-size: 1.5rem;
+  margin-bottom: 8px;
+  color: #fff;
+}
+.login-card p { margin-bottom: 12px; font-size: 0.95rem; color: var(--muted); }
+.login-card hr { border: 0; height: 1px; margin: 18px 0; background: rgba(255,255,255,0.06); }
 
-    } else {
-      // Reset UI for guest
-      authBtn.textContent = "Login";
-      document.getElementById("authName").textContent = "Guest";
-      document.getElementById("authRole").textContent = "not signed in";
-      document.getElementById("authAvatar").src = "https://via.placeholder.com/36";
-
-      document.getElementById("sbName").textContent = "Guest";
-      document.getElementById("sbEmail").textContent = "-";
-      document.getElementById("sbAvatar").src = "https://via.placeholder.com/48";
-      document.getElementById("sbBalance").textContent = "৳ 0";
-
-      document.getElementById("profileName").textContent = "Guest";
-      document.getElementById("profileRole").textContent = "not signed in";
-      document.getElementById("profileEmail").textContent = "-";
-      document.getElementById("profilePhone").textContent = "-";
-      document.getElementById("profilePhoto").src = "https://via.placeholder.com/80";
-      document.getElementById("profileBalance").textContent = "৳ 0";
-      document.getElementById("profileApproved").textContent = "❌";
-      document.getElementById("profileRefunded").textContent = "0";
-    }
-  });
-
-  // ==== Footer Year ====
-  document.getElementById("year").textContent = new Date().getFullYear();
-</script>
-</body>
-</html>
+/* Animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
