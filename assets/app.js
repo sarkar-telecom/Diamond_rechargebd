@@ -92,3 +92,11 @@ auth.onAuthStateChanged(async user => {
     sbAvatar.src = user.photoURL || "https://via.placeholder.com/48";
 
     ftName.text
+
+if (user) {
+    sbName.innerHTML = `${user.displayName || "User"} <span id="sbRole">(admin)</span>`;
+    sbBalance.textContent = `💎 ${user.balance || 0}`; // get from Firestore
+    sbPhone.textContent = `📱 ${user.phoneNumber || "-"}`;
+    sbEmail.textContent = `✉️ ${user.email || "-"}`;
+    sbTier.textContent = `Tier: ${user.tier || "SVIP"} | Weekly Total: ${user.weeklyTotal || 0} | Weekly Diamonds: ${user.weeklyDiamonds || 0}`;
+}
