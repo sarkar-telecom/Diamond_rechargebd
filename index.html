@@ -1,85 +1,88 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sarkar Telecom - Dashboard</title>
-  <link rel="stylesheet" href="assets/style.css" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Diamond Recharge BD</title>
+  <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
-  <!-- Header -->
-  <header class="header">
-    <button id="menuToggle" class="menu-btn">☰</button>
-    <h1 class="logo">Sarkar Telecom</h1>
-    <div class="auth-section">
-      <img id="authAvatar" src="https://via.placeholder.com/36" alt="avatar" />
-      <div>
-        <span id="authName">Guest</span>
-        <small id="authRole">not signed in</small>
-      </div>
-      <button id="authToggleBtn">Login</button>
-    </div>
-  </header>
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">Diamond <span>Recharge</span></div>
+      <nav class="nav">
+        <a class="nav-item active" href="#">Dashboard</a>
+        <a class="nav-item" href="#">Recharge</a>
+        <a class="nav-item" href="#">Transactions</a>
+        <a class="nav-item" href="#">Settings</a>
+      </nav>
+      <button id="sidebarToggle" class="sidebar-toggle">☰</button>
+    </aside>
 
-  <!-- Sidebar -->
-  <aside id="sidebar" class="sidebar" aria-hidden="true">
-    <button id="closeSidebar" class="close-btn">×</button>
-    <div class="profile-box">
-      <img id="sbAvatar" src="https://via.placeholder.com/48" alt="profile" />
-      <h3 id="sbName">Guest</h3>
-      <p id="sbEmail">-</p>
-      <p id="sbBalance">৳ 0</p>
-    </div>
-    <nav class="sidebar-nav">
-      <a href="dashboard.html">📊 Dashboard</a>
-      <a href="order.html">🛒 Order</a>
-      <a href="order-history.html">📜 Order History</a>
-      <a href="profile.html">👤 Profile</a>
-      <a href="reward.html">🎁 Reward</a>
-      <a href="balance.html">💰 Balance</a>
-      <a href="admin.html">⚙️ Admin</a>
-    </nav>
-  </aside>
+    <main class="main">
+      <header class="topbar">
+        <h1>Welcome</h1>
+        <div class="actions">
+          <button id="logoutBtn" class="btn small">Logout</button>
+        </div>
+      </header>
 
-  <!-- Main Content -->
-  <main class="main">
-    <h2>Welcome to Sarkar Telecom</h2>
-    <p>This is your dashboard main page.</p>
-  </main>
+      <section class="content">
+        <div class="card login-card">
+          <h2>Sign in / Sign up</h2>
+          <form id="loginForm">
+            <label for="email">Email</label>
+            <input id="email" type="email" placeholder="email@example.com" required>
 
-  <!-- Footer -->
-  <footer class="footer">
-    <div class="footer-profile">
-      <img id="ftAvatar" src="https://via.placeholder.com/32" alt="footer avatar" />
-      <div>
-        <span id="ftName">Guest</span>
-        <small id="ftEmail">-</small>
-      </div>
-    </div>
-    <p>&copy; <span id="year"></span> Sarkar Telecom</p>
- <div class="profile-box">
-  <div class="profile-left">
-    <img id="sbAvatar" src="https://via.placeholder.com/60" alt="profile" />
+            <label for="password">Password</label>
+            <input id="password" type="password" placeholder="••••••" required>
+
+            <button type="submit" class="btn">Log in</button>
+            <button type="button" id="signupBtn" class="btn">Sign up</button>
+
+            <div class="divider">or</div>
+            <button type="button" id="googleBtn" class="btn google">Continue with Google</button>
+          </form>
+        </div>
+
+        <div class="card info-card">
+          <h3>Latest Offers</h3>
+          <p>Neon themed responsive design with glassmorphism.</p>
+        </div>
+      </section>
+    </main>
   </div>
-  <div class="profile-right">
-    <h3 id="sbName">saMrAt™ <span id="sbRole">(admin)</span></h3>
-    <p id="sbBalance">💎 12792</p>
-    <p id="sbPhone">📱 +8801715118684</p>
-    <p id="sbEmail">✉️ samrat.khulas@gmail.com</p>
-    <p id="sbTier">Tier: SVIP | Weekly Total: 3000 | Weekly Diamonds: 120</p>
-  </div>
-</div>
- </footer>
 
-  <!-- Overlay -->
-  <div id="overlay"></div>
+  <!-- Firebase SDKs -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword,
+             signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } 
+      from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
 
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAyhjOsIXNAkBglpRllt0OZIOJYpdB_9-8",
+      authDomain: "diamond-recharge-f7f59.firebaseapp.com",
+      projectId: "diamond-recharge-f7f59",
+      storageBucket: "diamond-recharge-f7f59.firebasestorage.app",
+      messagingSenderId: "657717928489",
+      appId: "1:657717928489:web:70431ebc9afb7002d4b238",
+      measurementId: "G-TDK78BQ8SQ"
+    };
 
-  <!-- App JS -->
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    window.firebaseAuth = auth;
+    window.firebaseProvider = provider;
+    window.firebaseSignInWithEmailAndPassword = signInWithEmailAndPassword;
+    window.firebaseCreateUserWithEmailAndPassword = createUserWithEmailAndPassword;
+    window.firebaseSignInWithPopup = signInWithPopup;
+    window.firebaseSignOut = signOut;
+    window.firebaseOnAuthStateChanged = onAuthStateChanged;
+  </script>
+
   <script src="assets/app.js"></script>
 </body>
 </html>
