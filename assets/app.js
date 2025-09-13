@@ -15,17 +15,29 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 
 // =========================
-// Sidebar Toggle
+// Sidebar & Overlay Toggle
 // =========================
 const menuToggle = document.getElementById("menuToggle");
 const closeSidebar = document.getElementById("closeSidebar");
 const sidebar = document.getElementById("sidebar");
+const overlay = document.getElementById("overlay");
 
 menuToggle.addEventListener("click", () => {
   sidebar.classList.add("open");
+  overlay.classList.add("active");
+  sidebar.setAttribute("aria-hidden", "false");
 });
+
 closeSidebar.addEventListener("click", () => {
   sidebar.classList.remove("open");
+  overlay.classList.remove("active");
+  sidebar.setAttribute("aria-hidden", "true");
+});
+
+overlay.addEventListener("click", () => {
+  sidebar.classList.remove("open");
+  overlay.classList.remove("active");
+  sidebar.setAttribute("aria-hidden", "true");
 });
 
 // =========================
@@ -51,7 +63,7 @@ const ftAvatar = document.getElementById("ftAvatar");
 const provider = new firebase.auth.GoogleAuthProvider();
 
 // =========================
-// Login / Logout Toggle
+// Login / Logout
 // =========================
 authToggleBtn.addEventListener("click", () => {
   if (auth.currentUser) {
@@ -79,50 +91,4 @@ auth.onAuthStateChanged(async user => {
     sbEmail.textContent = user.email || "-";
     sbAvatar.src = user.photoURL || "https://via.placeholder.com/48";
 
-    ftName.textContent = user.displayName || "User";
-    ftEmail.textContent = user.email || "-";
-    ftAvatar.src = user.photoURL || "https://via.placeholder.com/32";
-
-    // 🔹 Load Balance from Firestore
-    try {
-      const userDoc = await db.collection("users").doc(user.uid).get();
-      if (userDoc.exists) {
-        const data = userDoc.data();
-        sbBalance.textContent = "৳ " + (data.balance || 0);
-      } else {
-        // If user doc doesn’t exist, create it
-        await db.collection("users").doc(user.uid).set({
-          balance: 0,
-          email: user.email,
-          name: user.displayName || "User",
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        sbBalance.textContent = "৳ 0";
-      }
-    } catch (err) {
-      console.error("Balance fetch error:", err);
-      sbBalance.textContent = "৳ 0";
-    }
-
-  } else {
-    // Logged out
-    authToggleBtn.textContent = "Login";
-    authName.textContent = "Guest";
-    authRole.textContent = "not signed in";
-    authAvatar.src = "https://via.placeholder.com/36";
-
-    sbName.textContent = "Guest";
-    sbEmail.textContent = "-";
-    sbAvatar.src = "https://via.placeholder.com/48";
-    sbBalance.textContent = "৳ 0";
-
-    ftName.textContent = "Guest";
-    ftEmail.textContent = "-";
-    ftAvatar.src = "https://via.placeholder.com/32";
-  }
-});
-
-// =========================
-// Footer Year
-// =========================
-document.getElementById("year").textContent = new Date().getFullYear();
+    ftName.text
