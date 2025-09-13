@@ -1,16 +1,18 @@
 // =========================
-// Firebase Config (use your own config)
+// Firebase Config
 // =========================
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_APP.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "SENDER_ID",
-  appId: "APP_ID"
+  apiKey: "AIzaSyAyhjOsIXNAkBglpRllt0OZIOJYpdB_9-8",
+  authDomain: "diamond-recharge-f7f59.firebaseapp.com",
+  projectId: "diamond-recharge-f7f59",
+  storageBucket: "diamond-recharge-f7f59.firebasestorage.app",
+  messagingSenderId: "657717928489",
+  appId: "1:657717928489:web:70431ebc9afb7002d4b238",
+  measurementId: "G-TDK78BQ8SQ"
 };
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
+const db = firebase.firestore();
 
 // =========================
 // Sidebar Toggle
@@ -22,7 +24,6 @@ const sidebar = document.getElementById("sidebar");
 menuToggle.addEventListener("click", () => {
   sidebar.classList.add("open");
 });
-
 closeSidebar.addEventListener("click", () => {
   sidebar.classList.remove("open");
 });
@@ -38,6 +39,7 @@ const authAvatar = document.getElementById("authAvatar");
 const sbName = document.getElementById("sbName");
 const sbEmail = document.getElementById("sbEmail");
 const sbAvatar = document.getElementById("sbAvatar");
+const sbBalance = document.getElementById("sbBalance");
 
 const ftName = document.getElementById("ftName");
 const ftEmail = document.getElementById("ftEmail");
@@ -57,6 +59,7 @@ authToggleBtn.addEventListener("click", () => {
   } else {
     auth.signInWithPopup(provider).catch(err => {
       console.error("Login error:", err);
+      alert("Login failed: " + err.message);
     });
   }
 });
@@ -64,7 +67,7 @@ authToggleBtn.addEventListener("click", () => {
 // =========================
 // Auth State Listener
 // =========================
-auth.onAuthStateChanged(user => {
+auth.onAuthStateChanged(async user => {
   if (user) {
     // Logged in
     authToggleBtn.textContent = "Logout";
@@ -79,6 +82,28 @@ auth.onAuthStateChanged(user => {
     ftName.textContent = user.displayName || "User";
     ftEmail.textContent = user.email || "-";
     ftAvatar.src = user.photoURL || "https://via.placeholder.com/32";
+
+    // 🔹 Load Balance from Firestore
+    try {
+      const userDoc = await db.collection("users").doc(user.uid).get();
+      if (userDoc.exists) {
+        const data = userDoc.data();
+        sbBalance.textContent = "৳ " + (data.balance || 0);
+      } else {
+        // If user doc doesn’t exist, create it
+        await db.collection("users").doc(user.uid).set({
+          balance: 0,
+          email: user.email,
+          name: user.displayName || "User",
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        sbBalance.textContent = "৳ 0";
+      }
+    } catch (err) {
+      console.error("Balance fetch error:", err);
+      sbBalance.textContent = "৳ 0";
+    }
+
   } else {
     // Logged out
     authToggleBtn.textContent = "Login";
@@ -89,6 +114,7 @@ auth.onAuthStateChanged(user => {
     sbName.textContent = "Guest";
     sbEmail.textContent = "-";
     sbAvatar.src = "https://via.placeholder.com/48";
+    sbBalance.textContent = "৳ 0";
 
     ftName.textContent = "Guest";
     ftEmail.textContent = "-";
