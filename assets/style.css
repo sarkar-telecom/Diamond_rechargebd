@@ -131,3 +131,9 @@ body {
 .footer-profile img {
   border-radius: 50%;
 }
+
+/* ensure sidebar sits above the overlay */
+.sidebar { z-index: 60; }
+
+/* optional: small nice fade for the sidebar when opening */
+.sidebar { transition: left 0.28s ease, transform 0.18s ease; }
