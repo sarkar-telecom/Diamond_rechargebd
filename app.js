@@ -126,3 +126,85 @@ auth.onAuthStateChanged(async user => {
 // Footer Year
 // =========================
 document.getElementById("year").textContent = new Date().getFullYear();
+
+// Import Firebase
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyAyhjOsIXNAkBglpRllt0OZIOJYpdB_9-8",
+  authDomain: "diamond-recharge-f7f59.firebaseapp.com",
+  projectId: "diamond-recharge-f7f59",
+  storageBucket: "diamond-recharge-f7f59.firebasestorage.app",
+  messagingSenderId: "657717928489",
+  appId: "1:657717928489:web:70431ebc9afb7002d4b238",
+  measurementId: "G-TDK78BQ8SQ"
+};
+
+// Init Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+
+// DOM Elements
+const authBtn = document.getElementById("authBtn");
+const userPic = document.getElementById("userPic");
+const userName = document.getElementById("userName");
+
+const sidebar = document.getElementById("sidebar");
+const menuBtn = document.getElementById("menuBtn");
+const closeBtn = document.getElementById("closeBtn");
+
+const sidebarUserPic = document.getElementById("sidebarUserPic");
+const sidebarUserName = document.getElementById("sidebarUserName");
+
+const footerUserPic = document.getElementById("footerUserPic");
+const footerUserName = document.getElementById("footerUserName");
+
+// Sidebar toggle
+menuBtn.addEventListener("click", () => {
+  sidebar.classList.add("active");
+});
+closeBtn.addEventListener("click", () => {
+  sidebar.classList.remove("active");
+});
+
+// Login/Logout button
+authBtn.addEventListener("click", async () => {
+  if (auth.currentUser) {
+    await signOut(auth);
+  } else {
+    await signInWithPopup(auth, provider).catch(err => console.error(err));
+  }
+});
+
+// Watch auth state
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    // Show user info
+    authBtn.textContent = "Logout";
+    userPic.src = user.photoURL;
+    userPic.style.display = "block";
+    userName.textContent = user.displayName;
+
+    sidebarUserPic.src = user.photoURL;
+    sidebarUserPic.style.display = "block";
+    sidebarUserName.textContent = user.displayName;
+
+    footerUserPic.src = user.photoURL;
+    footerUserPic.style.display = "block";
+    footerUserName.textContent = user.displayName;
+  } else {
+    // Reset UI
+    authBtn.textContent = "Login";
+    userPic.style.display = "none";
+    userName.textContent = "";
+
+    sidebarUserPic.style.display = "none";
+    sidebarUserName.textContent = "";
+
+    footerUserPic.style.display = "none";
+    footerUserName.textContent = "";
+  }
+});
