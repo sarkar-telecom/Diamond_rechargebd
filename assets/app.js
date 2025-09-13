@@ -1,102 +1,68 @@
-// =========================
-// Firebase Config
-// =========================
-const firebaseConfig = {
-  apiKey: "AIzaSyAyhjOsIXNAkBglpRllt0OZIOJYpdB_9-8",
-  authDomain: "diamond-recharge-f7f59.firebaseapp.com",
-  projectId: "diamond-recharge-f7f59",
-  storageBucket: "diamond-recharge-f7f59.firebasestorage.app",
-  messagingSenderId: "657717928489",
-  appId: "1:657717928489:web:70431ebc9afb7002d4b238",
-  measurementId: "G-TDK78BQ8SQ"
-};
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
+document.addEventListener('DOMContentLoaded', function () {
+  const sidebar = document.getElementById('sidebar');
+  const toggle = document.getElementById('sidebarToggle');
+  toggle && toggle.addEventListener('click', () => sidebar.classList.toggle('open'));
 
-// =========================
-// Sidebar & Overlay Toggle
-// =========================
-const menuToggle = document.getElementById("menuToggle");
-const closeSidebar = document.getElementById("closeSidebar");
-const sidebar = document.getElementById("sidebar");
-const overlay = document.getElementById("overlay");
+  const auth = window.firebaseAuth;
 
-menuToggle.addEventListener("click", () => {
-  sidebar.classList.add("open");
-  overlay.classList.add("active");
-  sidebar.setAttribute("aria-hidden", "false");
+  // Email/Password login
+  const form = document.getElementById('loginForm');
+  form && form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('email').value.trim();
+    const pass = document.getElementById('password').value.trim();
+    try {
+      const cred = await window.firebaseSignInWithEmailAndPassword(auth, email, pass);
+      alert(`Logged in as ${cred.user.email}`);
+    } catch (err) {
+      alert(err.message);
+    }
+  });
+
+  // Sign up new account
+  const signupBtn = document.getElementById('signupBtn');
+  signupBtn && signupBtn.addEventListener('click', async () => {
+    const email = document.getElementById('email').value.trim();
+    const pass = document.getElementById('password').value.trim();
+    try {
+      const cred = await window.firebaseCreateUserWithEmailAndPassword(auth, email, pass);
+      alert(`Account created: ${cred.user.email}`);
+    } catch (err) {
+      alert(err.message);
+    }
+  });
+
+  // Google login
+  const googleBtn = document.getElementById('googleBtn');
+  googleBtn && googleBtn.addEventListener('click', async () => {
+    try {
+      const result = await window.firebaseSignInWithPopup(auth, window.firebaseProvider);
+      const user = result.user;
+      alert(`Welcome ${user.displayName}!`);
+    } catch (err) {
+      alert(err.message);
+    }
+  });
+
+  // Logout
+  const logoutBtn = document.getElementById('logoutBtn');
+  logoutBtn && logoutBtn.addEventListener('click', async () => {
+    try {
+      await window.firebaseSignOut(auth);
+      alert("Logged out");
+    } catch (err) {
+      alert(err.message);
+    }
+  });
+
+  // Auto-detect login state
+  window.firebaseOnAuthStateChanged(auth, (user) => {
+    if (user) {
+      console.log("User logged in:", user);
+      document.querySelector('.topbar h1').textContent = `Welcome, ${user.email || user.displayName}`;
+    } else {
+      console.log("No user logged in");
+      document.querySelector('.topbar h1').textContent = "Welcome";
+    }
+  });
 });
-
-closeSidebar.addEventListener("click", () => {
-  sidebar.classList.remove("open");
-  overlay.classList.remove("active");
-  sidebar.setAttribute("aria-hidden", "true");
-});
-
-overlay.addEventListener("click", () => {
-  sidebar.classList.remove("open");
-  overlay.classList.remove("active");
-  sidebar.setAttribute("aria-hidden", "true");
-});
-
-// =========================
-// Auth Elements
-// =========================
-const authToggleBtn = document.getElementById("authToggleBtn");
-const authName = document.getElementById("authName");
-const authRole = document.getElementById("authRole");
-const authAvatar = document.getElementById("authAvatar");
-
-const sbName = document.getElementById("sbName");
-const sbEmail = document.getElementById("sbEmail");
-const sbAvatar = document.getElementById("sbAvatar");
-const sbBalance = document.getElementById("sbBalance");
-
-const ftName = document.getElementById("ftName");
-const ftEmail = document.getElementById("ftEmail");
-const ftAvatar = document.getElementById("ftAvatar");
-
-// =========================
-// Google Auth Provider
-// =========================
-const provider = new firebase.auth.GoogleAuthProvider();
-
-// =========================
-// Login / Logout
-// =========================
-authToggleBtn.addEventListener("click", () => {
-  if (auth.currentUser) {
-    auth.signOut();
-  } else {
-    auth.signInWithPopup(provider).catch(err => {
-      console.error("Login error:", err);
-      alert("Login failed: " + err.message);
-    });
-  }
-});
-
-// =========================
-// Auth State Listener
-// =========================
-auth.onAuthStateChanged(async user => {
-  if (user) {
-    // Logged in
-    authToggleBtn.textContent = "Logout";
-    authName.textContent = user.displayName || "User";
-    authRole.textContent = "Signed in";
-    authAvatar.src = user.photoURL || "https://via.placeholder.com/36";
-
-    sbName.textContent = user.displayName || "User";
-    sbEmail.textContent = user.email || "-";
-    sbAvatar.src = user.photoURL || "https://via.placeholder.com/48";
-
-    ftName.text
-
-if (user) {
-    sbName.innerHTML = `${user.displayName || "User"} <span id="sbRole">(admin)</span>`;
-    sbBalance.textContent = `💎 ${user.balance || 0}`; // get from Firestore
-    sbPhone.textContent = `📱 ${user.phoneNumber || "-"}`;
-    sbEmail.textContent = `✉️ ${user.email || "-"}`;
-    sbTier.textContent = `Tier: ${user.tier || "SVIP"} | Weekly Total: ${user.weeklyTotal || 0} | Weekly Diamonds: ${user.weeklyDiamonds || 0}`;
-}
