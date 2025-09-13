@@ -1,35 +1,38 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Sarkar Telecom - Dashboard</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <!-- Header -->
   <header class="header">
-    <button id="menuBtn" class="menu-btn">☰</button>
+    <button id="menuBtn" class="menu-btn" aria-label="Open menu">☰</button>
     <h1 class="logo">Sarkar Telecom</h1>
+
     <div class="auth-section">
-      <img id="userPic" src="https://via.placeholder.com/36" alt="avatar" style="display:none;" />
+      <img id="userPic" src="https://via.placeholder.com/36" alt="avatar" style="display:none" />
       <div>
-        <span id="userName">Guest</span>
+        <span id="userName">Guest</span><br />
         <small id="userRole">not signed in</small>
       </div>
-      <button id="authBtn">Login</button>
+      <button id="authBtn" class="auth-btn">Login</button>
     </div>
   </header>
 
   <!-- Sidebar -->
   <aside id="sidebar" class="sidebar" aria-hidden="true">
-    <button id="closeBtn" class="close-btn">×</button>
+    <button id="closeBtn" class="close-btn" aria-label="Close menu">×</button>
+
     <div class="profile-box">
-      <img id="sidebarUserPic" src="https://via.placeholder.com/48" alt="profile" style="display:none;" />
+      <img id="sidebarUserPic" src="https://via.placeholder.com/48" alt="profile" style="display:none" />
       <h3 id="sidebarUserName">Guest</h3>
       <p id="sidebarUserEmail">-</p>
       <p id="sidebarBalance">৳ 0</p>
     </div>
+
     <nav class="sidebar-nav">
       <a href="dashboard.html">📊 Dashboard</a>
       <a href="order.html">🛒 Order</a>
@@ -50,16 +53,16 @@
   <!-- Footer -->
   <footer class="footer">
     <div class="footer-profile">
-      <img id="footerUserPic" src="https://via.placeholder.com/32" alt="footer avatar" style="display:none;" />
+      <img id="footerUserPic" src="https://via.placeholder.com/32" alt="footer avatar" style="display:none" />
       <div>
-        <span id="footerUserName">Guest</span>
+        <span id="footerUserName">Guest</span><br />
         <small id="footerUserEmail">-</small>
       </div>
     </div>
     <p>&copy; <span id="year"></span> Sarkar Telecom</p>
   </footer>
 
-  <!-- App JS (Firebase Modular v9) -->
+  <!-- App JS (modular, type=module) -->
   <script type="module" src="app.js"></script>
 </body>
 </html>
