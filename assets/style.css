@@ -73,7 +73,7 @@ body {
   color: #fff;
   padding: 20px;
   transition: left 0.3s ease;
-  z-index: 1000;
+  z-index: 1200;
   overflow-y: auto;
   box-shadow: 2px 0 8px rgba(0,0,0,0.2);
 }
@@ -123,6 +123,25 @@ body {
 .sidebar .sidebar-nav a:hover {
   background: rgba(255, 255, 255, 0.1);
   padding-left: 14px;
+}
+
+/* ========== Overlay ========== */
+#overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 1100;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease;
+}
+
+#overlay.active {
+  opacity: 1;
+  visibility: visible;
 }
 
 /* ========== Main Content ========== */
