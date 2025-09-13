@@ -47,7 +47,8 @@ body {
   border-radius: 50%;
 }
 
-.auth-section button {
+.auth-section button,
+.auth-btn {
   background: #00ffcc;
   border: none;
   padding: 6px 12px;
@@ -60,13 +61,14 @@ body {
 .sidebar {
   position: fixed;
   top: 0;
-  left: -260px;
+  left: -260px; /* hidden by default */
   width: 240px;
   height: 100%;
   background: rgba(25, 25, 25, 0.95);
   padding: 20px;
-  transition: left 0.3s ease;
+  transition: left 0.28s ease, transform 0.18s ease;
   backdrop-filter: blur(10px);
+  z-index: 60; /* above overlay (50) */
 }
 
 .sidebar.active {
@@ -132,8 +134,17 @@ body {
   border-radius: 50%;
 }
 
-/* ensure sidebar sits above the overlay */
-.sidebar { z-index: 60; }
+/* Overlay inserted by JS */
+#sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  z-index: 50; /* below sidebar */
+  opacity: 1;
+}
 
-/* optional: small nice fade for the sidebar when opening */
-.sidebar { transition: left 0.28s ease, transform 0.18s ease; }
+/* small responsive */
+@media (max-width: 800px) {
+  .sidebar { width: 260px; left: -280px; }
+  .sidebar.active { left: 0; }
+}
