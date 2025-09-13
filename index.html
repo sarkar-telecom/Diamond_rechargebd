@@ -1,55 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Firebase Auth Sidebar</title>
-  <link rel="stylesheet" href="style.css">
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sarkar Telecom - Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <!-- Header -->
   <header class="header">
-    <div class="logo">MyApp</div>
-    <button class="menu-btn" id="menuBtn">☰</button>
+    <button id="menuBtn" class="menu-btn">☰</button>
+    <h1 class="logo">Sarkar Telecom</h1>
     <div class="auth-section">
-      <img id="userPic" src="" alt="" width="32" height="32" style="display:none;">
-      <span id="userName"></span>
+      <img id="userPic" src="https://via.placeholder.com/36" alt="avatar" style="display:none;" />
+      <div>
+        <span id="userName">Guest</span>
+        <small id="userRole">not signed in</small>
+      </div>
       <button id="authBtn">Login</button>
     </div>
   </header>
 
   <!-- Sidebar -->
-  <aside class="sidebar" id="sidebar">
-    <button class="close-btn" id="closeBtn">×</button>
+  <aside id="sidebar" class="sidebar" aria-hidden="true">
+    <button id="closeBtn" class="close-btn">×</button>
     <div class="profile-box">
-      <img id="sidebarUserPic" src="" alt="" width="60" height="60" style="display:none;">
-      <p id="sidebarUserName"></p>
+      <img id="sidebarUserPic" src="https://via.placeholder.com/48" alt="profile" style="display:none;" />
+      <h3 id="sidebarUserName">Guest</h3>
+      <p id="sidebarUserEmail">-</p>
+      <p id="sidebarBalance">৳ 0</p>
     </div>
     <nav class="sidebar-nav">
-      <a href="#">🏠 Home</a>
-      <a href="#">⚡ Dashboard</a>
-      <a href="#">📦 Services</a>
-      <a href="#">⚙ Settings</a>
+      <a href="dashboard.html">📊 Dashboard</a>
+      <a href="order.html">🛒 Order</a>
+      <a href="order-history.html">📜 Order History</a>
+      <a href="profile.html">👤 Profile</a>
+      <a href="reward.html">🎁 Reward</a>
+      <a href="balance.html">💰 Balance</a>
+      <a href="admin.html">⚙️ Admin</a>
     </nav>
   </aside>
 
-  <!-- Main -->
+  <!-- Main Content -->
   <main class="main">
-    <h1>Welcome to Firebase Auth + Sidebar</h1>
-    <p>Try logging in with Google and opening the sidebar.</p>
+    <h2>Welcome to Sarkar Telecom</h2>
+    <p>This is your dashboard main page.</p>
   </main>
 
   <!-- Footer -->
   <footer class="footer">
-    <div>© 2025 MyApp</div>
     <div class="footer-profile">
-      <img id="footerUserPic" src="" alt="" width="28" height="28" style="display:none;">
-      <span id="footerUserName"></span>
+      <img id="footerUserPic" src="https://via.placeholder.com/32" alt="footer avatar" style="display:none;" />
+      <div>
+        <span id="footerUserName">Guest</span>
+        <small id="footerUserEmail">-</small>
+      </div>
     </div>
+    <p>&copy; <span id="year"></span> Sarkar Telecom</p>
   </footer>
 
+  <!-- App JS (Firebase Modular v9) -->
   <script type="module" src="app.js"></script>
 </body>
 </html>
