@@ -1,9 +1,16 @@
+// app.js (replace your existing file with this)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-import { getAuth, signInWithPopup, GoogleAuthProvider, 
-         signInWithEmailAndPassword, createUserWithEmailAndPassword,
-         onAuthStateChanged, signOut } 
-from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+import {
+  getAuth,
+  signInWithPopup,
+  GoogleAuthProvider,
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
 
+/* ---------------------------
+   Firebase config - replace if needed
+   --------------------------- */
 const firebaseConfig = {
   apiKey: "AIzaSyAyhjOsIXNAkBglpRllt0OZIOJYpdB_9-8",
   authDomain: "diamond-recharge-f7f59.firebaseapp.com",
@@ -18,59 +25,161 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
-// DOM Elements
-const sidebar = document.getElementById("sidebar");
-const menuToggle = document.getElementById("menuToggle");
-const closeSidebar = document.getElementById("closeSidebar");
-const authToggleBtn = document.getElementById("authToggleBtn");
+/* ---------------------------
+   DOM ready
+   --------------------------- */
+document.addEventListener("DOMContentLoaded", () => {
+  // Elements (may be null if markup changed)
+  const sidebar = document.getElementById("sidebar");
+  const menuToggle = document.getElementById("menuToggle");
+  const closeSidebar = document.getElementById("closeSidebar");
+  const authToggleBtn = document.getElementById("authToggleBtn");
 
-// Auth state listener
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    updateUI(user);
-    authToggleBtn.textContent = "Logout";
-  } else {
-    updateUI(null);
-    authToggleBtn.textContent = "Login";
+  // UI fields to update
+  const authAvatar = document.getElementById("authAvatar");
+  const authName = document.getElementById("authName");
+  const authRole = document.getElementById("authRole");
+  const sbAvatar = document.getElementById("sbAvatar");
+  const sbName = document.getElementById("sbName");
+  const sbEmail = document.getElementById("sbEmail");
+  const ftAvatar = document.getElementById("ftAvatar");
+  const ftName = document.getElementById("ftName");
+  const ftEmail = document.getElementById("ftEmail");
+
+  // Safety checks
+  console.log("Init UI, elements:", {
+    sidebar: !!sidebar,
+    menuToggle: !!menuToggle,
+    closeSidebar: !!closeSidebar,
+    authToggleBtn: !!authToggleBtn
+  });
+
+  /* Sidebar open/close helpers */
+  let overlayEl = null;
+  function ensureSidebarZIndex() {
+    if (!sidebar) return;
+    // keep sidebar above overlay
+    sidebar.style.zIndex = "60";
   }
-});
+  function createOverlay() {
+    if (overlayEl) return;
+    overlayEl = document.createElement("div");
+    overlayEl.id = "sidebar-overlay";
+    overlayEl.style.position = "fixed";
+    overlayEl.style.inset = "0";
+    overlayEl.style.background = "rgba(0,0,0,0.35)";
+    overlayEl.style.zIndex = "50"; // below sidebar which is 60
+    overlayEl.addEventListener("click", closeSidebarFn);
+    document.body.appendChild(overlayEl);
+  }
+  function removeOverlay() {
+    if (!overlayEl) return;
+    overlayEl.removeEventListener("click", closeSidebarFn);
+    overlayEl.remove();
+    overlayEl = null;
+  }
+  function openSidebarFn() {
+    if (!sidebar) return;
+    ensureSidebarZIndex();
+    sidebar.classList.add("active");
+    createOverlay();
+  }
+  function closeSidebarFn() {
+    if (!sidebar) return;
+    sidebar.classList.remove("active");
+    removeOverlay();
+  }
+  function toggleSidebarFn() {
+    if (!sidebar) return;
+    if (sidebar.classList.contains("active")) closeSidebarFn();
+    else openSidebarFn();
+  }
 
-// Sidebar toggle
-menuToggle.addEventListener("click", () => sidebar.classList.add("active"));
-closeSidebar.addEventListener("click", () => sidebar.classList.remove("active"));
+  // Attach sidebar listeners safely
+  if (menuToggle) menuToggle.addEventListener("click", (e) => {
+    e.preventDefault();
+    toggleSidebarFn();
+  });
+  if (closeSidebar) closeSidebar.addEventListener("click", (e) => {
+    e.preventDefault();
+    closeSidebarFn();
+  });
 
-// Login/Logout toggle
-authToggleBtn.addEventListener("click", async () => {
-  if (auth.currentUser) {
-    await signOut(auth);
-  } else {
+  // close with Escape
+  document.addEventListener("keydown", (ev) => {
+    if (ev.key === "Escape") closeSidebarFn();
+  });
+
+  /* ---------------------------
+     Auth (Google popup) & UI sync
+     --------------------------- */
+  async function doGoogleSignIn() {
     try {
-      const result = await signInWithPopup(auth, provider);
-      console.log("Google user:", result.user);
+      const res = await signInWithPopup(auth, provider);
+      console.log("Google sign-in success:", res.user);
+      // onAuthStateChanged will update UI
     } catch (err) {
-      alert(err.message);
+      console.error("Google sign-in error:", err);
+      alert("Google sign-in failed: " + (err && err.message ? err.message : err));
     }
   }
+
+  async function doSignOut() {
+    try {
+      await signOut(auth);
+      alert("Signed out");
+    } catch (err) {
+      console.error("Sign-out error:", err);
+      alert("Sign-out failed: " + (err && err.message ? err.message : err));
+    }
+  }
+
+  if (authToggleBtn) {
+    authToggleBtn.addEventListener("click", async () => {
+      // guard to avoid multiple clicks
+      authToggleBtn.disabled = true;
+      try {
+        if (auth.currentUser) {
+          await doSignOut();
+        } else {
+          await doGoogleSignIn();
+        }
+      } catch (err) {
+        console.error("Auth toggle handler error:", err);
+      } finally {
+        authToggleBtn.disabled = false;
+      }
+    });
+  }
+
+  // Keep UI synced
+  function updateUI(user) {
+    const avatar = user?.photoURL || "https://via.placeholder.com/36";
+    const name = user?.displayName || "Guest";
+    const email = user?.email || "-";
+    const roleText = user ? "Signed in" : "not signed in";
+
+    if (authAvatar) authAvatar.src = avatar;
+    if (authName) authName.textContent = name;
+    if (authRole) authRole.textContent = roleText;
+
+    if (sbAvatar) sbAvatar.src = avatar;
+    if (sbName) sbName.textContent = name;
+    if (sbEmail) sbEmail.textContent = email;
+
+    if (ftAvatar) ftAvatar.src = avatar;
+    if (ftName) ftName.textContent = name;
+    if (ftEmail) ftEmail.textContent = email;
+
+    if (authToggleBtn) authToggleBtn.textContent = user ? "Logout" : "Login";
+  }
+
+  // Listen for changes
+  onAuthStateChanged(auth, (user) => {
+    console.log("Auth state changed, user:", user);
+    updateUI(user);
+  });
+
+  // initialize UI from current state (fast)
+  updateUI(auth.currentUser);
 });
-
-// Update UI
-function updateUI(user) {
-  const avatar = user?.photoURL || "https://via.placeholder.com/36";
-  const name = user?.displayName || "Guest";
-  const email = user?.email || "-";
-
-  document.getElementById("authAvatar").src = avatar;
-  document.getElementById("authName").textContent = name;
-  document.getElementById("authRole").textContent = user ? "Signed in" : "not signed in";
-
-  document.getElementById("sbAvatar").src = avatar;
-  document.getElementById("sbName").textContent = name;
-  document.getElementById("sbEmail").textContent = email;
-
-  document.getElementById("ftAvatar").src = avatar;
-  document.getElementById("ftName").textContent = name;
-  document.getElementById("ftEmail").textContent = email;
-}
-
-// Footer year
-document.getElementById("year").textContent = new Date().getFullYear();
