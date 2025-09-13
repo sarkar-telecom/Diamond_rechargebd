@@ -1,21 +1,28 @@
-// app.js (replace your existing file with this)
+// app.js (modular Firebase v10) — drop into project as-is
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
 import {
   getAuth,
-  signInWithPopup,
   GoogleAuthProvider,
-  onAuthStateChanged,
-  signOut
+  signInWithPopup,
+  signOut,
+  onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 
 /* ---------------------------
-   Firebase config - replace if needed
+   Config
    --------------------------- */
 const firebaseConfig = {
   apiKey: "AIzaSyAyhjOsIXNAkBglpRllt0OZIOJYpdB_9-8",
   authDomain: "diamond-recharge-f7f59.firebaseapp.com",
   projectId: "diamond-recharge-f7f59",
-  storageBucket: "diamond-recharge-f7f59.firebasestorage.app",
+  storageBucket: "diamond-recharge-f7f59.appspot.com",
   messagingSenderId: "657717928489",
   appId: "1:657717928489:web:70431ebc9afb7002d4b238",
   measurementId: "G-TDK78BQ8SQ"
@@ -24,162 +31,180 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
+const db = getFirestore(app);
 
 /* ---------------------------
-   DOM ready
+   DOM Ready
    --------------------------- */
 document.addEventListener("DOMContentLoaded", () => {
-  // Elements (may be null if markup changed)
+  // DOM elements
+  const menuBtn = document.getElementById("menuBtn");
+  const closeBtn = document.getElementById("closeBtn");
   const sidebar = document.getElementById("sidebar");
-  const menuToggle = document.getElementById("menuToggle");
-  const closeSidebar = document.getElementById("closeSidebar");
-  const authToggleBtn = document.getElementById("authToggleBtn");
 
-  // UI fields to update
-  const authAvatar = document.getElementById("authAvatar");
-  const authName = document.getElementById("authName");
-  const authRole = document.getElementById("authRole");
-  const sbAvatar = document.getElementById("sbAvatar");
-  const sbName = document.getElementById("sbName");
-  const sbEmail = document.getElementById("sbEmail");
-  const ftAvatar = document.getElementById("ftAvatar");
-  const ftName = document.getElementById("ftName");
-  const ftEmail = document.getElementById("ftEmail");
+  const authBtn = document.getElementById("authBtn");
+  const userPic = document.getElementById("userPic");
+  const userName = document.getElementById("userName");
+  const userRole = document.getElementById("userRole");
 
-  // Safety checks
-  console.log("Init UI, elements:", {
-    sidebar: !!sidebar,
-    menuToggle: !!menuToggle,
-    closeSidebar: !!closeSidebar,
-    authToggleBtn: !!authToggleBtn
-  });
+  const sidebarUserPic = document.getElementById("sidebarUserPic");
+  const sidebarUserName = document.getElementById("sidebarUserName");
+  const sidebarUserEmail = document.getElementById("sidebarUserEmail");
+  const sidebarBalance = document.getElementById("sidebarBalance");
 
-  /* Sidebar open/close helpers */
-  let overlayEl = null;
-  function ensureSidebarZIndex() {
-    if (!sidebar) return;
-    // keep sidebar above overlay
-    sidebar.style.zIndex = "60";
+  const footerUserPic = document.getElementById("footerUserPic");
+  const footerUserName = document.getElementById("footerUserName");
+  const footerUserEmail = document.getElementById("footerUserEmail");
+
+  // safe guards
+  if (!menuBtn || !closeBtn || !sidebar || !authBtn) {
+    console.warn("Missing core DOM elements — check your HTML IDs.");
   }
+
+  /* Overlay helpers */
+  let overlay = null;
   function createOverlay() {
-    if (overlayEl) return;
-    overlayEl = document.createElement("div");
-    overlayEl.id = "sidebar-overlay";
-    overlayEl.style.position = "fixed";
-    overlayEl.style.inset = "0";
-    overlayEl.style.background = "rgba(0,0,0,0.35)";
-    overlayEl.style.zIndex = "50"; // below sidebar which is 60
-    overlayEl.addEventListener("click", closeSidebarFn);
-    document.body.appendChild(overlayEl);
+    if (overlay) return;
+    overlay = document.createElement("div");
+    overlay.id = "sidebar-overlay";
+    overlay.addEventListener("click", closeSidebar);
+    document.body.appendChild(overlay);
   }
   function removeOverlay() {
-    if (!overlayEl) return;
-    overlayEl.removeEventListener("click", closeSidebarFn);
-    overlayEl.remove();
-    overlayEl = null;
+    if (!overlay) return;
+    overlay.removeEventListener("click", closeSidebar);
+    overlay.remove();
+    overlay = null;
   }
-  function openSidebarFn() {
+
+  /* Sidebar */
+  function openSidebar() {
     if (!sidebar) return;
-    ensureSidebarZIndex();
     sidebar.classList.add("active");
     createOverlay();
   }
-  function closeSidebarFn() {
+  function closeSidebar() {
     if (!sidebar) return;
     sidebar.classList.remove("active");
     removeOverlay();
   }
-  function toggleSidebarFn() {
+  function toggleSidebar() {
     if (!sidebar) return;
-    if (sidebar.classList.contains("active")) closeSidebarFn();
-    else openSidebarFn();
+    if (sidebar.classList.contains("active")) closeSidebar();
+    else openSidebar();
   }
 
-  // Attach sidebar listeners safely
-  if (menuToggle) menuToggle.addEventListener("click", (e) => {
+  menuBtn?.addEventListener("click", (e) => {
     e.preventDefault();
-    toggleSidebarFn();
+    toggleSidebar();
   });
-  if (closeSidebar) closeSidebar.addEventListener("click", (e) => {
+  closeBtn?.addEventListener("click", (e) => {
     e.preventDefault();
-    closeSidebarFn();
+    closeSidebar();
   });
-
-  // close with Escape
+  // Escape to close
   document.addEventListener("keydown", (ev) => {
-    if (ev.key === "Escape") closeSidebarFn();
+    if (ev.key === "Escape") closeSidebar();
   });
 
-  /* ---------------------------
-     Auth (Google popup) & UI sync
-     --------------------------- */
-  async function doGoogleSignIn() {
+  /* Auth toggle (Login with Google / Logout) */
+  authBtn?.addEventListener("click", async () => {
+    if (authBtn.disabled) return;
+    authBtn.disabled = true;
     try {
-      const res = await signInWithPopup(auth, provider);
-      console.log("Google sign-in success:", res.user);
-      // onAuthStateChanged will update UI
+      if (auth.currentUser) {
+        await signOut(auth);
+        console.log("Signed out.");
+      } else {
+        // prefer popup but catch errors
+        try {
+          await signInWithPopup(auth, provider);
+          console.log("Signed in with popup.");
+        } catch (err) {
+          console.warn("Popup sign-in failed, try redirect or check popup blocker:", err);
+          alert("Sign-in failed: " + (err.message || err));
+        }
+      }
     } catch (err) {
-      console.error("Google sign-in error:", err);
-      alert("Google sign-in failed: " + (err && err.message ? err.message : err));
+      console.error("Auth toggle error:", err);
+      alert("Auth error: " + (err.message || err));
+    } finally {
+      authBtn.disabled = false;
     }
+  });
+
+  /* Update UI helper */
+  function setLoggedInUI(user) {
+    const avatar = user.photoURL || "https://via.placeholder.com/36";
+    const name = user.displayName || user.email || "User";
+    const email = user.email || "-";
+
+    if (userPic) { userPic.src = avatar; userPic.style.display = "block"; }
+    if (userName) userName.textContent = name;
+    if (userRole) userRole.textContent = "Signed in";
+
+    if (sidebarUserPic) { sidebarUserPic.src = avatar; sidebarUserPic.style.display = "block"; }
+    if (sidebarUserName) sidebarUserName.textContent = name;
+    if (sidebarUserEmail) sidebarUserEmail.textContent = email;
+
+    if (footerUserPic) { footerUserPic.src = avatar; footerUserPic.style.display = "block"; }
+    if (footerUserName) footerUserName.textContent = name;
+    if (footerUserEmail) footerUserEmail.textContent = email;
   }
 
-  async function doSignOut() {
-    try {
-      await signOut(auth);
-      alert("Signed out");
-    } catch (err) {
-      console.error("Sign-out error:", err);
-      alert("Sign-out failed: " + (err && err.message ? err.message : err));
-    }
+  function setLoggedOutUI() {
+    if (userPic) userPic.style.display = "none";
+    if (userName) userName.textContent = "Guest";
+    if (userRole) userRole.textContent = "not signed in";
+
+    if (sidebarUserPic) sidebarUserPic.style.display = "none";
+    if (sidebarUserName) sidebarUserName.textContent = "Guest";
+    if (sidebarUserEmail) sidebarUserEmail.textContent = "-";
+    if (sidebarBalance) sidebarBalance.textContent = "৳ 0";
+
+    if (footerUserPic) footerUserPic.style.display = "none";
+    if (footerUserName) footerUserName.textContent = "Guest";
+    if (footerUserEmail) footerUserEmail.textContent = "-";
   }
 
-  if (authToggleBtn) {
-    authToggleBtn.addEventListener("click", async () => {
-      // guard to avoid multiple clicks
-      authToggleBtn.disabled = true;
+  /* Auth state listener */
+  onAuthStateChanged(auth, async (user) => {
+    console.log("Auth state changed:", user);
+    if (user) {
+      // set UI
+      if (authBtn) authBtn.textContent = "Logout";
+      setLoggedInUI(user);
+
+      // Load or create user doc & balance
       try {
-        if (auth.currentUser) {
-          await doSignOut();
+        const userRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+          const data = userSnap.data();
+          if (sidebarBalance) sidebarBalance.textContent = "৳ " + (data.balance ?? 0);
         } else {
-          await doGoogleSignIn();
+          await setDoc(userRef, {
+            name: user.displayName ?? "User",
+            email: user.email ?? "",
+            balance: 0,
+            createdAt: serverTimestamp()
+          });
+          if (sidebarBalance) sidebarBalance.textContent = "৳ 0";
         }
       } catch (err) {
-        console.error("Auth toggle handler error:", err);
-      } finally {
-        authToggleBtn.disabled = false;
+        console.error("Failed to load/create user doc:", err);
+        if (sidebarBalance) sidebarBalance.textContent = "৳ 0";
       }
-    });
-  }
-
-  // Keep UI synced
-  function updateUI(user) {
-    const avatar = user?.photoURL || "https://via.placeholder.com/36";
-    const name = user?.displayName || "Guest";
-    const email = user?.email || "-";
-    const roleText = user ? "Signed in" : "not signed in";
-
-    if (authAvatar) authAvatar.src = avatar;
-    if (authName) authName.textContent = name;
-    if (authRole) authRole.textContent = roleText;
-
-    if (sbAvatar) sbAvatar.src = avatar;
-    if (sbName) sbName.textContent = name;
-    if (sbEmail) sbEmail.textContent = email;
-
-    if (ftAvatar) ftAvatar.src = avatar;
-    if (ftName) ftName.textContent = name;
-    if (ftEmail) ftEmail.textContent = email;
-
-    if (authToggleBtn) authToggleBtn.textContent = user ? "Logout" : "Login";
-  }
-
-  // Listen for changes
-  onAuthStateChanged(auth, (user) => {
-    console.log("Auth state changed, user:", user);
-    updateUI(user);
+    } else {
+      if (authBtn) authBtn.textContent = "Login";
+      setLoggedOutUI();
+    }
   });
 
-  // initialize UI from current state (fast)
-  updateUI(auth.currentUser);
+  // footer year
+  const yearEl = document.getElementById("year");
+  if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+  // initial UI set (in case onAuthStateChanged fires after)
+  setLoggedOutUI();
 });
