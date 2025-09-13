@@ -1,17 +1,23 @@
-// =========================
-// Firebase v9 Modular SDK
-// =========================
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-import { 
-  getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged 
-} from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
-import { 
-  getFirestore, doc, getDoc, setDoc, serverTimestamp 
-} from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+// app.js (modular Firebase v10) — drop into project as-is
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signOut,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 
-// =========================
-// Firebase Config
-// =========================
+/* ---------------------------
+   Config
+   --------------------------- */
 const firebaseConfig = {
   apiKey: "AIzaSyAyhjOsIXNAkBglpRllt0OZIOJYpdB_9-8",
   authDomain: "diamond-recharge-f7f59.firebaseapp.com",
@@ -22,120 +28,183 @@ const firebaseConfig = {
   measurementId: "G-TDK78BQ8SQ"
 };
 
-// Init Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 const db = getFirestore(app);
 
-// =========================
-// Sidebar Toggle
-// =========================
-const menuBtn = document.getElementById("menuBtn");
-const closeBtn = document.getElementById("closeBtn");
-const sidebar = document.getElementById("sidebar");
+/* ---------------------------
+   DOM Ready
+   --------------------------- */
+document.addEventListener("DOMContentLoaded", () => {
+  // DOM elements
+  const menuBtn = document.getElementById("menuBtn");
+  const closeBtn = document.getElementById("closeBtn");
+  const sidebar = document.getElementById("sidebar");
 
-menuBtn.addEventListener("click", () => {
-  sidebar.classList.add("active");
-});
-closeBtn.addEventListener("click", () => {
-  sidebar.classList.remove("active");
-});
+  const authBtn = document.getElementById("authBtn");
+  const userPic = document.getElementById("userPic");
+  const userName = document.getElementById("userName");
+  const userRole = document.getElementById("userRole");
 
-// =========================
-// Auth Elements
-// =========================
-const authBtn = document.getElementById("authBtn");
-const userPic = document.getElementById("userPic");
-const userName = document.getElementById("userName");
+  const sidebarUserPic = document.getElementById("sidebarUserPic");
+  const sidebarUserName = document.getElementById("sidebarUserName");
+  const sidebarUserEmail = document.getElementById("sidebarUserEmail");
+  const sidebarBalance = document.getElementById("sidebarBalance");
 
-// Sidebar
-const sidebarUserPic = document.getElementById("sidebarUserPic");
-const sidebarUserName = document.getElementById("sidebarUserName");
-const sidebarUserEmail = document.getElementById("sidebarUserEmail");
-const sidebarBalance = document.getElementById("sidebarBalance");
+  const footerUserPic = document.getElementById("footerUserPic");
+  const footerUserName = document.getElementById("footerUserName");
+  const footerUserEmail = document.getElementById("footerUserEmail");
 
-// Footer
-const footerUserPic = document.getElementById("footerUserPic");
-const footerUserName = document.getElementById("footerUserName");
-const footerUserEmail = document.getElementById("footerUserEmail");
-
-// =========================
-// Login / Logout Toggle
-// =========================
-authBtn.addEventListener("click", async () => {
-  if (auth.currentUser) {
-    await signOut(auth);
-  } else {
-    await signInWithPopup(auth, provider).catch(err => {
-      console.error("Login error:", err);
-      alert("Login failed: " + err.message);
-    });
+  // safe guards
+  if (!menuBtn || !closeBtn || !sidebar || !authBtn) {
+    console.warn("Missing core DOM elements — check your HTML IDs.");
   }
-});
 
-// =========================
-// Auth State Listener
-// =========================
-onAuthStateChanged(auth, async (user) => {
-  if (user) {
-    // Logged in
-    authBtn.textContent = "Logout";
-    userPic.src = user.photoURL;
-    userPic.style.display = "block";
-    userName.textContent = user.displayName || "User";
+  /* Overlay helpers */
+  let overlay = null;
+  function createOverlay() {
+    if (overlay) return;
+    overlay = document.createElement("div");
+    overlay.id = "sidebar-overlay";
+    overlay.addEventListener("click", closeSidebar);
+    document.body.appendChild(overlay);
+  }
+  function removeOverlay() {
+    if (!overlay) return;
+    overlay.removeEventListener("click", closeSidebar);
+    overlay.remove();
+    overlay = null;
+  }
 
-    sidebarUserPic.src = user.photoURL;
-    sidebarUserPic.style.display = "block";
-    sidebarUserName.textContent = user.displayName || "User";
-    sidebarUserEmail.textContent = user.email || "-";
+  /* Sidebar */
+  function openSidebar() {
+    if (!sidebar) return;
+    sidebar.classList.add("active");
+    createOverlay();
+  }
+  function closeSidebar() {
+    if (!sidebar) return;
+    sidebar.classList.remove("active");
+    removeOverlay();
+  }
+  function toggleSidebar() {
+    if (!sidebar) return;
+    if (sidebar.classList.contains("active")) closeSidebar();
+    else openSidebar();
+  }
 
-    footerUserPic.src = user.photoURL;
-    footerUserPic.style.display = "block";
-    footerUserName.textContent = user.displayName || "User";
-    footerUserEmail.textContent = user.email || "-";
+  menuBtn?.addEventListener("click", (e) => {
+    e.preventDefault();
+    toggleSidebar();
+  });
+  closeBtn?.addEventListener("click", (e) => {
+    e.preventDefault();
+    closeSidebar();
+  });
+  // Escape to close
+  document.addEventListener("keydown", (ev) => {
+    if (ev.key === "Escape") closeSidebar();
+  });
 
-    // 🔹 Load Balance from Firestore
+  /* Auth toggle (Login with Google / Logout) */
+  authBtn?.addEventListener("click", async () => {
+    if (authBtn.disabled) return;
+    authBtn.disabled = true;
     try {
-      const userRef = doc(db, "users", user.uid);
-      const userSnap = await getDoc(userRef);
-
-      if (userSnap.exists()) {
-        const data = userSnap.data();
-        sidebarBalance.textContent = "৳ " + (data.balance || 0);
+      if (auth.currentUser) {
+        await signOut(auth);
+        console.log("Signed out.");
       } else {
-        // If user doc doesn’t exist, create it
-        await setDoc(userRef, {
-          balance: 0,
-          email: user.email,
-          name: user.displayName || "User",
-          createdAt: serverTimestamp()
-        });
-        sidebarBalance.textContent = "৳ 0";
+        // prefer popup but catch errors
+        try {
+          await signInWithPopup(auth, provider);
+          console.log("Signed in with popup.");
+        } catch (err) {
+          console.warn("Popup sign-in failed, try redirect or check popup blocker:", err);
+          alert("Sign-in failed: " + (err.message || err));
+        }
       }
     } catch (err) {
-      console.error("Balance fetch error:", err);
-      sidebarBalance.textContent = "৳ 0";
+      console.error("Auth toggle error:", err);
+      alert("Auth error: " + (err.message || err));
+    } finally {
+      authBtn.disabled = false;
     }
+  });
 
-  } else {
-    // Logged out
-    authBtn.textContent = "Login";
-    userPic.style.display = "none";
-    userName.textContent = "";
+  /* Update UI helper */
+  function setLoggedInUI(user) {
+    const avatar = user.photoURL || "https://via.placeholder.com/36";
+    const name = user.displayName || user.email || "User";
+    const email = user.email || "-";
 
-    sidebarUserPic.style.display = "none";
-    sidebarUserName.textContent = "Guest";
-    sidebarUserEmail.textContent = "-";
-    sidebarBalance.textContent = "৳ 0";
+    if (userPic) { userPic.src = avatar; userPic.style.display = "block"; }
+    if (userName) userName.textContent = name;
+    if (userRole) userRole.textContent = "Signed in";
 
-    footerUserPic.style.display = "none";
-    footerUserName.textContent = "Guest";
-    footerUserEmail.textContent = "-";
+    if (sidebarUserPic) { sidebarUserPic.src = avatar; sidebarUserPic.style.display = "block"; }
+    if (sidebarUserName) sidebarUserName.textContent = name;
+    if (sidebarUserEmail) sidebarUserEmail.textContent = email;
+
+    if (footerUserPic) { footerUserPic.src = avatar; footerUserPic.style.display = "block"; }
+    if (footerUserName) footerUserName.textContent = name;
+    if (footerUserEmail) footerUserEmail.textContent = email;
   }
-});
 
-// =========================
-// Footer Year
-// =========================
-document.getElementById("year").textContent = new Date().getFullYear();
+  function setLoggedOutUI() {
+    if (userPic) userPic.style.display = "none";
+    if (userName) userName.textContent = "Guest";
+    if (userRole) userRole.textContent = "not signed in";
+
+    if (sidebarUserPic) sidebarUserPic.style.display = "none";
+    if (sidebarUserName) sidebarUserName.textContent = "Guest";
+    if (sidebarUserEmail) sidebarUserEmail.textContent = "-";
+    if (sidebarBalance) sidebarBalance.textContent = "৳ 0";
+
+    if (footerUserPic) footerUserPic.style.display = "none";
+    if (footerUserName) footerUserName.textContent = "Guest";
+    if (footerUserEmail) footerUserEmail.textContent = "-";
+  }
+
+  /* Auth state listener */
+  onAuthStateChanged(auth, async (user) => {
+    console.log("Auth state changed:", user);
+    if (user) {
+      // set UI
+      if (authBtn) authBtn.textContent = "Logout";
+      setLoggedInUI(user);
+
+      // Load or create user doc & balance
+      try {
+        const userRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+          const data = userSnap.data();
+          if (sidebarBalance) sidebarBalance.textContent = "৳ " + (data.balance ?? 0);
+        } else {
+          await setDoc(userRef, {
+            name: user.displayName ?? "User",
+            email: user.email ?? "",
+            balance: 0,
+            createdAt: serverTimestamp()
+          });
+          if (sidebarBalance) sidebarBalance.textContent = "৳ 0";
+        }
+      } catch (err) {
+        console.error("Failed to load/create user doc:", err);
+        if (sidebarBalance) sidebarBalance.textContent = "৳ 0";
+      }
+    } else {
+      if (authBtn) authBtn.textContent = "Login";
+      setLoggedOutUI();
+    }
+  });
+
+  // footer year
+  const yearEl = document.getElementById("year");
+  if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+  // initial UI set (in case onAuthStateChanged fires after)
+  setLoggedOutUI();
+});
