@@ -7,7 +7,6 @@
   <title>Header + Sidebar (Firebase Auth)</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    /* small extra for avatar fallback */
     .avatar-fallback { background: linear-gradient(135deg,#e2e8f0,#cbd5e1); display:inline-block }
   </style>
 </head>
@@ -18,16 +17,13 @@
         <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
         </svg>
-      </button><!-- Site name -->
-  <h1 class="text-lg font-semibold">MySite</h1>
-</div>
-
-<!-- Auth button -->
-<div>
-  <button id="authBtn" class="bg-blue-600 text-white px-4 py-1 rounded-md hover:bg-blue-700">Login</button>
-</div>
-
-  </header>  <!-- Overlay (for closing sidebar on outside click) -->  <div id="overlay" class="fixed inset-0 bg-black/40 hidden z-30"></div>  <!-- Sidebar -->  <aside id="sidebar" class="fixed inset-y-0 left-0 w-80 max-w-full bg-white shadow-lg transform -translate-x-full transition-transform duration-300 z-40">
+      </button>
+      <h1 class="text-lg font-semibold">MySite</h1>
+    </div>
+    <div>
+      <button id="authBtn" class="bg-blue-600 text-white px-4 py-1 rounded-md hover:bg-blue-700">Login</button>
+    </div>
+  </header>  <!-- Overlay -->  <div id="overlay" class="fixed inset-0 bg-black/40 hidden z-30"></div>  <!-- Sidebar -->  <aside id="sidebar" class="fixed inset-y-0 left-0 w-80 max-w-full bg-white shadow-lg transform -translate-x-full transition-transform duration-300 z-40">
     <div class="p-4">
       <div class="flex items-center justify-between">
         <h2 class="text-lg font-semibold">Profile</h2>
@@ -37,7 +33,6 @@
           </svg>
         </button>
       </div><div class="mt-4 border-t pt-4">
-    <!-- User Info -->
     <div class="flex items-center gap-3">
       <img id="userAvatar" src="" alt="avatar" class="w-14 h-14 rounded-full object-cover avatar-fallback">
       <div>
@@ -59,38 +54,28 @@
   </div>
 </div>
 
-  </aside>  <!-- Main content placeholder -->  <main class="p-6">
+  </aside>  <main class="p-6">
     <p class="text-gray-700">Main page content here. Click the hamburger to open the sidebar.</p>
-  </main>  <!-- Firebase + logic (ES modules, v9+) -->  <script type="module">
+  </main>  <!-- Firebase + logic -->  <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
-    import {
-      getAuth,
-      onAuthStateChanged,
-      GoogleAuthProvider,
-      signInWithPopup,
-      signOut
-    } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js';
-    import {
-      getFirestore,
-      doc,
-      getDoc,
-      setDoc
-    } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
+    import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js';
+    import { getFirestore, doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
 
-    // ======= REPLACE with your Firebase config =======
+    // ✅ Your Firebase config (corrected)
     const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID",
-      // optional: storageBucket, messagingSenderId, appId
+      apiKey: "AIzaSyAyhjOsIXNAkBglpRllt0OZIOJYpdB_9-8",
+      authDomain: "diamond-recharge-f7f59.firebaseapp.com",
+      projectId: "diamond-recharge-f7f59",
+      storageBucket: "diamond-recharge-f7f59.appspot.com",
+      messagingSenderId: "657717928489",
+      appId: "1:657717928489:web:70431ebc9afb7002d4b238",
+      measurementId: "G-TDK78BQ8SQ"
     };
-    // =================================================
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // Elements
     const menuBtn = document.getElementById('menuBtn');
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('overlay');
@@ -104,7 +89,6 @@
     const userEmail = document.getElementById('userEmail');
     const userPhone = document.getElementById('userPhone');
 
-    // Sidebar helpers
     function openSidebar() {
       sidebar.classList.remove('-translate-x-full');
       overlay.classList.remove('hidden');
@@ -125,23 +109,17 @@
     overlay.addEventListener('click', closeSide);
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSide(); });
 
-    // Format helpers
     function fmtAmount(n) { return '৳' + (Number(n || 0)).toLocaleString(); }
 
-    // Auth state
     onAuthStateChanged(auth, async (user) => {
       try {
         if (user) {
           authBtn.textContent = 'Logout';
-
-          // Basic info from Auth
           userName.textContent = user.displayName || (user.email ? user.email.split('@')[0] : 'User');
           userEmail.textContent = user.email || '-';
           userPhone.textContent = user.phoneNumber || '-';
           userAvatar.src = user.photoURL || '';
-          if (!user.photoURL) userAvatar.classList.add('avatar-fallback'); else userAvatar.classList.remove('avatar-fallback');
 
-          // Try to read Firestore user doc
           const userDocRef = doc(db, 'users', user.uid);
           const snap = await getDoc(userDocRef);
           if (snap.exists()) {
@@ -149,14 +127,11 @@
             userRole.textContent = data.role || 'User';
             userBalance.textContent = 'Balance: ' + fmtAmount(data.balance || 0);
           } else {
-            // create default profile doc (merge to avoid overwriting)
             await setDoc(userDocRef, { role: 'User', balance: 0, weeklyTotal: 0, weeklyDiamonds: 0 }, { merge: true });
             userRole.textContent = 'User';
             userBalance.textContent = 'Balance: ' + fmtAmount(0);
           }
-
         } else {
-          // logged out
           authBtn.textContent = 'Login';
           userName.textContent = 'Guest';
           userRole.textContent = 'Role';
@@ -164,14 +139,12 @@
           userEmail.textContent = '-';
           userPhone.textContent = '-';
           userAvatar.src = '';
-          userAvatar.classList.add('avatar-fallback');
         }
       } catch (err) {
         console.error('Auth handling error', err);
       }
     });
 
-    // Login/Logout
     authBtn.addEventListener('click', async () => {
       try {
         if (auth.currentUser) {
