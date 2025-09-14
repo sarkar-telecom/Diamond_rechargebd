@@ -117,7 +117,7 @@
           authBtn.textContent = 'Logout';
           userName.textContent = user.displayName || (user.email ? user.email.split('@')[0] : 'User');
           userEmail.textContent = user.email || '-';
-          userPhone.textContent = user.phoneNumber || '-';
+          userPhone.textContent = user.phone || '-';
           userAvatar.src = user.photoURL || '';
 
           const userDocRef = doc(db, 'users', user.uid);
