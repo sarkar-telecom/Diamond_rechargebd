@@ -1,113 +1,190 @@
-<!DOCTYPE html>
+<!doctype html>
+
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Header with Sidebar</title>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Header + Sidebar (Firebase Auth)</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* small extra for avatar fallback */
+    .avatar-fallback { background: linear-gradient(135deg,#e2e8f0,#cbd5e1); display:inline-block }
+  </style>
 </head>
-<body class="bg-gray-100">
+<body class="bg-gray-100 min-h-screen">  <!-- Header -->  <header class="flex items-center justify-between bg-white p-4 shadow-md">
+    <div class="flex items-center gap-3">
+      <!-- Hamburger -->
+      <button id="menuBtn" aria-controls="sidebar" aria-expanded="false" class="p-2 rounded-md hover:bg-gray-100 focus:outline-none focus:ring">
+        <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button><!-- Site name -->
+  <h1 class="text-lg font-semibold">MySite</h1>
+</div>
 
-  <!-- Header -->
-  <header class="flex items-center justify-between bg-white p-4 shadow">
-    <!-- Hamburger -->
-    <button id="menu-btn" class="text-2xl">&#9776;</button>
+<!-- Auth button -->
+<div>
+  <button id="authBtn" class="bg-blue-600 text-white px-4 py-1 rounded-md hover:bg-blue-700">Login</button>
+</div>
 
-    <!-- Site name -->
-    <h1 class="text-xl font-bold">MySite</h1>
-
-    <!-- Login / Logout -->
-    <button id="auth-btn" class="bg-blue-500 text-white px-4 py-1 rounded">Login</button>
-  </header>
-
-  <!-- Sidebar -->
-  <aside id="sidebar" class="fixed top-0 left-0 w-64 h-full bg-white shadow transform -translate-x-full transition-transform duration-300">
+  </header>  <!-- Overlay (for closing sidebar on outside click) -->  <div id="overlay" class="fixed inset-0 bg-black/40 hidden z-30"></div>  <!-- Sidebar -->  <aside id="sidebar" class="fixed inset-y-0 left-0 w-80 max-w-full bg-white shadow-lg transform -translate-x-full transition-transform duration-300 z-40">
     <div class="p-4">
-      <!-- User Info -->
-      <div class="flex items-center space-x-3 mb-4">
-        <img id="user-avatar" src="https://via.placeholder.com/50" class="w-12 h-12 rounded-full" alt="avatar">
-        <div>
-          <p id="user-name" class="font-bold">Guest</p>
-          <p id="user-role" class="text-sm text-gray-500">Role</p>
-          <p id="user-balance" class="text-sm text-green-600">Balance: 0</p>
-        </div>
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-semibold">Profile</h2>
+        <button id="closeSidebar" class="p-2 rounded-md hover:bg-gray-100 focus:outline-none">
+          <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div><div class="mt-4 border-t pt-4">
+    <!-- User Info -->
+    <div class="flex items-center gap-3">
+      <img id="userAvatar" src="" alt="avatar" class="w-14 h-14 rounded-full object-cover avatar-fallback">
+      <div>
+        <div id="userName" class="font-semibold">Guest</div>
+        <div id="userRole" class="text-sm text-gray-500">Role</div>
+        <div id="userBalance" class="text-sm text-green-600">Balance: ৳0</div>
       </div>
-      <!-- Email & Phone -->
-      <p id="user-email" class="text-sm text-gray-700">Email: -</p>
-      <p id="user-phone" class="text-sm text-gray-700">Phone: -</p>
     </div>
-  </aside>
 
-  <script type="module">
-    // Firebase config
+    <div class="mt-4 text-sm text-gray-700 space-y-1">
+      <div><strong>Email:</strong> <span id="userEmail">-</span></div>
+      <div><strong>Phone:</strong> <span id="userPhone">-</span></div>
+      <div class="pt-2 text-xs text-gray-500">(Data loads from Firebase Auth + Firestore users/&lt;uid&gt;)</div>
+    </div>
+
+    <div class="mt-6">
+      <button id="openProfileBtn" class="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100">View full profile</button>
+    </div>
+  </div>
+</div>
+
+  </aside>  <!-- Main content placeholder -->  <main class="p-6">
+    <p class="text-gray-700">Main page content here. Click the hamburger to open the sidebar.</p>
+  </main>  <!-- Firebase + logic (ES modules, v9+) -->  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
+    import {
+      getAuth,
+      onAuthStateChanged,
+      GoogleAuthProvider,
+      signInWithPopup,
+      signOut
+    } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js';
+    import {
+      getFirestore,
+      doc,
+      getDoc,
+      setDoc
+    } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
+
+    // ======= REPLACE with your Firebase config =======
     const firebaseConfig = {
       apiKey: "YOUR_API_KEY",
       authDomain: "YOUR_PROJECT.firebaseapp.com",
       projectId: "YOUR_PROJECT_ID",
+      // optional: storageBucket, messagingSenderId, appId
     };
+    // =================================================
 
-    const app = firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
     // Elements
-    const menuBtn = document.getElementById("menu-btn");
-    const sidebar = document.getElementById("sidebar");
-    const authBtn = document.getElementById("auth-btn");
+    const menuBtn = document.getElementById('menuBtn');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    const closeSidebar = document.getElementById('closeSidebar');
 
-    const userName = document.getElementById("user-name");
-    const userRole = document.getElementById("user-role");
-    const userBalance = document.getElementById("user-balance");
-    const userAvatar = document.getElementById("user-avatar");
-    const userEmail = document.getElementById("user-email");
-    const userPhone = document.getElementById("user-phone");
+    const authBtn = document.getElementById('authBtn');
+    const userAvatar = document.getElementById('userAvatar');
+    const userName = document.getElementById('userName');
+    const userRole = document.getElementById('userRole');
+    const userBalance = document.getElementById('userBalance');
+    const userEmail = document.getElementById('userEmail');
+    const userPhone = document.getElementById('userPhone');
 
-    // Sidebar toggle
-    menuBtn.addEventListener("click", () => {
-      sidebar.classList.toggle("-translate-x-full");
+    // Sidebar helpers
+    function openSidebar() {
+      sidebar.classList.remove('-translate-x-full');
+      overlay.classList.remove('hidden');
+      menuBtn.setAttribute('aria-expanded', 'true');
+    }
+    function closeSide() {
+      sidebar.classList.add('-translate-x-full');
+      overlay.classList.add('hidden');
+      menuBtn.setAttribute('aria-expanded', 'false');
+    }
+
+    menuBtn.addEventListener('click', () => {
+      const isOpen = !sidebar.classList.contains('-translate-x-full');
+      if (isOpen) closeSide(); else openSidebar();
     });
+
+    closeSidebar.addEventListener('click', closeSide);
+    overlay.addEventListener('click', closeSide);
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSide(); });
+
+    // Format helpers
+    function fmtAmount(n) { return '৳' + (Number(n || 0)).toLocaleString(); }
 
     // Auth state
-    auth.onAuthStateChanged(async (user) => {
-      if (user) {
-        authBtn.textContent = "Logout";
+    onAuthStateChanged(auth, async (user) => {
+      try {
+        if (user) {
+          authBtn.textContent = 'Logout';
 
-        // Display user info
-        userName.textContent = user.displayName || "No Name";
-        userEmail.textContent = "Email: " + (user.email || "-");
-        userPhone.textContent = "Phone: " + (user.phoneNumber || "-");
-        userAvatar.src = user.photoURL || "https://via.placeholder.com/50";
+          // Basic info from Auth
+          userName.textContent = user.displayName || (user.email ? user.email.split('@')[0] : 'User');
+          userEmail.textContent = user.email || '-';
+          userPhone.textContent = user.phoneNumber || '-';
+          userAvatar.src = user.photoURL || '';
+          if (!user.photoURL) userAvatar.classList.add('avatar-fallback'); else userAvatar.classList.remove('avatar-fallback');
 
-        // Get Firestore user data
-        const doc = await db.collection("users").doc(user.uid).get();
-        if (doc.exists) {
-          const data = doc.data();
-          userRole.textContent = data.role || "User";
-          userBalance.textContent = "Balance: " + (data.balance || 0);
+          // Try to read Firestore user doc
+          const userDocRef = doc(db, 'users', user.uid);
+          const snap = await getDoc(userDocRef);
+          if (snap.exists()) {
+            const data = snap.data();
+            userRole.textContent = data.role || 'User';
+            userBalance.textContent = 'Balance: ' + fmtAmount(data.balance || 0);
+          } else {
+            // create default profile doc (merge to avoid overwriting)
+            await setDoc(userDocRef, { role: 'User', balance: 0, weeklyTotal: 0, weeklyDiamonds: 0 }, { merge: true });
+            userRole.textContent = 'User';
+            userBalance.textContent = 'Balance: ' + fmtAmount(0);
+          }
+
+        } else {
+          // logged out
+          authBtn.textContent = 'Login';
+          userName.textContent = 'Guest';
+          userRole.textContent = 'Role';
+          userBalance.textContent = 'Balance: ' + fmtAmount(0);
+          userEmail.textContent = '-';
+          userPhone.textContent = '-';
+          userAvatar.src = '';
+          userAvatar.classList.add('avatar-fallback');
         }
-      } else {
-        authBtn.textContent = "Login";
-        userName.textContent = "Guest";
-        userEmail.textContent = "Email: -";
-        userPhone.textContent = "Phone: -";
-        userRole.textContent = "Role";
-        userBalance.textContent = "Balance: 0";
-        userAvatar.src = "https://via.placeholder.com/50";
+      } catch (err) {
+        console.error('Auth handling error', err);
       }
     });
 
-    // Login/Logout toggle
-    authBtn.addEventListener("click", async () => {
-      if (auth.currentUser) {
-        await auth.signOut();
-      } else {
-        const provider = new firebase.auth.GoogleAuthProvider();
-        await auth.signInWithPopup(provider);
+    // Login/Logout
+    authBtn.addEventListener('click', async () => {
+      try {
+        if (auth.currentUser) {
+          await signOut(auth);
+        } else {
+          const provider = new GoogleAuthProvider();
+          await signInWithPopup(auth, provider);
+        }
+      } catch (err) {
+        console.error('Auth action error', err);
+        alert('Auth error: ' + (err.message || err));
       }
     });
-  </script>
-</body>
+
+  </script></body>
 </html>
