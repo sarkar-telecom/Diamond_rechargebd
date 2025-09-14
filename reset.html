@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Reset Password - Sarkar Telecom</title>
+
+<link href="assets/style.css" rel="stylesheet"/></head>
+<body><button class="hamburger" onclick="toggleSidebar()">☰</button>
+<div class="card">
+<h2>🔑 Reset Password</h2>
+<input id="newPass" placeholder="Enter new password" type="password"/>
+<button onclick="resetPassword()">Reset Password</button>
+<p class="msg" id="msg"></p>
+</div>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+    import { getAuth, confirmPasswordReset } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBIIOv-2Laqugv5_HAIRNJllp8YUfYndF8",
+      authDomain: "diamond-recharge-f7f59.firebaseapp.com",
+      projectId: "diamond-recharge-f7f59",
+      storageBucket: "diamond-recharge-f7f59.appspot.com",
+      messagingSenderId: "657717928489",
+      appId: "1:657717928489:web:70431ebc9afb7002d4b238"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    const msgEl=document.getElementById("msg");
+
+    function getParam(name){
+      return new URL(window.location.href).searchParams.get(name);
+    }
+
+    window.resetPassword=()=>{
+      const oobCode=getParam("oobCode");
+      const newPass=document.getElementById("newPass").value.trim();
+      if(!newPass){ msgEl.textContent="⚠️ Enter new password"; return; }
+      confirmPasswordReset(auth,oobCode,newPass)
+        .then(()=>{
+          msgEl.textContent="✅ Password reset successful! Redirecting...";
+          setTimeout(()=>window.location.href="login.html",1500);
+        })
+        .catch(e=>msgEl.textContent="❌ "+e.message);
+    };
+  </script>
+<script>
+        function toggleSidebar() {
+          document.querySelector('.sidebar').classList.toggle('active');
+        }
+        </script></body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Logging Out...</title>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    // Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyDJRm9-jRkxVrTLYBzK1gGrRmAEu29jVrU",
+      authDomain: "diamond-recharge-f7f59.firebaseapp.com",
+      projectId: "diamond-recharge-f7f59",
+      storageBucket: "diamond-recharge-f7f59.appspot.com",
+      messagingSenderId: "657717928489",
+      appId: "1:657717928489:web:70431ebc9afb7002d4b238",
+      measurementId: "G-TDK78BQ8SQ"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    async function doLogout() {
+      try {
+        await signOut(auth);
+        localStorage.removeItem("user");
+        document.getElementById("msg").innerText = "✅ Logout successful!";
+        setTimeout(() => {
+          window.location.href = "login.html";
+        }, 1500);
+      } catch (err) {
+        document.getElementById("msg").innerText = "❌ Logout failed: " + err.message;
+      }
+    }
+
+    doLogout();
+  </script>
+<link href="assets/style.css" rel="stylesheet"/></head>
+<body><button class="hamburger" onclick="toggleSidebar()">☰</button>
+<div class="box">
+<h2 id="msg">Logging you out...</h2>
+<div class="loader"></div>
+</div>
+<script>
+        function toggleSidebar() {
+          document.querySelector('.sidebar').classList.toggle('active');
+        }
+        </script></body>
+</html>

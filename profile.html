@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Profile - Sarkar Telecom</title>
+
+<link href="assets/style.css" rel="stylesheet"/></head>
+<body><button class="hamburger" onclick="toggleSidebar()">☰</button>
+<header>
+<span>👤 Sarkar Telecom – Profile</span>
+<div>
+<span class="user-info" id="userInfo">🔄 Checking...</span>
+<button class="auth-btn" id="authBtn">Login</button>
+</div>
+</header>
+<div class="container">
+<h2>My Profile</h2>
+<div class="profile-box" id="profileBox">
+<p>Loading profile...</p>
+</div>
+<!-- Edit Profile Form -->
+<div id="editSection">
+<h2>Edit Profile</h2>
+<form id="editForm">
+<input id="nameInput" placeholder="Full Name" type="text"/><br/>
+<input id="phoneInput" placeholder="Phone" type="text"/><br/>
+<input id="avatarInput" placeholder="Avatar URL" type="text"/><br/>
+<button class="btn" type="submit">Update Profile</button>
+</form>
+<h2>Change Password</h2>
+<form id="passForm">
+<input id="oldPass" placeholder="Old Password" type="password"/><br/>
+<input id="newPass" placeholder="New Password" type="password"/><br/>
+<button class="btn" type="submit">Change Password</button>
+</form>
+</div>
+</div>
+<!-- Footer container -->
+<div id="footer-container"></div>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyBIIOv-2Laqugv5_HAIRNJllp8YUfYndF8",
+      authDomain: "diamond-recharge-f7f59.firebaseapp.com",
+      projectId: "diamond-recharge-f7f59",
+      storageBucket: "diamond-recharge-f7f59.appspot.com",
+      messagingSenderId: "657717928489",
+      appId: "1:657717928489:web:70431ebc9afb7002d4b238"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const userInfo=document.getElementById("userInfo");
+    const authBtn=document.getElementById("authBtn");
+    const profileBox=document.getElementById("profileBox");
+    const editSection=document.getElementById("editSection");
+
+    const nameInput=document.getElementById("nameInput");
+    const phoneInput=document.getElementById("phoneInput");
+    const avatarInput=document.getElementById("avatarInput");
+
+    const oldPass=document.getElementById("oldPass");
+    const newPass=document.getElementById("newPass");
+
+    let currentUser=null;
+
+    // Auth state
+    onAuthStateChanged(auth, async (user)=>{
+      if(user){
+        currentUser=user;
+        userInfo.textContent="👤 "+(user.displayName || user.email);
+        authBtn.textContent="Logout";
+        authBtn.classList.add("logout");
+        authBtn.onclick=()=>signOut(auth);
+
+        try {
+          const ref=doc(db,"users",user.uid);
+          const snap=await getDoc(ref);
+          const data=snap.exists()?snap.data():{};
+
+          profileBox.innerHTML=`
+            <img src="${data.avatar || user.photoURL || 'https://i.ibb.co/3pPYd14/user.png'}" width="120">
+            <h3>${data.name || user.displayName || "No Name"} <span style="color:orange">(${data.role || "User"})</span></h3>
+            <p>💎 Balance: <span style="color:lime">${data.balance ?? 0}</span></p>
+            <p>📱 Phone: <span style="color:gold">${data.phone ?? "N/A"}</span></p>
+            <p>📧 Email: <span style="color:skyblue">${user.email}</span></p>
+          `;
+
+          // form values fill
+          nameInput.value=data.name || "";
+          phoneInput.value=data.phone || "";
+          avatarInput.value=data.avatar || "";
+
+          // show forms
+          editSection.style.display="block";
+
+        } catch(e){
+          console.error(e);
+        }
+      } else {
+        currentUser=null;
+        userInfo.textContent="❌ Not logged in";
+        authBtn.textContent="Login";
+        authBtn.classList.remove("logout");
+        authBtn.onclick=()=>window.location.href="login.html";
+
+        profileBox.innerHTML="<p style='color:red;'>❌ Please login to view profile.</p>";
+        editSection.style.display="none"; // hide forms
+      }
+    });
+
+    // Profile update
+    document.getElementById("editForm").addEventListener("submit", async (e)=>{
+      e.preventDefault();
+      if(!currentUser) return alert("Login first!");
+      try {
+        await setDoc(doc(db,"users",currentUser.uid),{
+          name:nameInput.value,
+          phone:phoneInput.value,
+          avatar:avatarInput.value
+        },{merge:true});
+        alert("✅ Profile updated!");
+        location.reload();
+      } catch(e){
+        alert("❌ Update failed!");
+      }
+    });
+
+    // Password change
+    document.getElementById("passForm").addEventListener("submit", async (e)=>{
+      e.preventDefault();
+      if(!currentUser) return alert("Login first!");
+
+      const cred = EmailAuthProvider.credential(currentUser.email, oldPass.value);
+      try {
+        await reauthenticateWithCredential(currentUser, cred);
+        await updatePassword(currentUser, newPass.value);
+        alert("✅ Password updated!");
+        oldPass.value=""; newPass.value="";
+      } catch(e){
+        alert("❌ "+e.message);
+      }
+    });
+
+   // Load footer
+    fetch("footer.html")
+      .then(res => res.text())
+      .then(html => {
+        document.getElementById("footer-container").innerHTML = html;
+        attachUserBox(); 
+      })
+      .catch(err=>console.error("Footer load error:", err));
+
+    // Attach user info in footer
+    async function attachUserBox() {
+      const userBox = document.getElementById("userBox");
+      if(!userBox) return;
+
+      onAuthStateChanged(auth, async (user)=>{
+        if(user){
+          const ref = doc(db, "users", user.uid);
+          const snap = await getDoc(ref);
+          const data = snap.exists() ? snap.data() : {};
+          const bal = data.balance ?? 0;
+          const role = data.role ?? "User";
+          const phone = data.phone ?? "N/A";
+
+          userBox.innerHTML = `
+            <img src="${data.avatar || user.photoURL || 'https://i.ibb.co/3pPYd14/user.png'}" width="100" style="border-radius:50%;border:3px solid #06b6d4;">
+            <div class="user-details">
+              <h3>${data.name || user.displayName || "No Name"} <span style="color:orange">(${role})</span></h3>
+              <p>💎 <span style="color:lime">${bal}</span></p>
+              <p>📱 <span style="color:gold">${phone}</span></p>
+              <p>📧 <span style="color:skyblue">${user.email ?? "No Email"}</span></p>
+            </div>
+          `;
+        } else {
+          userBox.innerHTML = "<p style='color:red;'>❌ Not logged in</p>";
+        }
+      });
+    }
+  </script>
+<script>
+        function toggleSidebar() {
+          document.querySelector('.sidebar').classList.toggle('active');
+        }
+        </script></body>
+</html>

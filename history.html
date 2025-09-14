@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Order History - Sarkar Telecom</title>
+
+<link href="assets/style.css" rel="stylesheet"/></head>
+<body><button class="hamburger" onclick="toggleSidebar()">☰</button>
+<header>
+<div class="top-row">
+<div class="site-info">
+<img alt="Logo" class="site-logo" src="https://sarkar-telecom.github.io/Topup/logo.png"/>
+<span class="site-name">SARKAR TELECOM</span>
+</div>
+<div class="user-info" id="userInfo"></div>
+</div>
+<div class="nav-row">
+<a href="dashboard.html">Dashboard</a>
+<a href="order.html">Order</a>
+<a href="order-history.html">Order History</a>
+<a href="profile.html">Profile</a>
+</div>
+</header>
+<h2>📜 Order History</h2>
+<!-- Table View -->
+<table>
+<thead>
+<tr>
+<th>SL</th>
+<th>Profile ID</th>
+<th>Amount</th>
+<th>Status</th>
+<th>Time</th>
+</tr>
+</thead>
+<tbody id="orderTable"></tbody>
+</table>
+<!-- Card View -->
+<div id="cardContainer"></div>
+<!-- Firebase -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+  import { getFirestore, collection, query, orderBy, onSnapshot, doc, getDoc, where } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBIIOv-2Laqugv5_HAIRNJllp8YUfYndF8",
+    authDomain: "diamond-recharge-f7f59.firebaseapp.com",
+    projectId: "diamond-recharge-f7f59",
+    storageBucket: "diamond-recharge-f7f59.appspot.com",
+    messagingSenderId: "657717928489",
+    appId: "1:657717928489:web:70431ebc9afb7002d4b238",
+    measurementId: "G-TDK78BQ8SQ"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  const userInfo = document.getElementById("userInfo");
+  const orderTable = document.getElementById("orderTable");
+  const cardContainer = document.getElementById("cardContainer");
+
+  // 🔐 User State
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      let balance = 0;
+      let avatarUrl = user.photoURL || "https://via.placeholder.com/40";
+
+      try {
+        const snap = await getDoc(doc(db, "users", user.uid));
+        if (snap.exists()) {
+          const data = snap.data();
+          balance = data.balance || 0;
+          if (data.avatar) avatarUrl = data.avatar;
+        }
+      } catch (e) {
+        console.error(e);
+      }
+
+      userInfo.innerHTML = `
+        <img src="${avatarUrl}" class="user-avatar" alt="User">
+        <div class="user-box">${user.email}</div>
+        <div class="user-box balance">💎 ${balance}</div>
+        <button class="btn logout" id="logoutBtn">Logout</button>
+      `;
+      document.getElementById("logoutBtn").addEventListener("click", async () => {
+        await signOut(auth);
+        window.location.href = "login.html";
+      });
+
+      loadOrders(user.phoneNumber || user.email);
+
+    } else {
+      userInfo.innerHTML = `<button class="btn login" onclick="window.location.href='login.html'">Login</button>`;
+    }
+  });
+
+  function renderOrders(orders) {
+    orderTable.innerHTML = "";
+    cardContainer.innerHTML = "";
+
+    orders.forEach((data, i) => {
+      let statusClass = "waiting", statusSymbol = "⏳";
+      if (data.status === "COMPLETED") { statusClass = "completed"; statusSymbol = "✅"; }
+      else if (data.status === "CANCELLED") { statusClass = "cancelled"; statusSymbol = "🚫"; }
+
+      const timeStr = data.createdAt?.toDate
+        ? data.createdAt.toDate().toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"})
+        : "-";
+
+      // Table Row
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${orders.length - i}</td>
+        <td>${data.profileId || "-"}</td>
+        <td>${data.amount || "-"}</td>
+        <td><span class="status-box ${statusClass}">${statusSymbol}</span></td>
+        <td>${timeStr}</td>
+      `;
+      orderTable.appendChild(tr);
+
+      // Card View
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `
+        <p><b>SL:</b> ${orders.length - i}</p>
+        <p><b>Profile ID:</b> ${data.profileId || "-"}</p>
+        <p><b>Amount:</b> ${data.amount || "-"}</p>
+        <p><b>Status:</b> <span class="status-box ${statusClass}">${statusSymbol}</span></p>
+        <p><b>Time:</b> ${timeStr}</p>
+      `;
+      cardContainer.appendChild(card);
+    });
+  }
+
+  function loadOrders(userKey) {
+    const q = query(collection(db, "orders"), where("profileId", "==", userKey), orderBy("createdAt", "desc"));
+    onSnapshot(q, (snapshot) => {
+      const orders = snapshot.docs.map(doc => doc.data());
+      renderOrders(orders);
+    });
+  }
+</script>
+<script>
+        function toggleSidebar() {
+          document.querySelector('.sidebar').classList.toggle('active');
+        }
+        </script></body>
+</html>
