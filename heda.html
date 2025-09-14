@@ -4,64 +4,73 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Header + Sidebar (Firebase Auth)</title>
+  <title>Header + Sidebar (Firebase Auth) — Header shows user info</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
+    /* small avatar fallback styling */
     .avatar-fallback { background: linear-gradient(135deg,#e2e8f0,#cbd5e1); display:inline-block }
   </style>
 </head>
-<body class="bg-gray-100 min-h-screen">  <!-- Header -->  <header class="flex items-center justify-between bg-white p-4 shadow-md">
+<body class="bg-gray-100 min-h-screen">  <!-- Header -->  <header class="flex items-center justify-between bg-white p-4 shadow-md relative">
     <div class="flex items-center gap-3">
       <!-- Hamburger -->
-      <button id="menuBtn" aria-controls="sidebar" aria-expanded="false" class="p-2 rounded-md hover:bg-gray-100 focus:outline-none focus:ring">
-        <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <button id="menuBtn" aria-controls="sidebar" aria-expanded="false" class="p-2 rounded-md hover:bg-gray-100 focus:outline-none" title="Toggle menu">
+        <svg class="w-6 h-6 text-gray-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
         </svg>
-      </button>
-      <h1 class="text-lg font-semibold">MySite</h1>
+      </button><!-- Site name -->
+  <h1 class="text-lg font-semibold text-gray-800">MySite</h1>
+</div>
+
+<!-- Right: user info + auth -->
+<div class="flex items-center gap-4">
+  <!-- Inline user info (avatar + name(role) + balance) -->
+  <div id="headerUser" class="relative flex items-center gap-3 cursor-pointer">
+    <img id="headerAvatar" src="" alt="avatar" class="w-10 h-10 rounded-full object-cover avatar-fallback border"/>
+    <div class="hidden sm:flex flex-col text-right">
+      <span id="headerName" class="text-sm font-medium text-gray-800">Guest</span>
+      <span id="headerRole" class="text-xs text-gray-500">Role</span>
     </div>
-    <div>
-      <button id="authBtn" class="bg-blue-600 text-white px-4 py-1 rounded-md hover:bg-blue-700">Login</button>
+    <div id="headerBalance" class="ml-3 text-sm text-green-600 font-semibold">৳0</div>
+
+    <!-- dropdown with email & phone -->
+    <div id="userDropdown" class="absolute right-0 mt-14 mr-0 w-64 bg-white border rounded shadow-lg p-3 hidden z-50">
+      <div class="text-sm text-gray-700"><strong>Email:</strong> <span id="headerEmail">-</span></div>
+      <div class="text-sm text-gray-700"><strong>Phone:</strong> <span id="headerPhone">-</span></div>
+      <div class="mt-2 text-xs text-gray-500">(Data from Firestore users/&lt;uid&gt; or Auth)</div>
     </div>
-  </header>  <!-- Overlay -->  <div id="overlay" class="fixed inset-0 bg-black/40 hidden z-30"></div>  <!-- Sidebar -->  <aside id="sidebar" class="fixed inset-y-0 left-0 w-80 max-w-full bg-white shadow-lg transform -translate-x-full transition-transform duration-300 z-40">
+  </div>
+
+  <!-- Auth button -->
+  <button id="authBtn" class="bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700">Login</button>
+</div>
+
+  </header>  <!-- Overlay (closes sidebar) -->  <div id="overlay" class="fixed inset-0 bg-black/40 hidden z-30"></div>  <!-- Sidebar (navigation only) -->  <aside id="sidebar" class="fixed inset-y-0 left-0 w-64 bg-white shadow transform -translate-x-full transition-transform duration-300 z-40">
     <div class="p-4">
-      <div class="flex items-center justify-between">
-        <h2 class="text-lg font-semibold">Profile</h2>
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold">Navigation</h2>
         <button id="closeSidebar" class="p-2 rounded-md hover:bg-gray-100 focus:outline-none">
-          <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <svg class="w-5 h-5 text-gray-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
-      </div><div class="mt-4 border-t pt-4">
-    <div class="flex items-center gap-3">
-      <img id="userAvatar" src="" alt="avatar" class="w-14 h-14 rounded-full object-cover avatar-fallback">
-      <div>
-        <div id="userName" class="font-semibold">Guest</div>
-        <div id="userRole" class="text-sm text-gray-500">Role</div>
-        <div id="userBalance" class="text-sm text-green-600">Balance: ৳0</div>
-      </div>
-    </div>
-
-    <div class="mt-4 text-sm text-gray-700 space-y-1">
-      <div><strong>Email:</strong> <span id="userEmail">-</span></div>
-      <div><strong>Phone:</strong> <span id="userPhone">-</span></div>
-      <div class="pt-2 text-xs text-gray-500">(Data loads from Firebase Auth + Firestore users/&lt;uid&gt;)</div>
-    </div>
-
-    <div class="mt-6">
-      <button id="openProfileBtn" class="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100">View full profile</button>
-    </div>
-  </div>
+      </div><nav class="space-y-2">
+    <a href="#" class="block px-3 py-2 rounded hover:bg-gray-100">Dashboard</a>
+    <a href="#" class="block px-3 py-2 rounded hover:bg-gray-100">Orders</a>
+    <a href="#" class="block px-3 py-2 rounded hover:bg-gray-100">Recharge</a>
+    <a href="#" class="block px-3 py-2 rounded hover:bg-gray-100">History</a>
+    <a href="#" class="block px-3 py-2 rounded hover:bg-gray-100">Settings</a>
+  </nav>
 </div>
 
-  </aside>  <main class="p-6">
-    <p class="text-gray-700">Main page content here. Click the hamburger to open the sidebar.</p>
-  </main>  <!-- Firebase + logic -->  <script type="module">
+  </aside>  <!-- Main content -->  <main class="p-6 ml-0 lg:ml-0">
+    <p class="text-gray-700">Main page content here. The header shows user info; sidebar is navigation.</p>
+  </main>  <!-- Firebase + logic (v9 modular) -->  <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
-    import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js';
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js';
     import { getFirestore, doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
 
-    // ✅ Your Firebase config (corrected)
+    // ======= Your Firebase config (already corrected) =======
     const firebaseConfig = {
       apiKey: "AIzaSyAyhjOsIXNAkBglpRllt0OZIOJYpdB_9-8",
       authDomain: "diamond-recharge-f7f59.firebaseapp.com",
@@ -71,24 +80,30 @@
       appId: "1:657717928489:web:70431ebc9afb7002d4b238",
       measurementId: "G-TDK78BQ8SQ"
     };
+    // =======================================================
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
+    const provider = new GoogleAuthProvider();
 
+    // Elements
     const menuBtn = document.getElementById('menuBtn');
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('overlay');
     const closeSidebar = document.getElementById('closeSidebar');
 
     const authBtn = document.getElementById('authBtn');
-    const userAvatar = document.getElementById('userAvatar');
-    const userName = document.getElementById('userName');
-    const userRole = document.getElementById('userRole');
-    const userBalance = document.getElementById('userBalance');
-    const userEmail = document.getElementById('userEmail');
-    const userPhone = document.getElementById('userPhone');
+    const headerAvatar = document.getElementById('headerAvatar');
+    const headerName = document.getElementById('headerName');
+    const headerRole = document.getElementById('headerRole');
+    const headerBalance = document.getElementById('headerBalance');
+    const headerEmail = document.getElementById('headerEmail');
+    const headerPhone = document.getElementById('headerPhone');
+    const headerUser = document.getElementById('headerUser');
+    const userDropdown = document.getElementById('userDropdown');
 
+    // Sidebar helpers
     function openSidebar() {
       sidebar.classList.remove('-translate-x-full');
       overlay.classList.remove('hidden');
@@ -104,54 +119,80 @@
       const isOpen = !sidebar.classList.contains('-translate-x-full');
       if (isOpen) closeSide(); else openSidebar();
     });
-
     closeSidebar.addEventListener('click', closeSide);
     overlay.addEventListener('click', closeSide);
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSide(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeSide(); userDropdown.classList.add('hidden'); } });
+
+    // Toggle user dropdown (email + phone)
+    headerUser.addEventListener('click', (e) => {
+      e.stopPropagation();
+      userDropdown.classList.toggle('hidden');
+    });
+    // close dropdown on outside click
+    document.addEventListener('click', () => { userDropdown.classList.add('hidden'); });
 
     function fmtAmount(n) { return '৳' + (Number(n || 0)).toLocaleString(); }
 
+    // Auth state handling: prefer Firestore for name/avatar/email/phone/role/balance
     onAuthStateChanged(auth, async (user) => {
       try {
         if (user) {
           authBtn.textContent = 'Logout';
-          userName.textContent = user.displayName || (user.email ? user.email.split('@')[0] : 'User');
-          userEmail.textContent = user.email || '-';
-          userPhone.textContent = user.phoneNumber || '-';
-          userAvatar.src = user.photoURL || '';
 
           const userDocRef = doc(db, 'users', user.uid);
-          const snap = await getDoc(userDocRef);
-          if (snap.exists()) {
-            const data = snap.data();
-            userRole.textContent = data.role || 'User';
-            userBalance.textContent = 'Balance: ' + fmtAmount(data.balance || 0);
-          } else {
-            await setDoc(userDocRef, { role: 'User', balance: 0, weeklyTotal: 0, weeklyDiamonds: 0 }, { merge: true });
-            userRole.textContent = 'User';
-            userBalance.textContent = 'Balance: ' + fmtAmount(0);
+          let snap = await getDoc(userDocRef);
+
+          if (!snap.exists()) {
+            // create default doc using available auth info
+            await setDoc(userDocRef, {
+              name: user.displayName || '',
+              email: user.email || '',
+              phone: user.phoneNumber || '',
+              avatar: user.photoURL || '',
+              role: 'user',
+              balance: 0,
+              weeklyTotal: 0,
+              weeklyDiamonds: 0
+            }, { merge: true });
+            snap = await getDoc(userDocRef);
           }
+
+          const data = snap.data() || {};
+
+          // header values (prefer Firestore fields, fallback to Auth)
+          headerAvatar.src = data.avatar || user.photoURL || '';
+          if (!headerAvatar.src) headerAvatar.classList.add('avatar-fallback'); else headerAvatar.classList.remove('avatar-fallback');
+
+          headerName.textContent = data.name || user.displayName || (user.email ? user.email.split('@')[0] : 'User');
+          headerRole.textContent = data.role || 'User';
+          headerBalance.textContent = fmtAmount(data.balance || 0);
+
+          headerEmail.textContent = data.email || user.email || '-';
+          headerPhone.textContent = data.phone || user.phoneNumber || '-';
+
         } else {
+          // logged out
           authBtn.textContent = 'Login';
-          userName.textContent = 'Guest';
-          userRole.textContent = 'Role';
-          userBalance.textContent = 'Balance: ' + fmtAmount(0);
-          userEmail.textContent = '-';
-          userPhone.textContent = '-';
-          userAvatar.src = '';
+          headerAvatar.src = '';
+          headerAvatar.classList.add('avatar-fallback');
+          headerName.textContent = 'Guest';
+          headerRole.textContent = 'Role';
+          headerBalance.textContent = fmtAmount(0);
+          headerEmail.textContent = '-';
+          headerPhone.textContent = '-';
         }
       } catch (err) {
         console.error('Auth handling error', err);
       }
     });
 
+    // Login / Logout
     authBtn.addEventListener('click', async () => {
       try {
         if (auth.currentUser) {
           await signOut(auth);
         } else {
-          const provider = new GoogleAuthProvider();
-          await signInWithPopup(auth, provider);
+          await signInWithPopup(auth, new GoogleAuthProvider());
         }
       } catch (err) {
         console.error('Auth action error', err);
