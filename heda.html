@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Header with Sidebar</title>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+
+  <!-- Header -->
+  <header class="flex items-center justify-between bg-white p-4 shadow">
+    <!-- Hamburger -->
+    <button id="menu-btn" class="text-2xl">&#9776;</button>
+
+    <!-- Site name -->
+    <h1 class="text-xl font-bold">MySite</h1>
+
+    <!-- Login / Logout -->
+    <button id="auth-btn" class="bg-blue-500 text-white px-4 py-1 rounded">Login</button>
+  </header>
+
+  <!-- Sidebar -->
+  <aside id="sidebar" class="fixed top-0 left-0 w-64 h-full bg-white shadow transform -translate-x-full transition-transform duration-300">
+    <div class="p-4">
+      <!-- User Info -->
+      <div class="flex items-center space-x-3 mb-4">
+        <img id="user-avatar" src="https://via.placeholder.com/50" class="w-12 h-12 rounded-full" alt="avatar">
+        <div>
+          <p id="user-name" class="font-bold">Guest</p>
+          <p id="user-role" class="text-sm text-gray-500">Role</p>
+          <p id="user-balance" class="text-sm text-green-600">Balance: 0</p>
+        </div>
+      </div>
+      <!-- Email & Phone -->
+      <p id="user-email" class="text-sm text-gray-700">Email: -</p>
+      <p id="user-phone" class="text-sm text-gray-700">Phone: -</p>
+    </div>
+  </aside>
+
+  <script type="module">
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+    };
+
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // Elements
+    const menuBtn = document.getElementById("menu-btn");
+    const sidebar = document.getElementById("sidebar");
+    const authBtn = document.getElementById("auth-btn");
+
+    const userName = document.getElementById("user-name");
+    const userRole = document.getElementById("user-role");
+    const userBalance = document.getElementById("user-balance");
+    const userAvatar = document.getElementById("user-avatar");
+    const userEmail = document.getElementById("user-email");
+    const userPhone = document.getElementById("user-phone");
+
+    // Sidebar toggle
+    menuBtn.addEventListener("click", () => {
+      sidebar.classList.toggle("-translate-x-full");
+    });
+
+    // Auth state
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        authBtn.textContent = "Logout";
+
+        // Display user info
+        userName.textContent = user.displayName || "No Name";
+        userEmail.textContent = "Email: " + (user.email || "-");
+        userPhone.textContent = "Phone: " + (user.phoneNumber || "-");
+        userAvatar.src = user.photoURL || "https://via.placeholder.com/50";
+
+        // Get Firestore user data
+        const doc = await db.collection("users").doc(user.uid).get();
+        if (doc.exists) {
+          const data = doc.data();
+          userRole.textContent = data.role || "User";
+          userBalance.textContent = "Balance: " + (data.balance || 0);
+        }
+      } else {
+        authBtn.textContent = "Login";
+        userName.textContent = "Guest";
+        userEmail.textContent = "Email: -";
+        userPhone.textContent = "Phone: -";
+        userRole.textContent = "Role";
+        userBalance.textContent = "Balance: 0";
+        userAvatar.src = "https://via.placeholder.com/50";
+      }
+    });
+
+    // Login/Logout toggle
+    authBtn.addEventListener("click", async () => {
+      if (auth.currentUser) {
+        await auth.signOut();
+      } else {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        await auth.signInWithPopup(provider);
+      }
+    });
+  </script>
+</body>
+</html>
